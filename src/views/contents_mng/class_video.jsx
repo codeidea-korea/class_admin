@@ -1,4 +1,6 @@
 import { Lucide } from "@/base-components";
+import Default_img from '@/assets/images/default_image.jpg';
+import Person from '@/assets/images/img02.png';
 import { Link } from "react-router-dom";
 
 function ClassVideo() {
@@ -34,7 +36,7 @@ function ClassVideo() {
                   OOO 선생님<span className="sub">수학</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/img02.png" />
+                  <img src={Person} />
                 </div>
                 <div className="btnSet w-full">
                   <Link to="/class_video_view" className="w-full">
@@ -54,7 +56,7 @@ function ClassVideo() {
                   OOO 선생님<span className="sub">수학</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/default_image.jpg" />
+                  <img src={Default_img} />
                 </div>
                 <div className="btnSet">
                   <Link to="/class_video_view" className="w-full">
@@ -89,7 +91,7 @@ function ClassVideo() {
                   OOO 선생님<span className="sub">수학</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/img02.png" />
+                  <img src={Person} />
                 </div>
                 <div className="btnSet">
                   <Link to="/class_video_view" className="w-full">
