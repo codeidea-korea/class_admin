@@ -116,7 +116,7 @@ function Login() {
 										</Link>
 									</div>
 									<div className="intro-x mt-5 text-center ">
-										<Link to="/join_result">
+										<Link to="/join">
 											<button className="btn btn-primary py-3 px-4 w-full align-top">
 												회원가입
 											</button>
