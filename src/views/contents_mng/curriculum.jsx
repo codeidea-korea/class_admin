@@ -2,8 +2,10 @@ import { Lucide, Modal, ModalBody } from "@/base-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+import Default_img from "@/assets/images/default_image.jpg";
+import Person from "@/assets/images/img02.png";
+
 function CurriCulum() {
-  
   // 비디오 영상 모달
   const [video, videoDetail] = useState(false);
 
@@ -38,7 +40,7 @@ function CurriCulum() {
                   OOO 선생님<span className="sub">수학</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/img02.png" />
+                  <img src={Person} />
                 </div>
                 <div className="btnSet">
                   <button
@@ -65,7 +67,7 @@ function CurriCulum() {
                   OOO 선생님<span className="sub">수학</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/default_image.jpg" />
+                  <img src={Default_img} />
                 </div>
                 <div class="btnSet">
                   <button
@@ -107,7 +109,7 @@ function CurriCulum() {
                   OOO 선생님<span className="sub">물리</span>
                 </div>
                 <div className="thumb">
-                  <img src="./src/assets/images/pubimg/img02.png" />
+                  <img src={Person} />
                 </div>
                 <div className="btnSet">
                   <button

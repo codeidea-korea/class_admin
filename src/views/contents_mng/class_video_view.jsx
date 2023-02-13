@@ -2,6 +2,8 @@ import { Lucide, Modal, ModalBody } from "@/base-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+import Default_img from "@/assets/images/default_image.jpg";
+
 function ClassVideoView() {
   // 비디오 영상 모달
   const [video, videoDetail] = useState(false);
@@ -19,10 +21,7 @@ function ClassVideoView() {
         <div className="intro-y p-5">
           <div className="bg-slate-50 flex p-5 gap-6 w-1/2">
             <div className="profile_img">
-              <img
-                src="./src/assets/images/pubimg/default_image.jpg"
-                className="rounded-md"
-              />
+              <img src={Default_img} className="rounded-md" />
             </div>
             <div className="w-full flex flex-col gap-6">
               <div className="text-lg font-medium flex items-center">

@@ -11,6 +11,8 @@ import {
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+import Default_img from "@/assets/images/default_image.jpg";
+
 function CurriCulumView() {
   const [video, videoDetail] = useState(false);
 
@@ -28,10 +30,7 @@ function CurriCulumView() {
           <div className="intro-y p-5">
             <div className="bg-slate-50 flex items-center p-5 gap-6 w-1/2">
               <div className="profile_img">
-                <img
-                  src="./src/assets/images/pubimg/default_image.jpg"
-                  className="rounded-md"
-                />
+                <img src={Default_img} className="rounded-md" />
               </div>
               <div className="w-full flex flex-col gap-6">
                 <div className="text-lg font-medium flex items-center">

@@ -1,7 +1,8 @@
 import { Lucide } from "@/base-components";
+import { Link } from "react-router-dom";
+
 import Default_img from '@/assets/images/default_image.jpg';
 import Person from '@/assets/images/img02.png';
-import { Link } from "react-router-dom";
 
 function ClassVideo() {
 
