@@ -138,6 +138,8 @@ function CurriCulumView() {
           </TabPanel>
         </TabPanels>
       </TabGroup>
+
+      
       {/* BEGIN: Modal 영상보기 */}
       <Modal
         size="modal-xl"

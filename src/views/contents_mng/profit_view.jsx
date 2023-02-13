@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 function ProfitView() {
   return (
     <>
-      {/* BEGIN: 관리자 계정 초대 */}
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">혜택</div>
@@ -48,7 +47,6 @@ function ProfitView() {
           </div>
         </div>
       </div>
-      {/* END: Page Layout */}
     </>
   );
 }

@@ -21,7 +21,6 @@ function CoverletterMng() {
 
   return (
     <>
-      {/* BEGIN: Page Layout */}
       <div className="intro-y box p-5 mt-5">
         <div className="p-5 bg-slate-50">
           <div className="font-bold text-lg">자기소개서 편집 설정 방법</div>
@@ -450,7 +449,6 @@ function CoverletterMng() {
           </TabPanels>
         </TabGroup>
       </div>
-      {/* END: Page Layout */}
     </>
   );
 }

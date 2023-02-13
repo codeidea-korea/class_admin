@@ -25,7 +25,6 @@ function ClassVideoForm() {
   };
   return (
     <>
-      {/* BEGIN: 관리자 계정 초대 */}
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium flex items-center">
@@ -181,7 +180,6 @@ function ClassVideoForm() {
           </div>
         </div>
       </div>
-      {/* END: Page Layout */}
     </>
   );
 }

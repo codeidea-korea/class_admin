@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 function LifeRecordView() {
   return (
     <>
-      {/* BEGIN: 관리자 계정 초대 */}
       <div className="flex justify-end gap-2 intro-x">
         <Link to="/life_record_edit">
           <button className="btn btn-sky ml-auto">
@@ -592,7 +591,7 @@ function LifeRecordView() {
         </div>
       </div>
 
-      {/* button 시작*/}
+
       <div className="flex mt-5 justify-center gap-3">
         <Link to="/life_record">
           <button className="btn bg-white w-24">목록</button>
@@ -601,8 +600,6 @@ function LifeRecordView() {
           <button className="btn w-24 btn-sky">수정하기</button>
         </Link>
       </div>
-      {/* button 끝*/}
-      {/* END: Page Layout */}
     </>
   );
 }
