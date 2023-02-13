@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
   Lucide,
@@ -27,22 +28,31 @@ function Main(props) {
       {/* BEGIN: Top Bar */}
       <div className="top-bar">
         {/* BEGIN: Breadcrumb */}
+        <Link to="">
+          <div className="text-2xl font-bold mr-6 text-white">
+            WP Apply
+          </div>
+        </Link>
+        
         <nav
           aria-label="breadcrumb"
           className="-intro-x mr-auto hidden sm:flex"
         >
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <a href="#">Application</a>
+              <a href="#" className="text-slate-400">회원관리</a>
             </li>
-            <li className="breadcrumb-item active" aria-current="page">
-              Dashboard
+            <li className="">
+              <Lucide icon="ChevronRight" className="w-4 h-4 text-slate-400"></Lucide>
+            </li>
+            <li className=" text-white " aria-current="page">
+              회원관리
             </li>
           </ol>
         </nav>
         {/* END: Breadcrumb */}
         {/* BEGIN: Search */}
-        <div className="intro-x relative mr-3 sm:mr-6">
+        {/* <div className="intro-x relative mr-3 sm:mr-6">
           <div className="search hidden sm:block">
             <input
               type="text"
@@ -126,59 +136,20 @@ function Main(props) {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
         {/* END: Search  */}
         {/* BEGIN: Notifications */}
-        <Dropdown className="intro-x mr-auto sm:mr-6">
-          <DropdownToggle
-            tag="div"
-            role="button"
-            className="notification notification--bullet cursor-pointer"
-          >
-            <Lucide
+        <div className="intro-x mr-6">
+          <div className="notification notification--bullet cursor-pointer">
+          </div>
+          <Lucide
               icon="Bell"
-              className="notification__icon dark:text-slate-500"
+              className="notification__icon dark:text-slate-500 text-white"
             />
-          </DropdownToggle>
-          <DropdownMenu className="notification-content pt-2">
-            <DropdownContent tag="div" className="notification-content__box">
-              <div className="notification-content__title">Notifications</div>
-              {$_.take($f(), 5).map((faker, fakerKey) => (
-                <div
-                  key={fakerKey}
-                  className={classnames({
-                    "cursor-pointer relative flex items-center": true,
-                    "mt-5": fakerKey,
-                  })}
-                >
-                  <div className="w-12 h-12 flex-none image-fit mr-1">
-                    <img
-                      alt="Midone Tailwind HTML Admin Template"
-                      className="rounded-full"
-                      src={faker.photos[0]}
-                    />
-                    <div className="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600"></div>
-                  </div>
-                  <div className="ml-2 overflow-hidden">
-                    <div className="flex items-center">
-                      <a href="" className="font-medium truncate mr-5">
-                        {faker.users[0].name}
-                      </a>
-                      <div className="text-xs text-slate-400 ml-auto whitespace-nowrap">
-                        {faker.times[0]}
-                      </div>
-                    </div>
-                    <div className="w-full truncate text-slate-500 mt-0.5">
-                      {faker.news[0].shortContent}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </DropdownContent>
-          </DropdownMenu>
-        </Dropdown>
+        </div>
         {/* END: Notifications  */}
         {/* BEGIN: Account Menu */}
+        <div className="mr-3 text-white">홍길동 님</div>
         <Dropdown className="intro-x w-8 h-8">
           <DropdownToggle
             tag="div"
@@ -191,27 +162,17 @@ function Main(props) {
             />
           </DropdownToggle>
           <DropdownMenu className="w-56">
-            <DropdownContent className="bg-primary text-white">
+            <DropdownContent className="bg-black text-white">
               <DropdownHeader tag="div" className="!font-normal">
-                <div className="font-medium">{$f()[0].users[0].name}</div>
+                <div className="font-medium">홍길동님</div>
                 <div className="text-xs text-white/70 mt-0.5 dark:text-slate-500">
-                  {$f()[0].jobs[0]}
+                  관리자
                 </div>
               </DropdownHeader>
               <DropdownDivider className="border-white/[0.08]" />
               <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="User" className="w-4 h-4 mr-2" /> Profile
+                <Lucide icon="User" className="w-4 h-4 mr-2" /> 프로필 수정하기
               </DropdownItem>
-              <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="Edit" className="w-4 h-4 mr-2" /> Add Account
-              </DropdownItem>
-              <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="Lock" className="w-4 h-4 mr-2" /> Reset Password
-              </DropdownItem>
-              <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="HelpCircle" className="w-4 h-4 mr-2" /> Help
-              </DropdownItem>
-              <DropdownDivider className="border-white/[0.08]" />
               <DropdownItem className="hover:bg-white/5">
                 <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Logout
               </DropdownItem>
