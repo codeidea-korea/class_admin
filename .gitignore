@@ -1,4 +1,14 @@
 node_modules
+<<<<<<< HEAD
 
 dist
 .DS_Store
+=======
+src/.DS_Store
+src/assets/.DS_Store
+src/assets/fonts/.DS_Store
+src/base-components/.DS_Store
+src/components/.DS_Store
+src/assets/css/.DS_Store
+src/assets/images/.DS_Store
+>>>>>>> 08343db5d1dc4faad767bb6c75300b91501869cc

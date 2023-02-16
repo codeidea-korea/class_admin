@@ -1,123 +1,289 @@
 import dom from "@left4code/tw-starter/dist/js/dom";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAxios from '@/hooks/useAxios';
 
 function Join() {
-  useEffect(() => {
-    dom("body").removeClass("main").removeClass("error-page").addClass("login_body");
-  }, []);
+	const navigate = useNavigate();
+	const api = useAxios();
+	const [isDuplicatedUserID, setIsDuplicatedUserID] = useState(false);
+    const [passCheck, setPassCheck] = useState(false);
+    const [idCheckBorder, setIdCheckBorder] = useState(false);
+	const [checkRequestAuth, setCheckRequestAuth] = useState(false);
+	const [checkAuth, setCheckAuth] = useState(false);
+	const [joinParams, setJoinParams] = useState({
+        user_id: '',
+        password: '',
+		password_confirm: '', 
+		phone: '', 
+		auth_number: '', 
+    });
+    const [alertText, setAlertText] = useState({
+        alertUserID: [0, ''],
+        alertPass: [0, ''],
+        alertPassCheck: [0, ''],
+        alertResult: [0, ''],
+    })
+	const idReg = /^.*(?=.*\d)(?=.*[a-zA-Z]).*$/;
+    const passReg = /^.*(?=.*\d)(?=.*[a-zA-Z]).*$/;
 
-  return (
-    <>
-      <div className="container">
-        <div className="block login_con">
-          {/* BEGIN: Login Form */}
-          <div className="h-auto flex py-0 my-0">
-            <div className="my-auto mx-auto  px-8 rounded-md shadow-md login_size">
-              <h2 className="intro-x font-bold text-5xl text-center text-white">
-                WP Apply
-                <br />
-                <span className="text-xl">admin</span>
-              </h2>
-              <div className="intro-y box mt-4">
-                <div class="p-3 px-5 flex items-center border-b border-slate-200/6 text-lg font-medium">
-                  관리자 회원가입
-                </div>
-                <div className="box p-8">
-                  <div className="intro-x">
-                    <div>
-                      <div className="font-medium">
-                        아이디 <span className="text-danger">*</span>
-                      </div>
-                      <div className="flex gap-2 items-center mt-1">
-                        <input
-                          type="text"
-                          className="intro-x login__input form-control py-3 px-4 block"
-                          placeholder="아이디를 입력해주세요."
-                        />
-                        <button className="btn btn-primary w-20 py-3 shrink-0">
-                          중복확인
-                        </button>
-                      </div>
-                      <div className="text-sm text-danger mt-2 ml-2">
-                        아이디는 5~20자의 영문 소문자, 숫자 조합으로 입력해
-                        주세요.
-                      </div>
-                    </div>
+	const handleChange = (event) => {
+        const { name, value } = event.currentTarget;
+		if (name === 'user_id') {
+            setIsDuplicatedUserID(false);
+            if (value.length < 5 || value.length > 20) {
+                setAlertText({...alertText, alertUserID: [1, '아이디는 5~20자의 영문 소문자, 숫자 조합으로 입력해주세요.']})
+                setIdCheckBorder(false);
+            }else if (!idReg.test(value)) {
+                setAlertText({...alertText, alertUserID: [1, '영문, 숫자를 최소 1자리를 포함해주세요.']})
+                setIdCheckBorder(false);
+            }else {
+                setAlertText({...alertText, alertUserID: [0, '']})
+                setIdCheckBorder(true);
+            }
+        }else if (name === 'password') {
+            if (value.length < 8 || value.length >= 16) {
+                setAlertText({...alertText, alertPass: [1, '8~16자리 이내로 해주세요.']})
+            }else if (!passReg.test(value)) {
+                setAlertText({...alertText, alertPass: [1, '영문, 숫자, 특수문자를 최소 1자리를 포함해주세요.']})
+            }else {
+                setAlertText({...alertText, alertPass: [0, '']})
+            }
+        }else if (name === 'password_confirm') {
+			if (joinParams.password !== value){
+				setAlertText({...alertText, alertPassCheck: [1, '비밀번호가 일치하지 않습니다.']})
+			}else{
+				setAlertText({...alertText, alertPassCheck: [0, '']})
+				setPassCheck(true)
+			}
+        }
+        setJoinParams({ ...joinParams, [name]: value });
+    };
 
-                    <div className="mt-3">
-                      <div className="font-medium">
-                        비밀번호 <span className="text-danger">*</span>
-                      </div>
-                      <input
-                        type="text"
-                        className="intro-x login__input form-control py-3 px-4 block mt-1"
-                        placeholder="비밀번호를 입력해주세요."
-                      />
-                      <div className="text-sm text-danger mt-2 ml-2">
-                        8~ 16자의 영어 대소문자, 숫자를 조합하여 입력해주세요.
-                      </div>
-                    </div>
+	// 인증 요청
+    const requestAuth = async () => {
+		if (idCheckBorder && passCheck && isDuplicatedUserID && joinParams.phone !== ""){
+			setAlertText({...alertText, alertResult: [0, '']}); 
+			await api.post('/admins/findAdminID', joinParams)
+			.then((res) => {
+				console.log(res)
+				if (res.data.code === 200) {
+					if (res.data.body === null){
+						setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
+					}else{
+						setCheckRequestAuth(true);
+						setTimer(179);
+					}
+				}
+			})
+			.catch((err) => {
+				setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+				console.log(err);
+			});
+		}else{
+			setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
+		}
+    }
 
-                    <div className="mt-3">
-                      <div className="font-medium">
-                        비밀번호 확인 <span className="text-danger">*</span>
-                      </div>
-                      <input
-                        type="text"
-                        className="intro-x login__input form-control py-3 px-4 block mt-1"
-                        placeholder="비밀번호를 입력해주세요."
-                      />
-                      <div className="text-sm text-danger mt-2 ml-2">
-                        비밀번호가 일치하지 않습니다.
-                      </div>
-                    </div>
+    // 인증번호 확인
+    const sendAuth = () => {
+        if (timer <= 0 && checkRequestAuth){
+            setAlertText({...alertText, alertResult: [1, '인증 시간이 초과되었습니다. 다시 인증요청해주세요.']});
+            return false;
+        }
+        
+        api.post('/admins/findAdminID', joinParams)
+        .then((res) => {
+            console.log(res)
+            if (res.data.code === 200) {
+                if (res.data.body === null){
+                    setAlertText({...alertText, alertResult: [1, '인증번호가 올바르지 않습니다. 다시 확인해주세요.']})
+                }else{
+                    setCheckAuth(true);
+                    setAlertText({...alertText, alertResult: [1, '인증이 정상적으로 처리되었습니다.']})
+                }
+            }
+        })
+        .catch((err) => {
+            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            console.log(err);
+        });
+    }
 
-                    <div className="mt-3">
-                      <div className="font-medium">휴대전화번호</div>
-                      <div className="flex gap-2 items-center mt-1">
-                        <input
-                          type="text"
-                          className="intro-x login__input form-control py-3 px-4 block w-60"
-                          placeholder="아이디를 입력해주세요."
-                        />
-                        <button className="btn btn-danger w-20 py-3 shrink-0">
-                          인증요청
-                        </button>
-                        <div className="text-slate-400">02:59</div>
-                      </div>
-                      <div className="flex gap-2 items-center mt-3">
-                        <input
-                          type="text"
-                          className="intro-x login__input form-control py-3 px-4 block w-60"
-                          placeholder="아이디를 입력해주세요."
-                        />
-                        <button className="btn btn-secondary w-20 py-3 shrink-0">
-                          확인
-                        </button>
-                      </div>
-                      <div className="text-sm text-danger mt-2 ml-2">
-                        입력하신 정보를 다시 한 번 확인해 주세요.
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="intro-x mt-5 text-center ">
-                    <Link to="/join_result">
-                      <button className="btn btn-sky py-3 px-4 w-full align-top">
-                        회원가입
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* END: Login Form */}
-        </div>
-      </div>
-    </>
-  );
+	// 아이디 중복확인
+	const checkUserIdDuplication = () => {
+        if (!joinParams.user_id) {
+            setAlertText({...alertText, alertUserID: [1, '아이디는 5~20자의 영문 소문자, 숫자 조합으로 입력해주세요.']})
+            return
+        }
+        api.post(`/users/checkUserDup?userID=${joinParams.user_id}`, null)
+        .then((res) => {
+			console.log(res);
+			if (!res.data.body.userID) {
+				setIsDuplicatedUserID(true);
+				setAlertText({...alertText, alertUserID: [2, '사용 가능한 아이디입니다.']})
+			}else {
+				setIsDuplicatedUserID(false);
+				setAlertText({...alertText, alertUserID: [1, '이미 사용 중인 아이디입니다.']})
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+    };
+
+	// 회원가입
+	const requestJoin = () => {
+		if (checkAuth){
+            api.post('/admins/findAdminID', joinParams)
+			.then((res) => {
+				console.log(res)
+				if (res.data.code === 200) {
+					if (res.data.body === null){
+						setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+					}else{
+						navigate('join_result', {state: {code: 200}})
+					}
+				}
+			})
+			.catch((err) => {
+				setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+				console.log(err);
+			});
+        }else{
+            setAlertText({...alertText, alertResult: [1, '본인인증을 진행해주세요.']})
+        }
+	}
+
+	/** 타이머 */
+    const [timer, setTimer] = useState(0);
+    let timerId = useRef(null);
+    useEffect(() => {
+        if (timer >= 0) {
+            const Counter = setInterval(() => {
+                timerId.current = timer - 1;
+                if (timerId.current >= 0) setTimer(timerId.current);
+            }, 1000)
+            if (timerId.current === 0) setAlertText({...alertText, alertResult: [1, '인증 시간이 초과되었습니다.']})
+            return () => clearInterval(Counter)
+        }
+    }, [timer])
+    const timeFormat = (time) => {
+        const m = Math.floor(time / 60).toString()
+        let s = (time % 60).toString()
+        if (s.length === 1) s = `0${s}`
+        return `${m}:${s}`
+    }
+
+	useEffect(() => {
+		dom("body").removeClass("main").removeClass("error-page").addClass("login_body");
+	}, []);
+
+	return (
+		<React.Fragment>
+			<div className="container">
+				<div className="block login_con">
+					{/* BEGIN: Login Form */}
+					<div className="h-auto flex py-0 my-0">
+						<div className="my-auto mx-auto  px-8 rounded-md shadow-md login_size">
+							<h2 className="intro-x font-bold text-5xl text-center text-white">
+								WP Apply
+								<br />
+								<span className="text-xl">admin</span>
+							</h2>
+							<div className="intro-y box mt-4">
+								<div className="p-3 px-5 flex items-center border-b border-slate-200/6 text-lg font-medium">
+									관리자 회원가입
+								</div>
+								<div className="box p-8">
+									<div className="intro-x">
+										<div>
+											<div className="font-medium">
+												아이디 <span className="text-danger">*</span>
+											</div>
+											<div className="flex gap-2 items-center mt-1">
+												<input
+													type="text" name={'user_id'}
+													className="intro-x login__input form-control py-3 px-4 block"
+													placeholder="아이디를 입력해주세요."
+													onChange={handleChange}
+												/>
+												<button className="btn btn-primary w-20 py-3 shrink-0" onClick={checkUserIdDuplication}>중복확인</button>
+											</div>
+											{!!alertText.alertUserID[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertUserID[1]}</div>}
+										</div>
+										<div className="mt-3">
+											<div className="font-medium">
+												비밀번호 <span className="text-danger">*</span>
+											</div>
+											<input
+												type="password" name={'password'}
+												className="intro-x login__input form-control py-3 px-4 block mt-1"
+												placeholder="비밀번호를 입력해주세요." 
+												onChange={handleChange}
+											/>
+											{!!alertText.alertPass[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertPass[1]}</div>}
+										</div>
+
+										<div className="mt-3">
+											<div className="font-medium">
+												비밀번호 확인 <span className="text-danger">*</span>
+											</div>
+											<input
+												type="password" name={'password_confirm'}
+												className="intro-x login__input form-control py-3 px-4 block mt-1"
+												placeholder="비밀번호를 입력해주세요." 
+												onChange={handleChange}
+											/>
+											{!!alertText.alertPassCheck[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertPassCheck[1]}</div>}
+										</div>
+
+										<div className="mt-3">
+											<div className="font-medium">휴대전화번호</div>
+											<div className="flex gap-2 items-center mt-1">
+												<input
+													type="number" name={'phone'}
+													className="intro-x login__input form-control py-3 px-4 block w-60"
+													placeholder="휴대전화번호를 입력해주세요." 
+													onChange={handleChange}
+												/>
+												<button className="btn btn-danger w-20 py-3 shrink-0" onClick={requestAuth}>인증요청</button>
+												{checkRequestAuth && (<div className="text-slate-400">{timeFormat(timer)}</div>)}
+											</div>
+											<div className="flex gap-2 items-center mt-3">
+												<input
+													type="text" name={'auth_number'}
+													className="intro-x login__input form-control py-3 px-4 block w-60"
+													placeholder="인증번호를 입력해주세요." 
+													onChange={handleChange}
+												/>
+												<button 
+													className={joinParams.auth_number !== "" 
+													? 'btn btn-green w-20 py-3 shrink-0' 
+													: 'btn btn-secondary w-20 py-3 shrink-0'} onClick={sendAuth}>
+													확인
+												</button>
+											</div>
+											{!!alertText.alertResult[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertResult[1]}</div>}
+										</div>
+										
+									</div>
+									<div className="intro-x mt-5 text-center ">
+										<Link to="#" onClick={requestJoin}>
+											<button className="btn btn-sky py-3 px-4 w-full align-top">
+												회원가입
+											</button>
+										</Link>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{/* END: Login Form */}
+				</div>
+			</div>
+		</React.Fragment>
+	);
 }
 
 export default Join;
