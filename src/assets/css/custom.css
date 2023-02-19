@@ -9,16 +9,15 @@ html body{
     /* padding-left:1rem;
     padding-right:1rem; */
     padding-top:0;
+    padding-left:1rem;
+    padding-right:1rem;
 }
 
 /* box 커스터마이징 */
 
 /* 전체 폰트 사이즈 조절 */
-.text-base{
-    font-size:0.95rem;
-}
 html body, .form-select, .form-control, textarea{
-    font-size:0.8.5rem;
+    font-size:0.85rem;
 }
 /* 전체 테이블 사이즈 조절 */
 /* .table td{
@@ -37,7 +36,7 @@ html body, .form-select, .form-control, textarea{
 } */
 
 /* 콘텐츠 스크롤 */
-.content{overflow-y:unset!important;overflow-x: unset!important;border-radius: 14px;padding:20px 30px 30px 30px;}
+.content{overflow-y:unset!important;overflow-x: unset!important;border-radius: 14px;padding:20px 20px 20px 20px;}
 
 /* 반응형 제거 */
 .content {min-width: 875px;overflow-x: scroll;}

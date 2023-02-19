@@ -48,7 +48,7 @@ function MemberMng() {
         <div className="intro-y p-5">
           <div className="overflow-x-auto">
             <table className="table">
-              <tr className="text-center bg-slate-100">
+              <tr className="text-center bg-slate-100 whitespace-nowrap">
                 <td className="w-10">
                   <input
                     className="form-check-input chkall"
@@ -58,7 +58,7 @@ function MemberMng() {
                 </td>
                 <td className="w-20">번호</td>
                 <td>아이디</td>
-                <td>이름</td>
+                <td >이름</td>
                 <td>
                   <select className="form-control">
                     <option>구분</option>
@@ -106,7 +106,7 @@ function MemberMng() {
                 </td>
               </tr>
 
-              <tr className="text-center">
+              <tr className="text-center whitespace-nowrap">
                 <td>
                   <input className="form-check-input chk1" type="checkbox" />
                 </td>

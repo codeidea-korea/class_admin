@@ -56,7 +56,7 @@ function AdminMng() {
         <div className="intro-y p-5">
           <div className="overflow-x-auto">
             <table className="table">
-              <tr className="text-center bg-slate-100">
+              <tr className="text-center bg-slate-100 whitespace-nowrap">
                 <td className="w-10">
                   <input
                     className="form-check-input chkall"
@@ -73,7 +73,7 @@ function AdminMng() {
                 <td>회원가입일</td>
                 <td>상태</td>
               </tr>
-              <tr className="text-center">
+              <tr className="text-center whitespace-nowrap">
                 <td>
                   <input className="form-check-input chk1" type="checkbox" />
                 </td>
@@ -183,7 +183,7 @@ function AdminMng() {
           <div className="font-bold">이메일</div>
           <div className="flex gap-3 mt-2">
             <input type="text" className="form-control" />
-            <button className="btn btn-primary w-24">초대하기</button>
+            <button className="btn btn-primary w-20 shrink-0">초대하기</button>
           </div>
         </ModalBody>
       </Modal>

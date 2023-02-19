@@ -86,7 +86,7 @@ function CurriculumForm() {
             <hr className="border-t border-dotted" />
             <div className="flex items-center">
               <div className="font-medium  w-36 text-left shrink-0">
-                학습영상 url
+                선생님 URL
               </div>
               <div>
                 <input type="text" className="form-control w-96" />

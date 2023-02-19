@@ -5,16 +5,16 @@ function LifeRecordView() {
   return (
     <>
       <div className="flex justify-end gap-2 intro-x">
+        <button className="btn btn-green flex items-center">
+          <Lucide icon="Download" className="w-4 h-4 mr-2"></Lucide>
+          다운로드
+        </button>
         <Link to="/life_record_edit">
           <button className="btn btn-sky ml-auto">
             <Lucide icon="Edit" className="w-4 h-4 mr-2"></Lucide>
             수정하기
           </button>
         </Link>
-        <button className="btn btn-green flex items-center">
-          <Lucide icon="Download" className="w-4 h-4 mr-2"></Lucide>
-          다운로드
-        </button>
       </div>
       <div className="intro-y box mt-5 p-5">
         <table className="table table_layout01">
@@ -590,7 +590,6 @@ function LifeRecordView() {
           </table>
         </div>
       </div>
-
 
       <div className="flex mt-5 justify-center gap-3">
         <Link to="/life_record">
