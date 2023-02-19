@@ -80,7 +80,15 @@ function AdminMng() {
                 <td>567</td>
                 <td>hong123</td>
                 <td>홍길동</td>
-                <td>선생님</td>
+                <td>
+                  {/* 셀렉트박스로 변경 */}
+                  <select className="form-select small w-24">
+                    <option>일반</option>
+                    <option>관리자</option>
+                    <option>선생님</option>
+                    <option>원장님</option>
+                  </select>
+                </td>
                 <td>010-0000-0000</td>
                 <td>ganada@gamil.com</td>
                 <td>2022-10-11</td>

@@ -300,3 +300,12 @@ body.login_body{
     right: 28px;
 }
 
+.h-80{
+    height:80px;
+}
+.show-menu{
+    display: block;
+}
+.hide-menu{
+    display: none;
+}
