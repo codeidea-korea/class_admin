@@ -40,13 +40,6 @@ function OnlinebasicClass() {
         </button>
       </div>
       <div className="intro-y box mt-5">
-        <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
-          <div className="text-lg font-medium flex items-center">
-            영재학교
-            <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            수학
-          </div>
-        </div>
         <div className="intro-y p-5">
           <div className="flex items-center gap-3">
             <Dropdown>

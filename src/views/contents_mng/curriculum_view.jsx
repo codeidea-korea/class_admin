@@ -14,6 +14,7 @@ import { useState } from "react";
 import Default_img from "@/assets/images/default_image.jpg";
 
 function CurriCulumView() {
+  // 영상보기 모달
   const [video, videoDetail] = useState(false);
 
   return (
@@ -139,7 +140,7 @@ function CurriCulumView() {
         </TabPanels>
       </TabGroup>
 
-      
+
       {/* BEGIN: Modal 영상보기 */}
       <Modal
         size="modal-xl"

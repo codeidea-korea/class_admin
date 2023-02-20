@@ -80,7 +80,6 @@ function Join() {
 			setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
 		}
     }
-
     // 인증번호 확인
     const sendAuth = () => {
         if (timer <= 0 && checkRequestAuth){
@@ -166,6 +165,16 @@ function Join() {
 		dom("body").removeClass("main").removeClass("error-page").addClass("login_body");
 	}, []);
 
+
+	// 자세히보기
+	const [isOpen, setMenu] = useState(false);
+	const toggleMenu = () => {
+        setMenu(isOpen => !isOpen);
+    }
+	const [isOpen2, setMenu2] = useState(false);
+	const toggleMenu2 = () => {
+        setMenu2(isOpen2 => !isOpen2);
+    }
 	return (
 		<React.Fragment>
 			<div className="container">
@@ -225,6 +234,20 @@ function Join() {
 											{!!alertText.alertPassCheck[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertPassCheck[1]}</div>}
 										</div>
 
+										{/* 이름 추가 */}
+										<div className="mt-3">
+											<div className="font-medium">
+												이름<span className="text-danger">*</span>
+											</div>
+											<input
+												type="text" name={''}
+												className="intro-x login__input form-control py-3 px-4 block mt-1"
+												placeholder="한글만 입력 가능합니다." 
+											/>
+											<div className="text-sm text-danger mt-2 ml-2">이름을 입력해주세요</div>
+										</div>
+										{/* 이름 추가 끝 */}
+
 										<div className="mt-3">
 											<div className="font-medium">휴대전화번호</div>
 											<div className="flex gap-2 items-center mt-1">
@@ -255,6 +278,50 @@ function Join() {
 										</div>
 										
 									</div>
+									
+									{/* 약관동의 추가 */}
+									<div className="mt-5">
+										<h2 className="text-lg">약관동의</h2>
+										<div className="border p-5 mt-2 rounded-md">
+											<div className="">
+												<div className="form-check">
+													<input id="checkbox-switch-1" className="form-check-input" type="checkbox" value="" />
+													<label className="form-check-label" htmlFor="checkbox-switch-1">회원가입 약관에 모두 동의합니다.</label>
+												</div>
+												<div className="mt-1 text-slate-400">이용약관, 개인정보처리 및 이용에 대한 안내(일부 선택), 개인정보의 마케팅 및 광고 활용(선택), 개인정보의 위탁(선택)에 모두 동의합니다.</div>
+											</div>
+											<div className="mt-3 border-t pt-3">
+												<div className="flex justify-between items-center">
+													<div className="form-check">
+														<input id="checkbox-switch-2" className="form-check-input" type="checkbox" value="" />
+														<label className="form-check-label" htmlFor="checkbox-switch-2">이용약관 <span className="text-primary">[필수]</span></label>
+													</div>
+													<button className="text-slate-400 underline see_detail" onClick={()=>toggleMenu()}>자세히 보기</button>
+												</div>
+												<div className={isOpen ? "show-menu" : "hide-menu"}>
+													<div className="bg-slate-100 p-3 mt-2 rounded-md text-slate-500 h-80 overflow-y-auto" >
+														내용입니다.
+													</div>
+												</div>
+											</div>
+											<div className="mt-3 border-t pt-3">
+												<div className="flex justify-between items-center">
+													<div className="form-check">
+														<input id="checkbox-switch-3" className="form-check-input" type="checkbox" value="" />
+														<label className="form-check-label" htmlFor="checkbox-switch-3">개인정보 필수항목에 대한 처리 및 이용 <span className="text-primary">[필수]</span></label>
+													</div>
+													<button className="text-slate-400 underline" onClick={()=>toggleMenu2()}>자세히 보기</button>
+												</div>
+												<div className={isOpen2 ? "show-menu" : "hide-menu"}>
+													<div className="bg-slate-100 p-3 mt-2 rounded-md text-slate-500 h-80 overflow-y-auto" >
+														내용입니다.
+													</div>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+									{/* 약관동의 추가 끝 */}
 									<div className="intro-x mt-5 text-center ">
 										<Link to="#" onClick={requestJoin}>
 											<button className="btn btn-sky py-3 px-4 w-full align-top">

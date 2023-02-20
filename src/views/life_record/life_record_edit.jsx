@@ -9,10 +9,6 @@ function LifeRecordEdit() {
           <Lucide icon="Edit" className="w-4 h-4 mr-2"></Lucide>
           저장하기
         </button>
-        <button className="btn btn-green flex items-center">
-          <Lucide icon="Download" className="w-4 h-4 mr-2"></Lucide>
-          다운로드
-        </button>
       </div>
       <div className="intro-y box mt-5 p-5">
         <table className="table table_layout01">
