@@ -6,10 +6,9 @@ function FindIdResult() {
 	const navigate = useNavigate();
     const location = useLocation();
     const state = location.state;
-    const findId = state?.findId;
 
 	useEffect(() => {
-		if (typeof(findId) === 'undefined') navigate('/')
+		if (typeof(state?.userId) === 'undefined') navigate('/')
 
 		dom("body")
 		.removeClass("main")
@@ -47,7 +46,7 @@ function FindIdResult() {
 										</Link>
 									</div>
 								<div className="py-10 text-center text-xl font-medium">
-									회원님의 ID는 <span className="text-danger">{findId}</span>{" "}
+									회원님의 ID는 <span className="text-danger">{userId}</span>{" "}
 									입니다.
 								</div>
 								<div className="intro-x mt-5 text-center ">

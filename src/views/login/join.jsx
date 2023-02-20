@@ -12,11 +12,11 @@ function Join() {
 	const [checkRequestAuth, setCheckRequestAuth] = useState(false);
 	const [checkAuth, setCheckAuth] = useState(false);
 	const [joinParams, setJoinParams] = useState({
-        user_id: '',
+        userId: '',
         password: '',
 		password_confirm: '', 
 		phone: '', 
-		auth_number: '', 
+		code: '', 
     });
     const [alertText, setAlertText] = useState({
         alertUserID: [0, ''],
@@ -29,7 +29,7 @@ function Join() {
 
 	const handleChange = (event) => {
         const { name, value } = event.currentTarget;
-		if (name === 'user_id') {
+		if (name === 'userId') {
             setIsDuplicatedUserID(false);
             if (value.length < 5 || value.length > 20) {
                 setAlertText({...alertText, alertUserID: [1, '아이디는 5~20자의 영문 소문자, 숫자 조합으로 입력해주세요.']})
@@ -64,16 +64,12 @@ function Join() {
     const requestAuth = async () => {
 		if (idCheckBorder && passCheck && isDuplicatedUserID && joinParams.phone !== ""){
 			setAlertText({...alertText, alertResult: [0, '']}); 
-			await api.post('/admins/findAdminID', joinParams)
+			await api.get(`/v1/admin/sign-up/request-number?phone=${joinParams.phone}`)
 			.then((res) => {
 				console.log(res)
-				if (res.data.code === 200) {
-					if (res.data.body === null){
-						setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
-					}else{
-						setCheckRequestAuth(true);
-						setTimer(179);
-					}
+				if (res.status === 200) {
+					setCheckRequestAuth(true);
+					setTimer(179);
 				}
 			})
 			.catch((err) => {
@@ -92,62 +88,53 @@ function Join() {
             return false;
         }
         
-        api.post('/admins/findAdminID', joinParams)
+        api.post('/v1/admin/sign-up/check-number', joinParams)
         .then((res) => {
             console.log(res)
-            if (res.data.code === 200) {
-                if (res.data.body === null){
-                    setAlertText({...alertText, alertResult: [1, '인증번호가 올바르지 않습니다. 다시 확인해주세요.']})
-                }else{
-                    setCheckAuth(true);
-                    setAlertText({...alertText, alertResult: [1, '인증이 정상적으로 처리되었습니다.']})
-                }
+            if (res.status === 200) {
+                setCheckAuth(true);
+            	setAlertText({...alertText, alertResult: [1, '인증이 정상적으로 처리되었습니다.']})
             }
         })
         .catch((err) => {
-            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
             console.log(err);
         });
     }
 
 	// 아이디 중복확인
 	const checkUserIdDuplication = () => {
-        if (!joinParams.user_id) {
+        if (!joinParams.userId) {
             setAlertText({...alertText, alertUserID: [1, '아이디는 5~20자의 영문 소문자, 숫자 조합으로 입력해주세요.']})
             return
         }
-        api.post(`/users/checkUserDup?userID=${joinParams.user_id}`, null)
+        api.get(`/v1/sign-up/check-duplicate?userId=${joinParams.userId}`)
         .then((res) => {
 			console.log(res);
-			if (!res.data.body.userID) {
-				setIsDuplicatedUserID(true);
-				setAlertText({...alertText, alertUserID: [2, '사용 가능한 아이디입니다.']})
-			}else {
-				setIsDuplicatedUserID(false);
-				setAlertText({...alertText, alertUserID: [1, '이미 사용 중인 아이디입니다.']})
-			}
+			if (res.status === 200){
+                setIsDuplicatedUserID(true);
+                setAlertText({...alertText, alertUserID: [2, '사용 가능한 아이디입니다.']})
+            }
 		})
 		.catch((err) => {
-			console.log(err);
+			setIsDuplicatedUserID(false);
+			setAlertText({...alertText, alertUserID: [1, err.response.data.msg]})
+            console.log(err);
 		});
     };
 
 	// 회원가입
 	const requestJoin = () => {
 		if (checkAuth){
-            api.post('/admins/findAdminID', joinParams)
+            api.post('v1/admin/sign-up', joinParams)
 			.then((res) => {
 				console.log(res)
-				if (res.data.code === 200) {
-					if (res.data.body === null){
-						setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
-					}else{
-						navigate('join_result', {state: {code: 200}})
-					}
+				if (res.status === 200) {
+					navigate('/join_result', {state: {code: 200}})
 				}
 			})
 			.catch((err) => {
-				setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+				setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
 				console.log(err);
 			});
         }else{
@@ -203,7 +190,7 @@ function Join() {
 											</div>
 											<div className="flex gap-2 items-center mt-1">
 												<input
-													type="text" name={'user_id'}
+													type="text" name={'userId'}
 													className="intro-x login__input form-control py-3 px-4 block"
 													placeholder="아이디를 입력해주세요."
 													onChange={handleChange}
@@ -252,13 +239,13 @@ function Join() {
 											</div>
 											<div className="flex gap-2 items-center mt-3">
 												<input
-													type="text" name={'auth_number'}
+													type="text" name={'code'}
 													className="intro-x login__input form-control py-3 px-4 block w-60"
 													placeholder="인증번호를 입력해주세요." 
 													onChange={handleChange}
 												/>
 												<button 
-													className={joinParams.auth_number !== "" 
+													className={joinParams.code !== "" 
 													? 'btn btn-green w-20 py-3 shrink-0' 
 													: 'btn btn-secondary w-20 py-3 shrink-0'} onClick={sendAuth}>
 													확인

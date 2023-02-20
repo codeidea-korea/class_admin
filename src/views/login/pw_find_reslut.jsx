@@ -1,9 +1,14 @@
 import dom from "@left4code/tw-starter/dist/js/dom";
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function PwFindResult() {
+	const location = useLocation();
+    const state = location.state;
+    const navigate = useNavigate();
+
 	useEffect(() => {
+		if (typeof(state?.userId) === 'undefined') navigate('/login')
 		dom("body")
 		.removeClass("main")
 		.removeClass("error-page")

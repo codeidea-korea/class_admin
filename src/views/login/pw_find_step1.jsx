@@ -9,10 +9,10 @@ function PwFindstep1() {
     const [checkAuth, setCheckAuth] = useState(false);
     const [checkRequestAuth, setCheckRequestAuth] = useState(false);
     const [findPwdParams, setFindPwdParams] = useState({
-        user_id: '', 
+        userId: '', 
         name: '',
         phone: '',
-        auth_number: '', 
+        code: '', 
     });
     const [alertText, setAlertText] = useState({
         alertResult: [0, ''],
@@ -25,20 +25,16 @@ function PwFindstep1() {
 
 	// 인증 요청
     const requestAuth = async () => {
-        await api.post('/admins/findAdminID', findPwdParams)
+        await api.get(`/v1/admin/find-password/request-number?userId=${findPwdParams.userId}&name=${findPwdParams.name}&phone=${findPwdParams.phone}`)
         .then((res) => {
             console.log(res)
-            if (res.data.code === 200) {
-                if (res.data.body === null){
-                    setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
-                }else{
-                    setCheckRequestAuth(true);
-                    setTimer(179);
-                }
+            if (res.status === 200) {
+                setCheckRequestAuth(true);
+                setTimer(179);
             }
         })
         .catch((err) => {
-            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
             console.log(err);
         });
     }
@@ -50,20 +46,16 @@ function PwFindstep1() {
             return false;
         }
         
-        api.post('/admins/findAdminID', findPwdParams)
+        api.post('/v1/admin/find-password/check-number', findPwdParams)
         .then((res) => {
             console.log(res)
-            if (res.data.code === 200) {
-                if (res.data.body === null){
-                    setAlertText({...alertText, alertResult: [1, '인증번호가 올바르지 않습니다. 다시 확인해주세요.']})
-                }else{
-                    setCheckAuth(true);
-                    setAlertText({...alertText, alertResult: [1, '인증이 정상적으로 처리되었습니다.']})
-                }
+            if (res.status === 200) {
+                setCheckAuth(true);
+                setAlertText({...alertText, alertResult: [1, '인증이 정상적으로 처리되었습니다.']})
             }
         })
         .catch((err) => {
-            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
             console.log(err);
         });
     }
@@ -71,7 +63,7 @@ function PwFindstep1() {
     // 비밀번호 재설정 버튼
     const linkResetPwd = () => {
         if (checkAuth){
-            navigate('/pw_find_step2', {state: {userNo: '11'}});
+            navigate('/pw_find_step2', {state: {userId: findPwdParams.userId, name: findPwdParams.name, phone: findPwdParams.phone}});
         }else{
             setAlertText({...alertText, alertResult: [1, '본인인증을 진행해주세요.']})
         }
@@ -139,7 +131,7 @@ function PwFindstep1() {
 									<div className="mt-3">
 										<div className="font-medium">아이디</div>
 										<input type="text" className="intro-x login__input form-control py-3 px-4 block mt-1"
-										name={'user_id'} placeholder="아이디를 입력해주세요." onChange={handleChange} 
+										name={'userId'} placeholder="아이디를 입력해주세요." onChange={handleChange} 
 										/>
 									</div>
 									<div className="mt-3">
@@ -159,10 +151,10 @@ function PwFindstep1() {
 										</div>
 										<div className="flex gap-2 items-center mt-3">
 											<input type="text" className="intro-x login__input form-control py-3 px-4 block w-60"
-											name={'auth_number'} placeholder="인증번호를 입력해주세요." onChange={handleChange}
+											name={'code'} placeholder="인증번호를 입력해주세요." onChange={handleChange}
 											/>
 											<button 
-												className={findPwdParams.auth_number !== "" 
+												className={findPwdParams.code !== "" 
 												? 'btn btn-green w-20 py-3 shrink-0' 
 												: 'btn btn-secondary w-20 py-3 shrink-0'} onClick={sendAuth}>
 												확인

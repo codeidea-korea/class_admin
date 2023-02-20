@@ -2,45 +2,69 @@ import dom from "@left4code/tw-starter/dist/js/dom";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAxios from '@/hooks/useAxios';
+import { useCookies } from "react-cookie";
+import { userState } from "@/states/userState";
+import { useRecoilValue, useRecoilState, useResetRecoilState } from "recoil";
 
 function Login() {
 	const api = useAxios();
     const navigate = useNavigate();
     const [checkAuth, setCheckAuth] = useState(false);
+	const [cookies, setCookie, removeCookie] = useCookies(['rememberId']);
+	const [userInfo, setUserInfo] = useRecoilState(userState);
     const [loginParams, setLoginParams] = useState({
-        certified: 'phone',
-        name: '',
-        phone: '',
-        email: '',
+        userId: '',
+        password: '',
     });
     const [alertText, setAlertText] = useState({
-        alertName: [0, ''],
-        alertEmail: [0, ''],
-        alertPhone: [0, ''],
         alertResult: [0, ''],
     })
-    const emailReg = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
-    const nameReg = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|]*$/;
 
 	const handleChange = (event) => {
         const { name, value } = event.currentTarget;
-        if (name === 'name') {
-            if (!nameReg.test(value)) {
-                setAlertText({...alertText, alertName: [1, '한글과 영문으로만 입력해주세요.']})
-            }else{
-                setAlertText({...alertText, alertName: [0, '']})
-            }
-        }else if (name === "email"){
-            if (!emailReg.test(value)) {
-                setAlertText({...alertText, alertEmail: [1, '이메일 형식이 올바르지 않습니다.']})
-            }else{
-                setAlertText({...alertText, alertEmail: [0, '']})
-            }
-        }
         setLoginParams({ ...loginParams, [name]: value });
     };
 
+	const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
+	const handleOnRememberIdChecked = (event) => {
+        if(event.currentTarget.checked){
+            setCookie('rememberId', loginParams.userId, {maxAge: 2000});
+        } else {
+            removeCookie('rememberId');
+        }
+    };
+
+	const requestLogin = async () => {
+		api.post('/v1/sign-in', loginParams)
+        .then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+                setUserInfo({...userInfo, 
+                    authority: res.data.authority,
+                    status: res.data.status,
+                    token: res.data.token,
+                    userId: res.data.userId,
+                });
+                navigate('/');
+            }
+        })
+        .catch((err) => {
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
+            console.log(err);
+        });
+	}
+
 	useEffect(() => {
+		if (cookies['rememberId'] && user.token === "") {
+            const target = document.getElementById('userId');
+            target.value = cookies['rememberId'];
+        }
+
 		dom("body").removeClass("main").removeClass("error-page").addClass("login_body");
 	}, []);
 
@@ -62,33 +86,29 @@ function Login() {
 								</div>
 								<div className="box p-8">
 									<div className="intro-x">
-										<input type="text" className="intro-x login__input form-control py-3 px-4 block" placeholder="아이디" 
-										onChange={handleChange}
+										<input 
+											type="text" name={'userId'} id={'userId'} 
+											className="intro-x login__input form-control py-3 px-4 block" 
+											placeholder="아이디를 입력해주세요." 
+											onChange={handleChange} 
 										/>
 										<input
-										type="password"
-										className="intro-x login__input form-control py-3 px-4 block mt-4"
-										placeholder="비밀번호"
+											type="password" name={'password'} 
+											className="intro-x login__input form-control py-3 px-4 block mt-4"
+											placeholder="비밀번호를 입력해주세요. " 
+											onChange={handleChange} 
+											onKeyPress={handleKeyPress}
 										/>
-										{/* <div className="text-danger mt-2 text-sm ml-2">
-											입력하신 아이디 또는 비밀번호가 일치하지 않습니다.
-										</div>
-										<div className="text-danger mt-2 text-sm ml-2">
-											다시 한 번 확인해 주세요.
-										</div>
-										<div className="text-danger mt-2 text-sm ml-2">
-											미승인/휴직/퇴직 처리 중인 아이디 입니다.
-										</div>
-										<div className="text-danger mt-2 text-sm ml-2">
-											고객센터 전화를 이용해주세요
-										</div> */}
+										{!!alertText.alertResult[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertResult[1]}</div>}
 									</div>
 									<div className="intro-x flex text-slate-400 text-sm mt-4">
 										<div className="flex items-center mr-auto">
 										<input
 											id="remember-me"
 											type="checkbox"
-											className="form-check-input border mr-2"
+											className="form-check-input border mr-2" 
+											onChange={handleOnRememberIdChecked} 
+                                            defaultChecked={cookies['rememberId']}
 										/>
 										<label
 											className="cursor-pointer select-none"
@@ -99,9 +119,7 @@ function Login() {
 										</div>
 									</div>
 									<div className="intro-x mt-5 text-center ">
-										<button className="btn btn-sky py-3 px-4 w-full align-top">
-										로그인
-										</button>
+										<button className="btn btn-sky py-3 px-4 w-full align-top" onClick={requestLogin}>로그인</button>
 									</div>
 									<div className="flex gap-3 mt-3">
 										<Link to="/id_find" className="w-full">

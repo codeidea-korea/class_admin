@@ -6,7 +6,6 @@ import useAxios from '@/hooks/useAxios';
 function PwFindstep2() {
 	const location = useLocation();
     const state = location.state;
-    const userNo = state?.userNo;
     const api = useAxios();
     const navigate = useNavigate();
     const [resetPwdParams, setResetPwdParams] = useState({
@@ -44,25 +43,21 @@ function PwFindstep2() {
             return false;
         }
 
-        api.post('/admins/findAdminID', resetPwdParams)
+        api.post(`/v1/admin/find-password/new-password?userId=${state.userId}&name=${state.name}&phone=${state.phone}&password=${resetPwdParams.pwd}`)
         .then((res) => {
             console.log(res)
-            if (res.data.code === 200) {
-                if (res.data.body === null){
-                    setAlertText({...alertText, alertResult: [1, '사용할 수 없는 비밀번호입니다.']})
-                }else{
-                    navigate('/pw_find_reslut', {state: {userNo: '11'}});
-                }
+            if (res.status === 200) {
+                navigate('/pw_find_reslut', {state: {userId: state.userId}});
             }
         })
         .catch((err) => {
-            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
             console.log(err);
         });
     }
 
 	useEffect(() => {
-		if (typeof(userNo) === 'undefined') navigate('/')
+		if (typeof(state?.userId) === 'undefined') navigate('/login')
 		dom("body")
 		.removeClass("main")
 		.removeClass("error-page")

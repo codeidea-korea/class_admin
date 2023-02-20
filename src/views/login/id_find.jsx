@@ -21,19 +21,15 @@ function FindId() {
 
 	// 확인 버튼
     const sendAuth = () => {
-        api.post('/admins/findAdminID', findIdParams)
+        api.get(`/v1/admin/find-id?name=${findIdParams.name}&phone=${findIdParams.phone}`)
         .then((res) => {
             console.log(res)
-            if (res.data.code === 200) {
-                if (res.data.body !== null){
-                    setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
-                }else{
-                    navigate('/id_find_result', {state: {findId: 200}})
-                }
+            if (res.status === 200) {
+                navigate('/id_find_result', {state: {userId: res.data.userId}})
             }
         })
         .catch((err) => {
-            setAlertText({...alertText, alertResult: [1, '데이터 처리중 오류가 발생하였습니다.']})
+            setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
             console.log(err);
         });
     }

@@ -61,139 +61,139 @@ function Router() {
 		children: [
 			// 회원관리
 			{
-			path: "/",
-			element: <MemberMng />,
+				path: "/",
+				element: <MemberMng />,
 			},
 			{
-			path: "/member_view", //유형이 학생일 때
-			element: <MemberView />,
+				path: "/member_view", //유형이 학생일 때
+				element: <MemberView />,
 			},
 			{
-			path: "/member_view2", //유형이 학생일 때
-			element: <MemberView2 />,
+				path: "/member_view2", //유형이 학생일 때
+				element: <MemberView2 />,
 			},
 			{
-			path: "/member_edit",
-			element: <MemberEdit />,
+				path: "/member_edit",
+				element: <MemberEdit />,
 			},
 			{
-			path: "/member_edit2",
-			element: <MemberEdit2 />,
+				path: "/member_edit2",
+				element: <MemberEdit2 />,
 			},
 			{
-			path: "/admin_mng",
-			element: <AdminMng />,
+				path: "/admin_mng",
+				element: <AdminMng />,
 			},
 
 			// 자기소개서 관리
 			{
-			path: "/coverletter_mng",
-			element: <CoverletterMng />,
+				path: "/coverletter_mng",
+				element: <CoverletterMng />,
 			},
 
 			// 생활기록부 관리
 			{
-			path: "/life_record",
-			element: <LifeRecord />,
+				path: "/life_record",
+				element: <LifeRecord />,
 			},
 			{
-			path: "/life_record_view",
-			element: <LifeRecordView />,
+				path: "/life_record_view",
+				element: <LifeRecordView />,
 			},
 			{
-			path: "/life_record_edit",
-			element: <LifeRecordEdit />,
+				path: "/life_record_edit",
+				element: <LifeRecordEdit />,
 			},
 
 			// 피드백 관리
 			{
-			path: "/feed_mng",
-			element: <FeedMng />,
+				path: "/feed_mng",
+				element: <FeedMng />,
 			},
 			{
-			path: "/feed_view",
-			element: <FeedView />,
+				path: "/feed_view",
+				element: <FeedView />,
 			},
 			{
-			path: "/mento_mng",
-			element: <MentoMng />,
+				path: "/mento_mng",
+				element: <MentoMng />,
 			},
 
 			// 콘텐츠 관리
 			{
-			path: "/notice", //공지사항
-			element: <Notice />,
+				path: "/notice", //공지사항
+				element: <Notice />,
 			},
 			{
-			path: "/notice_edit",
-			element: <NoticeEdit />,
+				path: "/notice_edit",
+				element: <NoticeEdit />,
 			},
 			{
-			path: "/notice_view",
-			element: <NoticeView />,
-			},
-
-			{
-			path: "/profit", //혜택
-			element: <Profit />,
-			},
-			{
-			path: "/profit_view",
-			element: <ProfitView />,
-			},
-			{
-			path: "/profit_edit",
-			element: <ProfitEdit />,
+				path: "/notice_view",
+				element: <NoticeView />,
 			},
 
 			{
-			path: "/curriculum", //커리큘럼
-			element: <CurriCulum />,
+				path: "/profit", //혜택
+				element: <Profit />,
 			},
 			{
-			path: "/curriculum_view",
-			element: <CurriCulumView />,
+				path: "/profit_view",
+				element: <ProfitView />,
 			},
 			{
-			path: "/curriculum_form",
-			element: <CurriculumForm />,
-			},
-
-			{
-			path: "/class_video", //실시간 영상 수업
-			element: <ClassVideo />,
-			},
-			{
-			path: "/class_video_view",
-			element: <ClassVideoView />,
-			},
-			{
-			path: "/class_video_form",
-			element: <ClassVideoForm />,
+				path: "/profit_edit",
+				element: <ProfitEdit />,
 			},
 
 			{
-			path: "/online_basic_class", //온라인 기초 학습
-			element: <OnlinebasicClass />,
+				path: "/curriculum", //커리큘럼
+				element: <CurriCulum />,
 			},
 			{
-			path: "/online_basic_class_form",
-			element: <OnlineBasicClassForm />,
+				path: "/curriculum_view",
+				element: <CurriCulumView />,
+			},
+			{
+				path: "/curriculum_form",
+				element: <CurriculumForm />,
 			},
 
 			{
-			path: "/mock_exam", //회차별 모의고사
-			element: <MockExam />,
+				path: "/class_video", //실시간 영상 수업
+				element: <ClassVideo />,
 			},
 			{
-			path: "/mock_exam_form",
-			element: <MockExamForm />,
+				path: "/class_video_view",
+				element: <ClassVideoView />,
+			},
+			{
+				path: "/class_video_form",
+				element: <ClassVideoForm />,
+			},
+
+			{
+				path: "/online_basic_class", //온라인 기초 학습
+				element: <OnlinebasicClass />,
+			},
+			{
+				path: "/online_basic_class_form",
+				element: <OnlineBasicClassForm />,
+			},
+
+			{
+				path: "/mock_exam", //회차별 모의고사
+				element: <MockExam />,
+			},
+			{
+				path: "/mock_exam_form",
+				element: <MockExamForm />,
 			},
 
 			// 컨텐츠 URL 및 다운로드
 			{
-			path: "/contents", // 컨텐츠 URL 및 다운로드
-			element: <Contents />,
+				path: "/contents", // 컨텐츠 URL 및 다운로드
+				element: <Contents />,
 			},
 		],
 		},

@@ -1,9 +1,15 @@
 import dom from "@left4code/tw-starter/dist/js/dom";
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 function JoinResult() {
+	const location = useLocation();
+    const state = location.state;
+    const navigate = useNavigate();
+
 	useEffect(() => {
+		if (typeof(state?.userId) === 'undefined') navigate('/join')
+
 		dom("body")
 		.removeClass("main")
 		.removeClass("error-page")
