@@ -2,6 +2,7 @@ import dom from "@left4code/tw-starter/dist/js/dom";
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAxios from '@/hooks/useAxios';
+import { allowSelection } from "@fullcalendar/core";
 
 function Join() {
 	const navigate = useNavigate();
@@ -11,17 +12,18 @@ function Join() {
     const [idCheckBorder, setIdCheckBorder] = useState(false);
 	const [checkRequestAuth, setCheckRequestAuth] = useState(false);
 	const [checkAuth, setCheckAuth] = useState(false);
+	const [checkList, setCheckList] = useState([]);
 	const [joinParams, setJoinParams] = useState({
-        userId: '',
-        password: '',
-		password_confirm: '', 
-		phone: '', 
-		code: '', 
+        userId: '', name: '', 
+        password: '', password_confirm: '', 
+		phone: '', code: '', 
+		tos1YN: 'Y', tos2YN: 'Y'
     });
     const [alertText, setAlertText] = useState({
         alertUserID: [0, ''],
         alertPass: [0, ''],
         alertPassCheck: [0, ''],
+		alertName: [0, ''],
         alertResult: [0, ''],
     })
 	const idReg = /^.*(?=.*\d)(?=.*[a-zA-Z]).*$/;
@@ -62,7 +64,7 @@ function Join() {
 
 	// 인증 요청
     const requestAuth = async () => {
-		if (idCheckBorder && passCheck && isDuplicatedUserID && joinParams.phone !== ""){
+		if (idCheckBorder && passCheck && isDuplicatedUserID && joinParams.name !== "" && joinParams.phone !== ""){
 			setAlertText({...alertText, alertResult: [0, '']}); 
 			await api.get(`/v1/admin/sign-up/request-number?phone=${joinParams.phone}`)
 			.then((res) => {
@@ -77,7 +79,7 @@ function Join() {
 				console.log(err);
 			});
 		}else{
-			setAlertText({...alertText, alertResult: [1, '입력한 정보가 올바르지 않습니다. 다시 확인해주세요.']})
+			setAlertText({...alertText, alertResult: [1, '필수 항목을 입력해주세요.']})
 		}
     }
     // 인증번호 확인
@@ -86,7 +88,6 @@ function Join() {
             setAlertText({...alertText, alertResult: [1, '인증 시간이 초과되었습니다. 다시 인증요청해주세요.']});
             return false;
         }
-        
         api.post('/v1/admin/sign-up/check-number', joinParams)
         .then((res) => {
             console.log(res)
@@ -124,22 +125,40 @@ function Join() {
 
 	// 회원가입
 	const requestJoin = () => {
-		if (checkAuth){
-            api.post('v1/admin/sign-up', joinParams)
-			.then((res) => {
-				console.log(res)
-				if (res.status === 200) {
-					navigate('/join_result', {state: {code: 200}})
-				}
-			})
-			.catch((err) => {
-				setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
-				console.log(err);
-			});
-        }else{
-            setAlertText({...alertText, alertResult: [1, '본인인증을 진행해주세요.']})
+		if (!checkAuth){
+			setAlertText({...alertText, alertResult: [1, '본인인증을 진행해주세요.']}); return false;
+		}
+		if (!checkList.includes('terms1') || !checkList.includes('terms2')){
+            setAlertText({...alertText, alertResult: [1, '회원가입 약관(필수)에 동의하셔야만 합니다.']})
+            return false;
         }
+		api.post('v1/admin/sign-up', joinParams)
+		.then((res) => {
+			console.log(res)
+			if (res.status === 200) {
+				navigate('/join_result', {state: {code: 200}})
+			}
+		})
+		.catch((err) => {
+			setAlertText({...alertText, alertResult: [1, err.response.data.msg]})
+			console.log(err);
+		});
 	}
+
+	// 체크박스 세트
+    const handlerAllCheck = (event) => {
+        let ckArr = Array.from(document.querySelectorAll(".ck"));
+        let checked = event.target.checked;
+        ckArr.forEach(ck => {
+            ck.checked = checked;
+        });
+        checked ? setCheckList(['terms1','terms2']) : setCheckList([]);
+    };
+    const handlerCheck = (event) => {
+        event.currentTarget.checked 
+        ? setCheckList([...checkList, event.currentTarget.name]) 
+        : setCheckList(checkList.filter((choice) => choice != event.currentTarget.name))
+    };
 
 	/** 타이머 */
     const [timer, setTimer] = useState(0);
@@ -233,21 +252,17 @@ function Join() {
 											/>
 											{!!alertText.alertPassCheck[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertPassCheck[1]}</div>}
 										</div>
-
-										{/* 이름 추가 */}
 										<div className="mt-3">
 											<div className="font-medium">
 												이름<span className="text-danger">*</span>
 											</div>
-											<input
-												type="text" name={''}
+											<input type="text" name={'name'}
 												className="intro-x login__input form-control py-3 px-4 block mt-1"
-												placeholder="한글만 입력 가능합니다." 
+												placeholder="이름을 입력해주세요." 
+												onChange={handleChange} 
 											/>
-											<div className="text-sm text-danger mt-2 ml-2">이름을 입력해주세요</div>
+											{!!alertText.alertName[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertName[1]}</div>}
 										</div>
-										{/* 이름 추가 끝 */}
-
 										<div className="mt-3">
 											<div className="font-medium">휴대전화번호</div>
 											<div className="flex gap-2 items-center mt-1">
@@ -285,7 +300,7 @@ function Join() {
 										<div className="border p-5 mt-2 rounded-md">
 											<div className="">
 												<div className="form-check">
-													<input id="checkbox-switch-1" className="form-check-input" type="checkbox" value="" />
+													<input id="checkbox-switch-1" className="form-check-input" type="checkbox" value="" onChange={handlerAllCheck}/>
 													<label className="form-check-label" htmlFor="checkbox-switch-1">회원가입 약관에 모두 동의합니다.</label>
 												</div>
 												<div className="mt-1 text-slate-400">이용약관, 개인정보처리 및 이용에 대한 안내(일부 선택), 개인정보의 마케팅 및 광고 활용(선택), 개인정보의 위탁(선택)에 모두 동의합니다.</div>
@@ -293,7 +308,8 @@ function Join() {
 											<div className="mt-3 border-t pt-3">
 												<div className="flex justify-between items-center">
 													<div className="form-check">
-														<input id="checkbox-switch-2" className="form-check-input" type="checkbox" value="" />
+														<input id="checkbox-switch-2" className="form-check-input ck" type="checkbox" 
+														name="terms1" onChange={handlerCheck}/>
 														<label className="form-check-label" htmlFor="checkbox-switch-2">이용약관 <span className="text-primary">[필수]</span></label>
 													</div>
 													<button className="text-slate-400 underline see_detail" onClick={()=>toggleMenu()}>자세히 보기</button>
@@ -307,7 +323,8 @@ function Join() {
 											<div className="mt-3 border-t pt-3">
 												<div className="flex justify-between items-center">
 													<div className="form-check">
-														<input id="checkbox-switch-3" className="form-check-input" type="checkbox" value="" />
+														<input id="checkbox-switch-3" className="form-check-input ck" type="checkbox" 
+														name="terms2" onChange={handlerCheck} />
 														<label className="form-check-label" htmlFor="checkbox-switch-3">개인정보 필수항목에 대한 처리 및 이용 <span className="text-primary">[필수]</span></label>
 													</div>
 													<button className="text-slate-400 underline" onClick={()=>toggleMenu2()}>자세히 보기</button>

@@ -164,11 +164,11 @@ function PwFindstep1() {
 									</div>
 
 									<div className="intro-x mt-5 text-center ">
-										<Link to="#" className="w-full" onClick={linkResetPwd}>
+										<span className="w-full" onClick={linkResetPwd}>
 											<button className="btn btn-sky py-3 px-4 w-full align-top">
 												확인
 											</button>
-										</Link>
+										</span>
 									</div>
 									<div className="flex gap-3 mt-3">
 										<Link to="/login" className="w-full">

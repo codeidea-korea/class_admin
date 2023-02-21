@@ -27,7 +27,7 @@ function Login() {
 
 	const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
-            handleLogin();
+            requestLogin();
         }
     };
 
@@ -60,7 +60,7 @@ function Login() {
 	}
 
 	useEffect(() => {
-		if (cookies['rememberId'] && user.token === "") {
+		if (cookies['rememberId']) {
             const target = document.getElementById('userId');
             target.value = cookies['rememberId'];
         }

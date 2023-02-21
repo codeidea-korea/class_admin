@@ -8,7 +8,7 @@ function JoinResult() {
     const navigate = useNavigate();
 
 	useEffect(() => {
-		if (typeof(state?.userId) === 'undefined') navigate('/join')
+		if (typeof(state?.code) === 'undefined') navigate('/join')
 
 		dom("body")
 		.removeClass("main")

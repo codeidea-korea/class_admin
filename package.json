@@ -39,6 +39,7 @@
     "react-cookie": "^4.1.1",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.29.0",
+    "react-paginate": "^8.1.4",
     "react-router-dom": "^6.3.0",
     "react-transition-group": "^4.4.2",
     "recoil": "^0.7.0",
