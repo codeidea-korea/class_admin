@@ -21,6 +21,7 @@ function FindId() {
 
 	// 확인 버튼
     const sendAuth = () => {
+		console.log(findIdParams)
         api.get(`/v1/admin/find-id?name=${findIdParams.name}&phone=${findIdParams.phone}`)
         .then((res) => {
             console.log(res)
@@ -72,13 +73,13 @@ function FindId() {
 									</div>
 									<div className="mt-3">
 										<div className="font-medium">이름</div>
-										<input type="text" className="intro-x login__input form-control py-3 px-4 block mt-1"
+										<input type="text" name={'name'} className="intro-x login__input form-control py-3 px-4 block mt-1"
 										placeholder="이름을 입력해주세요." onChange={handleChange}
 										/>
 									</div>
 									<div className="mt-3">
 										<div className="font-medium">휴대전화번호</div>
-										<input type="text" className="intro-x login__input form-control py-3 px-4 block mt-1"
+										<input type="text" name={'phone'} className="intro-x login__input form-control py-3 px-4 block mt-1"
 										placeholder="휴대전화번호 입력해주세요."  onChange={handleChange}
 										/>
 										{!!alertText.alertResult[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertResult[1]}</div>}

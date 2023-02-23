@@ -46,7 +46,7 @@ function FindIdResult() {
 										</Link>
 									</div>
 								<div className="py-10 text-center text-xl font-medium">
-									회원님의 ID는 <span className="text-danger">{userId}</span>{" "}
+									회원님의 ID는 <span className="text-danger">{state?.userId}</span>{" "}
 									입니다.
 								</div>
 								<div className="intro-x mt-5 text-center ">
