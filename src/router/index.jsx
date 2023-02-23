@@ -65,15 +65,11 @@ function Router() {
 				element: <MemberMng />,
 			},
 			{
-				path: "/member_view", //유형이 학생일 때
+				path: "/member_view/:id", //유형이 학생일 때
 				element: <MemberView />,
 			},
 			{
-				path: "/member_view2", //유형이 학생일 때
-				element: <MemberView2 />,
-			},
-			{
-				path: "/member_edit",
+				path: "/member_edit/:id",
 				element: <MemberEdit />,
 			},
 			{

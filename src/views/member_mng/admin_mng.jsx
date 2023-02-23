@@ -16,11 +16,10 @@ function AdminMng() {
 	const [pageParams, setPageParams] = useState({
 		totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10
 	});
-	// 관리자 계정 초대
 	const [AccountInvitation, acountDetail] = useState(false);
-	// 선택삭제 모달
 	const [selDelete, selDeleteDetail] = useState(false);
 
+	// 관리자 데이터 가져오기
 	const getAdminList = async (searchString) => {
         await api.get(`/admin/admin-management?searchWord=${searchString}&page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`, 
 			{headers: {Authorization: `Bearer ${user.token}`}}
