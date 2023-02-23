@@ -63,6 +63,7 @@ function Login() {
 		if (cookies['rememberId']) {
             const target = document.getElementById('userId');
             target.value = cookies['rememberId'];
+			setLoginParams({ ...loginParams, userId: cookies['rememberId'] });
         }
 
 		dom("body").removeClass("main").removeClass("error-page").addClass("login_body");
