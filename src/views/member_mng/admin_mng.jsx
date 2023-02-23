@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Lucide, Modal, ModalBody, ModalHeader, ModalFooter } from "@/base-components";
+import React, { useState, useEffect, useRef } from "react";
+import { Lucide, Modal, ModalBody, ModalHeader, ModalFooter, Notification } from "@/base-components";
 import { Link, useNavigate } from "react-router-dom";
 import useAxios from "@/hooks/useAxios";
 import { useRecoilValue } from "recoil";
@@ -18,6 +18,9 @@ function AdminMng() {
 	});
 	const [AccountInvitation, acountDetail] = useState(false);
 	const [selDelete, selDeleteDetail] = useState(false);
+	const [alertText, setAlertText] = useState({
+        alertSelUserRemove: [0, ''],
+    })
 
 	// 관리자 데이터 가져오기
 	const getAdminList = async (searchString) => {
@@ -77,6 +80,27 @@ function AdminMng() {
         }
     };
 
+	/** 관리자 구분(권한) 변경하기 */
+	const handleAuthorityChange = (user_no, change_status) => {
+		api.patch(`/admin/admin-management/authority/${user_no}?status=${change_status}`, null, 
+			{headers: {Authorization: `Bearer ${user.token}`}}
+		).then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				basicNonStickyNotificationToggle();
+			}
+		})
+		.catch((err) => {
+			console.log('error', err);
+			if (err.response.status === 403){
+				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+				navigate('/login');
+			}else{
+				alert(err.response.data.msg); return false;
+			}
+		});
+	}
+
 	// 관리자 상태값 변경하기
 	const handleStatusChange = (user_no, change_status) => {
 		api.patch(`/admin/admin-management/status/${user_no}?status=${change_status}`, null, 
@@ -84,7 +108,7 @@ function AdminMng() {
 		).then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				return false;
+				basicNonStickyNotificationToggle();
 			}
 		})
 		.catch((err) => {
@@ -139,6 +163,54 @@ function AdminMng() {
 			}
 		});
     };
+
+	/** 관리자 삭제 팝업 */
+	const adminSelRemovePop = () => {
+		const sequences = new Array();
+        const checkedInputs = Array.from(document.querySelectorAll('.ck'));
+        checkedInputs.filter(item => item.value != '').forEach(item => {
+            if (item.checked) sequences.push(parseInt(item.value));
+        });
+        if(sequences.length > 0){
+			setAlertText({...alertText, alertSelUserRemove: [0, '']})
+            selDeleteDetail(true);
+        }else{
+			setAlertText({...alertText, alertSelUserRemove: [1, '삭제할 관리자를 선택해주세요.']})
+		}
+	}
+
+	/** 관리자 삭제 요청 */
+	const adminSelRemoveProc= async () => {
+		const sequences = new Array();
+        const checkedInputs = Array.from(document.querySelectorAll('.ck'));
+        checkedInputs.filter(item => item.value != '').forEach(item => {
+            if (item.checked) sequences.push(parseInt(item.value));
+        });
+		if(sequences.length > 0){
+			await api.delete(`/admin/admin-management?users=${sequences}`,  
+				{headers: {Authorization: `Bearer ${user.token}`}})
+			.then((res) => {
+				console.log(res)
+				if (res.status === 200) {
+					document.querySelectorAll('input:checked').forEach(item => {
+						item.checked = false;
+					});
+					selDeleteDetail(false);
+					getAdminList('');
+				}
+			})
+			.catch((err) => {
+				console.log(err.response.data.msg);
+			});
+        }else{
+			setAlertText({...alertText, alertSelUserRemove: [1, '삭제할 관리자를 선택해주세요.']})
+		}
+	}
+
+	const basicNonStickyNotification = useRef();
+	const basicNonStickyNotificationToggle = () => {
+		basicNonStickyNotification.current.showToast();
+	};
 
 	return (
 		<React.Fragment>
@@ -196,17 +268,18 @@ function AdminMng() {
 								return (
 									<tr key={index} className="text-center whitespace-nowrap">
 										<td>
-											<input className="form-check-input ck" type="checkbox" value={item.pgNo} onChange={handleCheck}/>
+											<input className="form-check-input ck" type="checkbox" value={item.id} onChange={handleCheck}/>
 										</td>
 										<td>{ano}</td>
 										<td>{item.userId}</td>
 										<td>{item.name}</td>
 										<td>
-											<select className="form-select small w-24">
-												<option value="">일반</option>
-												<option value="">관리자</option>
-												<option value="">선생님</option>
-												<option value="">원장님</option>
+											<select defaultValue={item.authority} className="form-select small w-24" 
+											onChange={(event) => {handleAuthorityChange(item.id, event.currentTarget.value)}}>
+												<option value="NORMAL">일반</option>
+												<option value="ADMIN">관리자</option>
+												<option value="TEACHER">선생님</option>
+												<option value="DIRECTOR">원장님</option>
 											</select>
 										</td>
 										<td>{item.phone}</td>
@@ -227,14 +300,10 @@ function AdminMng() {
 							</tbody>
 						</table>
 					</div>
-					<button
-						className="btn btn-outline-danger mt-3"
-						onClick={() => {
-						selDeleteDetail(true);
-						}}
-					>
+					<button className="btn btn-outline-danger mt-3" onClick={adminSelRemovePop}>
 						선택 삭제
 					</button>
+					{!!alertText.alertSelUserRemove[0] && <span className="text-sm text-danger mt-2 ml-2">{alertText.alertSelUserRemove[1]}</span>}
 				</div>
 			</div>
 
@@ -311,23 +380,31 @@ function AdminMng() {
 				</ModalHeader>
 				<ModalBody className="p-5">
 					<div className="text-lg font-medium text-center">
-						선택한 회원을 삭제하시겠습니까?
+						선택한 관리자를 삭제하시겠습니까?
 					</div>
 				</ModalBody>
 				<ModalFooter>
-					<button type="button" className="btn btn-ouline-secondary w-24 mr-2"
-						onClick={() => {
-							selDeleteDetail(false);
-						}}
-					>
-						취소
-					</button>
-					<button type="button" className="btn btn-danger w-24">
-						삭제
-					</button>
+					<button type="button" className="btn btn-ouline-secondary w-24 mr-2" onClick={() => { selDeleteDetail(false); }}>취소</button>
+					<button type="button" className="btn btn-danger w-24" onClick={adminSelRemoveProc}>삭제</button>
 				</ModalFooter>
 			</Modal>
 			{/* END: Modal 선택삭제 */}
+
+			{/* BEGIN: Basic Non Sticky Notification Content */}
+			<Notification 
+				getRef={(el)=> {
+					basicNonStickyNotification.current = el;
+				}}
+				options={{
+					duration: 3000,
+				}}
+				className="flex flex-col sm:flex-row"
+			>
+				<div className="font-medium">
+					성공적으로 변경되었습니다. 
+				</div>
+			</Notification>
+			{/* END: Basic Non Sticky Notification Content */}
 		</React.Fragment>
 	);
 }

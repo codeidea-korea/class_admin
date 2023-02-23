@@ -145,8 +145,7 @@ function MemberMng() {
             if (item.checked) sequences.push(parseInt(item.value));
         });
 		if(sequences.length > 0){
-			//await api.delete(`/admin/user-management?users=${sequences}`,  
-			await api.delete(`/admin/user-management?users=1111`,  
+			await api.delete(`/admin/user-management?users=${sequences}`,  
 				{headers: {Authorization: `Bearer ${user.token}`}})
 			.then((res) => {
 				console.log(res)
@@ -169,7 +168,7 @@ function MemberMng() {
 	/** 회원 엑셀 다운로드 */
 	const usersExcelDownload = async () => {
 		await api.get(`/admin/user-management/excel-download`, 
-			{headers: {Authorization: `Bearer ${user.token}`}}
+			{headers: {Authorization: `Bearer ${user.token}`}, responseType: 'blob'}
 		).then((res) => {
 			console.log(res)
 			if (res.status === 200) {
