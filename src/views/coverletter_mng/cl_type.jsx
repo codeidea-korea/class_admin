@@ -186,15 +186,21 @@ function ClType(props) {
                         {statementList?.map((item, index) => {
                             return (
                                 <React.Fragment key={index}>
-                                    <button className="flex items-center w-full p-2 rounded-md supportlist fieldList"
-                                        onClick={() => {handleFieldList(index)}} 
-                                    >
-                                        <div className="flex items-center">
-                                            <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
-                                            {item.name}
-                                        </div>
-                                    </button>
-                                    <Lucide icon="X" className="w-4 h-4 ml-auto" onClick={()=>{removeStatement(item.id, 'field')}}></Lucide>
+                                    <div className="flex items-center gap-2">
+                                        <button className="flex items-center w-full p-2 rounded-md supportlist fieldList"
+                                            onClick={() => {handleFieldList(index)}} 
+                                        >
+                                            <div className="flex items-center">
+                                                <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
+                                                {item.name}
+                                            </div>
+                                        </button>
+                                        <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'field')}}>
+                                            <Lucide icon="X" className="w-4 h-4 ml-auto"></Lucide>
+                                        </button>
+                                        
+                                    </div>
+                                    
                                 </React.Fragment>
                             )
                         })}
@@ -219,15 +225,19 @@ function ClType(props) {
                             {schoolStatementList.map((item, index) => {
                                 return (
                                     <React.Fragment key={index}>
-                                        <button key={index} className="flex items-center w-full p-2 rounded-md supportlist schoolList" 
-                                            onClick={() => {handleSchoolList(index)}} 
-                                        >
-                                            <div className="flex items-center">
-                                                <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
-                                                {item.name}
-                                            </div>
-                                        </button>
-                                        <Lucide icon="X" className="w-4 h-4 ml-auto" onClick={()=>{removeStatement(item.id, 'school')}}></Lucide>
+                                        <div className="flex items-center gap-2">
+                                            <button key={index} className="flex items-center w-full p-2 rounded-md supportlist schoolList" 
+                                                onClick={() => {handleSchoolList(index)}} 
+                                            >
+                                                <div className="flex items-center">
+                                                    <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
+                                                    {item.name}
+                                                </div>
+                                            </button>
+                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'field')}}>
+                                                <Lucide icon="X" className="w-4 h-4 ml-auto"></Lucide>
+                                            </button>
+                                        </div>
                                     </React.Fragment>
                                 )
                             })}
@@ -253,15 +263,19 @@ function ClType(props) {
                             {typeStatementList.map((item, index) => {
                                 return (
                                     <React.Fragment key={index}>
-                                        <button key={index} className="flex items-center w-full p-2 rounded-md supportlist typeList" 
-                                            onClick={() => {handleTypeList(index)}} 
-                                        >
-                                            <div className="flex items-center">
-                                                <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
-                                                {item.name}
-                                            </div>
-                                        </button>
-                                        <Lucide icon="X" className="w-4 h-4 ml-auto" onClick={()=>{removeStatement(item.id, 'type')}}></Lucide>
+                                        <div className="flex items-center gap-2">
+                                            <button key={index} className="flex items-center w-full p-2 rounded-md supportlist typeList" 
+                                                onClick={() => {handleTypeList(index)}} 
+                                            >
+                                                <div className="flex items-center">
+                                                    <Lucide icon="Check" className="w-4 h-4 mr-2"></Lucide>
+                                                    {item.name}
+                                                </div>
+                                            </button>
+                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'field')}}>
+                                                <Lucide icon="X" className="w-4 h-4 ml-auto"></Lucide>
+                                            </button>
+                                        </div>
                                     </React.Fragment>
                                 )
                             })}
