@@ -8,7 +8,6 @@ import ClType from "@/views/coverletter_mng/cl_type";
 import ClNote from "@/views/coverletter_mng/cl_note";
 import ClQuestion from "@/views/coverletter_mng/cl_question";
 import ClOutline from "@/views/coverletter_mng/cl_outline";
-import dom from "@left4code/tw-starter/dist/js/dom";
 
 function CoverletterMng() {
 	const api = useAxios();
@@ -43,8 +42,6 @@ function CoverletterMng() {
 				setQuestionLength(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].questionList.length);
 				setOutlineLength(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].outlineList.length);
 				console.log('type-data', res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd]);
-				//document.querySelector('.olist').classList.add('active');
-
 			}
 		}).catch((err) => {
 			console.log('error', err);
@@ -62,12 +59,6 @@ function CoverletterMng() {
 			}
         })();
     }, [psnStat]);
-
-	useEffect(() => {
-        (async () => {
-			console.log('seltab', selTab)
-        })();
-    }, [selTab]);
 
 	return (
 		<React.Fragment>
@@ -90,7 +81,11 @@ function CoverletterMng() {
 				{psnStat.typeId > 0 && (
 					<React.Fragment>
 						{/* 자기소개소 유의사항, 지원학생확인서약 */}
-						<ClNote psnNote={psnNote} setPsnNote={setPsnNote} />
+						<ClNote 
+							typeId={psnStat.typeId} 
+							psnNote={psnNote} setPsnNote={setPsnNote} 
+							personalStatement={personalStatement}
+						/>
 
 						<TabGroup className="mt-6 intro-y">
 							<TabList className="nav-boxed-tabs gap-6">

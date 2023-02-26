@@ -95,23 +95,27 @@ function ClType(props) {
 
     /** 지원 영역, 학교, 전형 삭제 요청 */
     const removeStatement = async (pkid, rtype) => {
-        await api.delete(`/admin/personal-statement/${rtype}/${pkid}`,  
-            {headers: {Authorization: `Bearer ${user.token}`}})
-        .then((res) => {
-            console.log(res)
-            if (res.status === 200) {
-                if (rtype === "field"){
-                    $('.fieldList').removeClass('on'); 
-                }else if (rtype === "school"){
-                    $('.schoolList').removeClass('on'); 
-                }else if (rtype === "type"){
-                    $('.typeList').removeClass('on'); 
+        if (confirm('선택하신 영역을 삭제하시겠습니까?')){
+            await api.delete(`/admin/personal-statement/${rtype}/${pkid}`,  
+                {headers: {Authorization: `Bearer ${user.token}`}})
+            .then((res) => {
+                console.log(res)
+                if (res.status === 200) {
+                    if (rtype === "field"){
+                        $('.fieldList').removeClass('on'); 
+                    }else if (rtype === "school"){
+                        $('.schoolList').removeClass('on'); 
+                    }else if (rtype === "type"){
+                        $('.typeList').removeClass('on'); 
+                    }
+                    personalStatement();
                 }
-                personalStatement();
-            }
-        }).catch((err) => {
-            console.log(err.response.data.msg);
-        });
+            }).catch((err) => {
+                console.log(err.response.data.msg);
+            });
+        }else{
+            return false;
+        }
     }
 
     /** 지원영역 선택시 */
@@ -234,7 +238,7 @@ function ClType(props) {
                                                     {item.name}
                                                 </div>
                                             </button>
-                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'field')}}>
+                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'school')}}>
                                                 <Lucide icon="X" className="w-4 h-4 ml-auto"></Lucide>
                                             </button>
                                         </div>
@@ -272,7 +276,7 @@ function ClType(props) {
                                                     {item.name}
                                                 </div>
                                             </button>
-                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'field')}}>
+                                            <button className="btn bg-slate-100 hover:btn-danger btn-sm" onClick={()=>{removeStatement(item.id, 'type')}}>
                                                 <Lucide icon="X" className="w-4 h-4 ml-auto"></Lucide>
                                             </button>
                                         </div>
