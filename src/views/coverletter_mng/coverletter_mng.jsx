@@ -8,6 +8,7 @@ import ClType from "@/views/coverletter_mng/cl_type";
 import ClNote from "@/views/coverletter_mng/cl_note";
 import ClQuestion from "@/views/coverletter_mng/cl_question";
 import ClOutline from "@/views/coverletter_mng/cl_outline";
+import dom from "@left4code/tw-starter/dist/js/dom";
 
 function CoverletterMng() {
 	const api = useAxios();
@@ -21,6 +22,9 @@ function CoverletterMng() {
 	const [psnActivity, setPsnActivity] = useState('N')
 	const [questionList, setQuestionList] = useState();
 	const [outlineList, setOutlineList] = useState();
+	const [questionLength, setQuestionLength] = useState(0);
+	const [outlineLength, setOutlineLength] = useState(0);
+	const [selTab, setSelTab] = useState('question');
 
 	/** 지원영역, 지원학교, 지원전형 전체목록 */
     const personalStatement = async () => {
@@ -36,7 +40,11 @@ function CoverletterMng() {
 				setPsnActivity(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].activityYN);
 				setQuestionList(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].questionList);
 				setOutlineList(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].outlineList);
+				setQuestionLength(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].questionList.length);
+				setOutlineLength(res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd].outlineList.length);
 				console.log('type-data', res.data[psnStat.fieldOrd].schoolList[psnStat.schoolOrd].typeList[psnStat.typeOrd]);
+				//document.querySelector('.olist').classList.add('active');
+
 			}
 		}).catch((err) => {
 			console.log('error', err);
@@ -55,6 +63,12 @@ function CoverletterMng() {
         })();
     }, [psnStat]);
 
+	useEffect(() => {
+        (async () => {
+			console.log('seltab', selTab)
+        })();
+    }, [selTab]);
+
 	return (
 		<React.Fragment>
 			<div className="intro-y box p-5 mt-5">
@@ -72,31 +86,46 @@ function CoverletterMng() {
 				{/* 지원영역, 지원학교, 지원전형 */}
 				<ClType psnStat={psnStat} setPsnStat={setPsnStat} />
 				
-				{/* 자기소개소 유의사항, 지원학생확인서약 */}
+				
 				{psnStat.typeId > 0 && (
-					<ClNote psnNote={psnNote} setPsnNote={setPsnNote} />
-				)}
+					<React.Fragment>
+						{/* 자기소개소 유의사항, 지원학생확인서약 */}
+						<ClNote psnNote={psnNote} setPsnNote={setPsnNote} />
 
-				<TabGroup className="mt-6 intro-y">
-					<TabList className="nav-boxed-tabs gap-6">
-						<Tab className="w-full py-2 border-slate-200" tag="button">자기소개서 문항</Tab>
-						<Tab className="w-full py-2 border-slate-200" tag="button">자기소개서 개요표</Tab>
-					</TabList>
-					<TabPanels className="mt-5">
-						{/* 자기소개서 문항 */}
-						<TabPanel className="leading-relaxed">
-							<ClQuestion 
-								typeId={psnStat.typeId} 
-								psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
-								questionList={questionList} setQuestionList={setQuestionList} 
-							/>
-						</TabPanel>
-						{/* 자기소개서 개요표 */}
-						<TabPanel className="leading-relaxed">
-							<ClOutline outlineList={outlineList} setOutlineList={setOutlineList} />
-						</TabPanel>
-					</TabPanels>
-				</TabGroup>
+						<TabGroup className="mt-6 intro-y">
+							<TabList className="nav-boxed-tabs gap-6">
+								<Tab className="w-full py-2 border-slate-200" tag="button" onClick={()=>{console.log('question')}}>자기소개서 문항</Tab>
+								<Tab className="w-full py-2 border-slate-200" tag="button" onClick={()=>{console.log('outline')}}>자기소개서 개요표</Tab>
+							</TabList>
+							<TabPanels className="mt-5">
+								{/* 자기소개서 문항 */}
+								<TabPanel className="leading-relaxed">
+									{/* {selTab === "question" &&  */}
+										<ClQuestion 
+											typeId={psnStat.typeId} 
+											psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
+											questionList={questionList} setQuestionList={setQuestionList} questionLength={questionLength} 
+											personalStatement={personalStatement}
+											selTab={selTab} setSelTab={setSelTab}
+										/>
+									{/* } */}
+								</TabPanel>
+								{/* 자기소개서 개요표 */}
+								<TabPanel className="leading-relaxed">
+									{/* {selTab === "outline" &&  */}
+										<ClOutline 
+											typeId={psnStat.typeId} 
+											psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
+											outlineList={outlineList} setOutlineList={setOutlineList} outlineLength={outlineLength} 
+											personalStatement={personalStatement}
+											selTab={selTab} setSelTab={setSelTab}
+										/>
+									{/* } */}
+								</TabPanel>
+							</TabPanels>
+						</TabGroup>
+					</React.Fragment>
+				)}				
 			</div>
 		</React.Fragment>
 	);
