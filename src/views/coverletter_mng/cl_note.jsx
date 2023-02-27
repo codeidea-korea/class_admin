@@ -69,16 +69,19 @@ function ClNote(props) {
                 </div>
             </div>  */}
             
-            {/* 임과장 아래 div영역 수정해줘  */}
-            <div>
-                자기소개서 관련 유의사항<br/>
-                <span style={{ whiteSpace: 'pre-line' }}>{props.psnNote.note}</span><br/>
-                지원 학생 확인 서약<br/>
-                <span style={{ whiteSpace: 'pre-line' }}>{props.psnNote.confirm}</span><br/>
-                <button onClick={() => {
-                    setModNoteParams({ ...modNoteParams, note: props.psnNote.note, confirm: props.psnNote.confirm })
-                    setModForm(true);
-                }}>수정하기</button>
+            {/* 수정완료 */}
+            <div className="p-5 bg-slate-50 mt-6">
+                <div className="font-bold text-lg mb-2">자기소개서 관련 유의사항</div>
+                <span style={{ whiteSpace: 'pre-line', lineHeight: '1.6rem' }}>{props.psnNote.note}</span>
+                <div className="font-bold text-lg mt-6 mb-2">지원 학생 확인 서약</div>
+                <span style={{ whiteSpace: 'pre-line', lineHeight: '1.6rem' }}>{props.psnNote.confirm}</span>
+                <div className="flex justify-end">
+                    <button className="btn btn-outline-primary border-dotted" onClick={() => {
+                        setModNoteParams({ ...modNoteParams, note: props.psnNote.note, confirm: props.psnNote.confirm })
+                        setModForm(true);
+                    }}>수정하기</button>
+                </div>
+              
             </div>
             
      
