@@ -67,7 +67,6 @@ function CoverletterMng() {
         })();
     }, [psnStat]);
 
-
 	const tabContArr=[
 		// 자기소개서 문항
         {
@@ -86,10 +85,8 @@ function CoverletterMng() {
 				/>
             )
         },
-
 		// 자기소개서 개요표
         {
-
             tabTitle:(
                 <li className={activeIndex===1 ? "is-active nav-item flex-1" : "nav-item flex-1"} onClick={()=>tabClickHandler(1)}>
 					<button className="btn w-full py-2 border-slate-200">자기소개서 개요표</button>
