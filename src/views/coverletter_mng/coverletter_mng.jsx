@@ -52,6 +52,13 @@ function CoverletterMng() {
 		});
     }
 
+	// 탭 시작
+	const [activeIndex, setActiveIndex]=useState(0);
+
+    const tabClickHandler=(index)=>{
+        setActiveIndex(index);
+    };
+
 	useEffect(() => {
         (async () => {
 			if (psnStat.typeId > 0){
@@ -59,6 +66,47 @@ function CoverletterMng() {
 			}
         })();
     }, [psnStat]);
+
+
+	const tabContArr=[
+		// 자기소개서 문항
+        {
+            tabTitle:(
+                <li className={activeIndex===0 ? "is-active nav-item flex-1" : "nav-item flex-1"} onClick={()=>tabClickHandler(0)}>
+					<button className="btn w-full py-2 border-slate-200">자기소개서 문항</button>
+				</li>
+            ),
+            tabCont:(
+                <ClQuestion 
+					typeId={psnStat.typeId} 
+					psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
+					questionList={questionList} setQuestionList={setQuestionList} questionLength={questionLength} 
+					personalStatement={personalStatement}
+					selTab={selTab} setSelTab={setSelTab}
+				/>
+            )
+        },
+
+		// 자기소개서 개요표
+        {
+
+            tabTitle:(
+                <li className={activeIndex===1 ? "is-active nav-item flex-1" : "nav-item flex-1"} onClick={()=>tabClickHandler(1)}>
+					<button className="btn w-full py-2 border-slate-200">자기소개서 개요표</button>
+				</li>
+            ),
+            tabCont:(
+                <ClOutline 
+					typeId={psnStat.typeId} 
+					psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
+					outlineList={outlineList} setOutlineList={setOutlineList} outlineLength={outlineLength} 
+					personalStatement={personalStatement}
+					selTab={selTab} setSelTab={setSelTab}
+				/>
+            )
+        }
+    ];
+	// 탭 끝
 
 	return (
 		<React.Fragment>
@@ -86,16 +134,14 @@ function CoverletterMng() {
 							psnNote={psnNote} setPsnNote={setPsnNote} 
 							personalStatement={personalStatement}
 						/>
-
-						<TabGroup className="mt-6 intro-y">
+						{/* 기존소스 */}
+						{/* <TabGroup className="mt-6 intro-y">
 							<TabList className="nav-boxed-tabs gap-6">
 								<Tab className="w-full py-2 border-slate-200" tag="button" onClick={()=>{console.log('question')}}>자기소개서 문항</Tab>
 								<Tab className="w-full py-2 border-slate-200" tag="button" onClick={()=>{console.log('outline')}}>자기소개서 개요표</Tab>
 							</TabList>
 							<TabPanels className="mt-5">
-								{/* 자기소개서 문항 */}
 								<TabPanel className="leading-relaxed">
-									{/* {selTab === "question" &&  */}
 										<ClQuestion 
 											typeId={psnStat.typeId} 
 											psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
@@ -103,11 +149,8 @@ function CoverletterMng() {
 											personalStatement={personalStatement}
 											selTab={selTab} setSelTab={setSelTab}
 										/>
-									{/* } */}
 								</TabPanel>
-								{/* 자기소개서 개요표 */}
 								<TabPanel className="leading-relaxed">
-									{/* {selTab === "outline" &&  */}
 										<ClOutline 
 											typeId={psnStat.typeId} 
 											psnActivity={psnActivity} setPsnActivity={setPsnActivity} 
@@ -115,12 +158,22 @@ function CoverletterMng() {
 											personalStatement={personalStatement}
 											selTab={selTab} setSelTab={setSelTab}
 										/>
-									{/* } */}
 								</TabPanel>
 							</TabPanels>
-						</TabGroup>
-					</React.Fragment>
-				)}				
+						</TabGroup> */}
+					</React.Fragment>	
+				)}
+				{/* 자기소개서 새로운 탭 */}
+				<div className="mt-6 intro-y">
+					<ul className="tabs is-boxe nav nav-boxed-tabs gap-6">
+						{tabContArr.map((section, index)=>{
+							return section.tabTitle
+						})}
+					</ul>
+					<div className="mt-5">
+						{tabContArr[activeIndex].tabCont}
+					</div>
+				</div>
 			</div>
 		</React.Fragment>
 	);
