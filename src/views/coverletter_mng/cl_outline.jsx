@@ -126,7 +126,7 @@ function ClOutline(props) {
 	return (
 		<React.Fragment>
             <div className="flex w-full justify-end gap-3">
-                <button className="btn" onClick={outlineSortUpdate} >순서 정하기</button>
+                <button className="btn" onClick={outlineSortUpdate} >순서 지정하기</button>
                 <button className="btn btn-outline-primary border-dotted flex itmes-center" 
                     onClick={() => { 
                         setAddForm(true); 

@@ -154,7 +154,7 @@ function ClQuestion(props) {
                     />
                     <label className="form-check-label" htmlFor="checkbox-switch-7">탐구 활동 증빙 자료 목록</label>
                 </div>
-                <button className="btn" onClick={questionSortUpdate} >순서 정하기</button>
+                <button className="btn" onClick={questionSortUpdate} >순서 지정하기</button>
                 <button className="btn btn-outline-primary border-dotted flex itmes-center" 
                     onClick={() => { 
                         setAddForm(true); 
