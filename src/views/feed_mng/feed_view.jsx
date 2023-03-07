@@ -1,14 +1,4 @@
-import {
-  Lucide,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  TabGroup,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-} from "@/base-components";
+import {Lucide, Modal, ModalBody, ModalHeader, TabGroup, TabList, Tab, TabPanels, TabPanel } from "@/base-components";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
