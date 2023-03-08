@@ -52,7 +52,6 @@ function MentoMng() {
 		if (txtSearchWord.searchStudentWord === ""){
 			alert('검색할 학생의 아이디/전화번호/이름을 입력해주세요.'); return false;
 		}
-		console.log(`${popSearchStrudentSelMentorId}`);
 		await api.get(`/admin/mentor-management/application/student?id=${popSearchStrudentSelMentorId}&searchWord=${txtSearchWord.searchStudentWord}`, 
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
@@ -71,8 +70,14 @@ function MentoMng() {
 
 	/** 학생 등록 */
 	const addStudentProc = async () => {
-		//addStudentIds
-		await api.post(`/admin/mentor-management/application/mentor`, addTeacherParams,  
+		if (addStudentIds.length === 0){
+			alert('등록할 학생들을 체크해주세요.'); return false;
+		}
+		let params = `{
+			"ids": [${addStudentIds.join(',')}],
+			"mentorId": ${popSearchStrudentSelMentorId}
+        }`;
+		await api.post(`/admin/mentor-management/application/student`, params,  
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
 			if (res.status === 200) {
@@ -80,6 +85,7 @@ function MentoMng() {
 				setPopSearchStrudentSelMentorId(0); 
 				setTxtSearchWord({ ...txtSearchWord, searchStudentWord: '', searchTeacherWord: '', serachField: '' });
 				setSearchedStudentList();
+				setAddStudentIds([]);
 				mentorFindAll();
 			}
 		}).catch((err) => {
@@ -91,6 +97,29 @@ function MentoMng() {
 				alert(err.response.data.msg); return;
 			}
 		});
+	}
+
+	/** 학생 삭제 */
+	const removeStudentProc = async (sid) => {
+		if (confirm('선택하신 학생을 삭제하시겠습니까?')){
+			await api.delete(`/admin/mentor-management/application/student?id=${sid}`,  
+				{headers: {Authorization: `Bearer ${user.token}`}}
+			).then((res) => {
+				if (res.status === 200) {
+					mentorFindAll();
+				}
+			}).catch((err) => {
+				console.log('error', err);
+				if (err.response.status === 403){
+					alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+					navigate('/login');
+				}else{
+					alert(err.response.data.msg); return;
+				}
+			});
+		}else{
+			return false;
+		}
 	}
 
 	/** 멘토(선생님) 검색 */
@@ -258,7 +287,10 @@ function MentoMng() {
 														<td>{userSchoolYear(item2.schoolYear)}</td>
 														<td>{item2.creDate}</td>
 														<td>{item2.applicationTypeName}</td>
-														<td><button className="btn btn-outline-danger btn-sm">담당 학생 삭제</button></td>
+														<td><button className="btn btn-outline-danger btn-sm" 
+														onClick={() => {
+															removeStudentProc(item2.id);
+														}}>담당 학생 삭제</button></td>
 													</tr>
 												</React.Fragment>
 											)
@@ -379,7 +411,8 @@ function MentoMng() {
 									return (
 										<React.Fragment key={sindex}>
 											<tr className="text-center">
-												<td><input name="student[]" id={`sl_${sindex}`} className="form-check-input" type="checkbox" value={sitem.id}
+												<td><input name="student[]" id={`sl_${sindex}`} className="form-check-input stu" 
+												type="checkbox" value={sitem.applicationId}
 												onChange={(event) => {
 													event.currentTarget.checked 
 													? setAddStudentIds([...addStudentIds, event.currentTarget.value]) 
