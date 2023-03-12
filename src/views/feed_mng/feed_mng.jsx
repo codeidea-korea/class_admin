@@ -16,10 +16,12 @@ function FeedMng() {
 		totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10
 	});
 	const [feedbackList, setFeedbackList] = useState();
+	const [searchParams, setSearchParams] = useState({ searchValue: '' });
 
 	/** 전체 목록 */
     const feedbackFindAll = async () => {
-        await api.get(`/admin/feedback-management/application?page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`, 
+        await api.get(`/admin/feedback-management/application?searchValue=${searchParams.searchValue}
+			&page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`, 
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
 			console.log('feedbackFindAll', res)
@@ -59,8 +61,11 @@ function FeedMng() {
 				<div className="p-3 px-5 flex items-center border-b border-slate-200/60">
 					<div className="ml-auto">
 						<div className="flex flex-middle gap-3">
-							<input type="text" name="" className="form-control w-60" placeholder="검색어 입력"/>
-							<button type="button" className="btn btn-primary flex items-center" >
+							<input type="text" name={'searchValues'} className="form-control w-60" placeholder="아이디, 이름,학교, 학년, 지원학교, 전형" 
+							value={searchParams.searchValue} onChange={(event) => {
+								setSearchParams({ ...searchParams, searchValue: event.currentTarget.value })
+							}}/>
+							<button type="button" className="btn btn-primary flex items-center" onClick={feedbackFindAll}>
 								<Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>검색
 							</button>
 						</div>
@@ -86,10 +91,9 @@ function FeedMng() {
 											<td>{item.applicationSchoolName}</td>
 											<td>{item.applicationTypeName}</td>
 											<td>
-												{item.status}
-												<span className="text-danger">미학인</span>
-												<span className="text-primary">확인</span>
-												<span className="text-slate-400">피드백 완료</span>
+												{(item.status === 'UNREAD') && (<span className="text-danger">미학인</span>)}
+												{(item.status === 'READ') && (<span className="text-primary">학인</span>)}
+												{(item.status === 'COMPLETE') && (<span className="text-slate-400">피드백 완료</span>)}
 											</td>
 										</tr>
 									</React.Fragment>

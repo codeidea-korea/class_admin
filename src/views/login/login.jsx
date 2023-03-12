@@ -49,6 +49,8 @@ function Login() {
                     status: res.data.status,
                     token: res.data.token,
                     userId: res.data.userId,
+                    grade: res.data.grade,
+                    name: res.data.name,
                 });
                 navigate('/');
             }

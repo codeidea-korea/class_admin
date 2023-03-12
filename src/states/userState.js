@@ -10,6 +10,8 @@ const userState = atom({
         token: '',
         userId: '',
         loginModal: false, 
+        grade: '', 
+        name: '', 
     },
     effects_UNSTABLE: [persistAtom],
 });

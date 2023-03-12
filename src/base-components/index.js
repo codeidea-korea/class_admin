@@ -28,6 +28,7 @@ import {
   DropdownDivider,
 } from "./dropdown";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "./tab";
+import { TabGroup2, TabList2, Tab2, TabPanels2, TabPanel2 } from "./tab2";
 import {
   AccordionGroup,
   AccordionItem,
@@ -78,6 +79,11 @@ export {
   Tab,
   TabPanels,
   TabPanel,
+  TabGroup2,
+  TabList2,
+  Tab2,
+  TabPanels2,
+  TabPanel2,
   AccordionGroup,
   AccordionItem,
   Accordion,

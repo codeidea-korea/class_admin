@@ -107,7 +107,7 @@ function Router() {
 				element: <FeedMng />,
 			},
 			{
-				path: "/feed_view/:id",
+				path: "/feed_view/:feedId",
 				element: <FeedView />,
 			},
 			{
