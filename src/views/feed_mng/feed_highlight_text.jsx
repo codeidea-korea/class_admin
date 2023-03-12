@@ -16,7 +16,7 @@ function FeedHighlightText(props) {
 	return (
 		<React.Fragment>
             <p>{props.content}</p>
-            <p>{props.feedbackList}</p>
+            
 		</React.Fragment>
 	);
 }
