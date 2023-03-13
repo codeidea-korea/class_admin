@@ -65,8 +65,8 @@ export function userSchoolYear(code) {
 
 export function convertBirthdayStr(birth) {
     let byear = birth?.substr(0,4);
-    let bmonth = birth?.substr(5,2);
-    let bday = birth?.substr(8,2);
+    let bmonth = birth?.substr(4,2);
+    let bday = birth?.substr(6,2);
     let str = byear + "년 " + bmonth + "월 " + bday + "일";
     return str;
 }
