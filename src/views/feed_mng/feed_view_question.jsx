@@ -211,13 +211,14 @@ function FeedViewQuestion(props) {
                                                 {
                                                 item.feedbackList?.length > 0 && (
                                                     item.feedbackList?.map((fitem, findex) => {
-                                                        answerContent = answerContent.replace(`${fitem.sentence}`,`<span class="fdb_highlight hightlight-red" id="fdb_${item.number}_${findex}" 
-                                                        data-reply="${fitem.reply}"data-sentence="${fitem.sentence}"data-fid="${fitem.id}">
+                                                        answerContent = answerContent.replace(`${fitem.sentence}`, 
+                                                        `<span class="fdb_highlight hightlight-red" id="fdb_${item.number}_${findex}" 
+                                                        data-reply="${fitem.reply}" data-sentence="${fitem.sentence}" data-fid="${fitem.id}">
                                                         ${fitem.sentence}</span>`)
                                                     })
                                                 )}
-                                                <p dangerouslySetInnerHTML={{ __html : answerContent }}></p>
-                                            </div> 
+                                                <div dangerouslySetInnerHTML={{ __html : answerContent }}></div>
+                                            </div>
                                             <div className="flex justify-between text-slate-400 mt-2 text-sm">
                                                 <div>글자수({item.content.replace(/<br\s*\/?>/gm, "\n").length.toString()}/{item.limit})</div>
                                                 <div>최종수정일 {item.modDate}</div>
