@@ -321,3 +321,8 @@ body.login_body{
 
 .hightlight-red { background-color: rgba(251,0,0,0.3); cursor:pointer }
 .hightlight-purple { background-color: rgba(66,0,255,0.3); cursor:pointer }
+
+/* agree_box */
+.agree_box table ,
+.agree_box table td,
+.agree_box table th {border:1px solid #ddd;}
