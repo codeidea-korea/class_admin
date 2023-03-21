@@ -1,4 +1,6 @@
-import { useRoutes } from "react-router-dom";
+import { useRoutes, useNavigate, Route } from "react-router-dom";
+
+import { PrivateRoute } from './private-route';
 import SideMenu from "../layouts/side-menu/Main";
 import AdminMng from "../views/member_mng/admin_mng";
 
@@ -62,134 +64,132 @@ function Router() {
 			// 회원관리
 			{
 				path: "/",
-				element: <MemberMng />,
+				element: <PrivateRoute element={<MemberMng />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/member_view/:id", //유형이 학생일 때
-				element: <MemberView />,
+				element: <PrivateRoute element={<MemberView />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/member_edit/:id",
-				element: <MemberEdit />,
+				element: <PrivateRoute element={<MemberEdit />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/member_edit2",
-				element: <MemberEdit2 />,
+				element: <PrivateRoute element={<MemberEdit2 />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/admin_mng",
-				element: <AdminMng />,
+				element: <PrivateRoute element={<AdminMng />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			// 자기소개서 관리
 			{
 				path: "/coverletter_mng",
-				element: <CoverletterMng />,
+				element: <PrivateRoute element={<MemberMng />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			// 생활기록부 관리
 			{
 				path: "/life_record",
-				element: <LifeRecord />,
+				element: <PrivateRoute element={<LifeRecord />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/life_record_view",
-				element: <LifeRecordView />,
+				element: <PrivateRoute element={<LifeRecordView />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/life_record_edit",
-				element: <LifeRecordEdit />,
+				element: <PrivateRoute element={<LifeRecordEdit />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 
 			// 피드백 관리
 			{
 				path: "/feed_mng",
-				element: <FeedMng />,
+				element: <PrivateRoute element={<FeedMng />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/feed_view/:feedId",
-				element: <FeedView />,
+				element: <PrivateRoute element={<FeedView />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/mento_mng",
-				element: <MentoMng />,
+				element: <PrivateRoute element={<MentoMng />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 
 			// 콘텐츠 관리
 			{
 				path: "/notice", //공지사항
-				element: <Notice />,
+				element: <PrivateRoute element={<Notice />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/notice_edit",
-				element: <NoticeEdit />,
+				element: <PrivateRoute element={<NoticeEdit />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/notice_view",
-				element: <NoticeView />,
+				element: <PrivateRoute element={<NoticeView />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			{
 				path: "/profit", //혜택
-				element: <Profit />,
+				element: <PrivateRoute element={<Profit />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/profit_view",
-				element: <ProfitView />,
+				element: <PrivateRoute element={<ProfitView />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/profit_edit",
-				element: <ProfitEdit />,
+				element: <PrivateRoute element={<ProfitEdit />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			{
 				path: "/curriculum", //커리큘럼
-				element: <CurriCulum />,
+				element: <PrivateRoute element={<CurriCulum />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/curriculum_view",
-				element: <CurriCulumView />,
+				element: <PrivateRoute element={<CurriCulumView />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/curriculum_form",
-				element: <CurriculumForm />,
+				element: <PrivateRoute element={<CurriculumForm />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
-
 			{
 				path: "/class_video", //실시간 영상 수업
-				element: <ClassVideo />,
+				element: <PrivateRoute element={<ClassVideo />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/class_video_view",
-				element: <ClassVideoView />,
+				element: <PrivateRoute element={<ClassVideoView />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 			{
 				path: "/class_video_form",
-				element: <ClassVideoForm />,
+				element: <PrivateRoute element={<ClassVideoForm />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
 			},
 
 			{
 				path: "/online_basic_class", //온라인 기초 학습
-				element: <OnlinebasicClass />,
+				element: <PrivateRoute element={<OnlinebasicClass />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/online_basic_class_form",
-				element: <OnlineBasicClassForm />,
+				element: <PrivateRoute element={<OnlineBasicClassForm />} role={['ADMIN', 'DIRECTOR']} />,
 			},
-
 			{
 				path: "/mock_exam", //회차별 모의고사
-				element: <MockExam />,
+				element: <PrivateRoute element={<MockExam />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 			{
 				path: "/mock_exam_form",
-				element: <MockExamForm />,
+				element: <PrivateRoute element={<MockExamForm />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			// 컨텐츠 URL 및 다운로드
 			{
 				path: "/contents", // 컨텐츠 URL 및 다운로드
-				element: <Contents />,
+				element: <PrivateRoute element={<Contents />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 		],
 		},
@@ -229,6 +229,32 @@ function Router() {
 	];
 
 	return useRoutes(routes);
+
+	
+
+	// const checkRole = (route) => {
+	// 	if (!route.role) {
+	// 		// 경로에 역할 정보가 없으면 모두 접근 가능
+	// 		return true;
+	// 	}
+	// 	return route.role.includes(myrole);
+	// };
+
+	// const authorizedRoutes = routes.map((route) => {
+	// 	const children = route.children?.filter(checkRole);
+	// 	if (!children?.length && !checkRole(route)) {
+	// 		// 접근 권한이 없는 경로는 null을 반환하여 렌더링되지 않도록 합니다.
+	// 		alert('접근 권한이 없습니다');
+	// 		navigate(-1);
+	// 		return null;
+	// 	}
+	// 	return {
+	// 		...route,
+	// 		children,
+	// 	};
+	// });
+
+	// return useRoutes(authorizedRoutes.filter(Boolean));
 }
 
 export default Router;
