@@ -5,7 +5,7 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useReducer, useEffect, useRef } from 'react'
+import React, { useState, useReducer, useEffect, memo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
@@ -13,14 +13,12 @@ import { userState } from '@/states/userState'
 import FeedViewActivity from './feed_view_activity'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
-import Editor from '@/components/editor'
 
-function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
+function FeedViewQuestion({ content, feedId, feedDetail, refetchFeedDetail }) {
   const api = useAxios()
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [tab, setTab] = useState(0)
-  const renderContentRef = useRef()
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -43,32 +41,26 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       reply: '',
     },
   )
-  const handleBlurRenderContent = () => {
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
-    const selectedText = range.toString().replace(/(<([^>]+)>)/gi, '')
-    const startContainer = range.startContainer
-    const startOffset = range.startOffset
-    const endContainer = range.endContainer
-    const endOffset = range.endOffset
-
-    console.log('Selected Text', selectedText)
-    console.log('Start Container', startContainer)
-    console.log('Start Offset', startOffset)
-    console.log('End Container', endContainer)
-    console.log('End Offset', endOffset)
-
+  const handleDragMouseUp = () => {
+    if (window.getSelection().toString() === '') return
+    const selectionStr = window.getSelection()
+    console.log('selectionStr', selectionStr)
     setSelection({
       fhId: feedId,
-      start: startOffset,
-      end: endOffset,
-      sentence: range.toString(),
+      start:
+        selectionStr.anchorOffset < selectionStr.extentOffset
+          ? selectionStr.anchorOffset
+          : selectionStr.extentOffset,
+      end:
+        selectionStr.extentOffset > selectionStr.anchorOffset
+          ? selectionStr.extentOffset
+          : selectionStr.anchorOffset,
+      sentence: selectionStr.toString(),
     })
   }
 
   /** 피드백 달기 버튼 */
   const feedbackStart = async (id) => {
-    console.log('selectionStr', renderContentRef.current)
     if (selection.end === 0) {
       alert('피드백할 영역을 선택해주세요.')
       return
@@ -250,24 +242,18 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                     </button>
                   </div>
                   <div
-                    ref={renderContentRef}
                     className="bg-slate-100 p-5 rounded-md mt-3"
                     style={{ whiteSpace: 'pre-line', lineHeight: '1.3rem' }}
-                    // onMouseUp={handleBlurRenderContent}
+                    // onMouseUp={handleDragMouseUp}
                   >
                     {/* <Editor
-                      content={item.content}
-                      setSelection={setSelection}
-                    /> */}
+                      editorState={editorState}
+                      onChange={setEditorState}
+                    ></Editor> */}
                     {/* <RenderContent
                       content={item.content}
                       feedback={item.feedbackList}
                     ></RenderContent> */}
-                    <Editor
-                      value={item.content}
-                      feedback={item.feedbackList}
-                      onChange={(value) => console.log(value)}
-                    ></Editor>
                   </div>
                   <div className="flex justify-between text-slate-400 mt-2 text-sm">
                     <div>
@@ -344,6 +330,135 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             </div>
           ))}
         </div>
+        {/* <TabGroup2>
+          <TabList2 className="nav-tabs">
+            {feedDetail?.qnaList.map((item, index) => (
+              <Tab2
+                key={item.questionId}
+                className={`w-full py-2 ${index === 0 && 'active'}`}
+                tag="button"
+              >
+                {item.number}번 문항
+              </Tab2>
+            ))}
+            {feedDetail?.activityYN === 'Y' && (
+              <Tab2 className="w-full py-2" tag="button">
+                탐구 활동 증빙 자료
+              </Tab2>
+            )}
+          </TabList2>
+          <TabPanels2 className="border-l border-r border-b">
+            {feedDetail?.qnaList.map((item, index) => (
+              <TabPanel2
+                key={index}
+                className={`leading-relaxed p-5 ${index === 0 && 'active'}`}
+              >
+                <div className="text-base font-medium mt-5">
+                  {item.number}. {item.title}
+                  <span className="text-slate-400 text-sm ml-2">
+                    (띄어쓰기 포함 {item.limit}자 이내)
+                  </span>
+                </div>
+                <div className="intro-y grid grid-cols-12 gap-6 mt-5">
+                  <div className="col-span-8">
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-green btn-sm"
+                        onClick={() => {
+                          feedbackStart(item.answerId)
+                        }}
+                      >
+                        피드백 달기
+                      </button>
+                    </div>
+                    <div
+                      className="bg-slate-100 p-5 rounded-md mt-3"
+                      style={{ whiteSpace: 'pre-line', lineHeight: '1.3rem' }}
+                      onMouseUp={handleDragMouseUp}
+                    >
+                      <div>{item.content}</div>
+                    </div>
+                    <div className="flex justify-between text-slate-400 mt-2 text-sm">
+                      <div>
+                        글자수(
+                        {item?.content
+                          ?.replace(/<br\s*\/?>/gm, '\n')
+                          ?.length.toString() ?? 0}
+                        /{item.limit})
+                      </div>
+                      <div>최종수정일 {item.modDate}</div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-4">
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-dark btn-sm"
+                        onClick={() => {
+                          setIsModal({
+                            history: true,
+                          })
+                        }}
+                      >
+                        히스토리 보기
+                      </button>
+                    </div>
+
+                    {item.feedbackList?.map((item, findex) => (
+                      <div
+                        key={findex}
+                        id={`hfdb_${item.number}_${findex}`}
+                        className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative hfdb_highlight"
+                      >
+                        <div className="absolute x_button">
+                          <button
+                            className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
+                            onClick={() => {
+                              if (
+                                confirm('선택하신 피드백을 삭제하시겠습니까?')
+                              ) {
+                                removeFeedback(item.id)
+                              }
+                            }}
+                          >
+                            <Lucide icon="X" className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex justify-between font-bold text-slate-500">
+                          <div>피드백</div>
+                          <div>{user.name}</div>
+                        </div>
+                        <div
+                          className="mt-3"
+                          style={{
+                            whiteSpace: 'pre-line',
+                            lineHeight: '1.3rem',
+                          }}
+                        >
+                          {item.reply}
+                        </div>
+                        <button
+                          className="btn bg-white w-full btn-sm mt-3"
+                          onClick={() => {
+                            // setSelection({
+                            // })
+                          }}
+                        >
+                          수정
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabPanel2>
+            ))}
+            {feedDetail?.activityYN === 'Y' && (
+              <TabPanel2 className="leading-relaxed p-5">
+                <FeedViewActivity />
+              </TabPanel2>
+            )}
+          </TabPanels2>
+        </TabGroup2> */}
       </div>
 
       {/* BEGIN: Modal 히스토리보기 */}
@@ -560,35 +675,29 @@ const hightlightColor = {
   1: 'hightlight-blue',
 }
 
-const RenderContent = ({ content, feedback }) => {
+const RenderContent = memo(({ content, feedback }) => {
   const replaceAt = (str, start, end, chr) => {
-    return str.substring(0, start) + chr + str.substring(end, str.length)
+    return str.substring(0, start) + chr + str.substring(end)
   }
-
-  const replaceContent = feedback.reduce((prev, item) => {
-    const { start, end, sentence } = item
-    const re = /<[^>]+>/g
-    const cleanPrev = prev.replace(re, '')
-    const replaced = replaceAt(
-      cleanPrev,
-      start,
-      end,
-      `<span style="background-color: yellow;">${sentence}</span>`,
-    )
-    return replaced
-  }, content)
-
+  const replaceText = feedback?.map((item, index) =>
+    replaceAt(
+      content,
+      item.start,
+      item.end,
+      `<span class="fdb_highlight hightlight-red">${item.sentence}</span>`,
+    ),
+  )
   if (feedback.length) {
     return (
       <div
         dangerouslySetInnerHTML={{
-          __html: replaceContent,
+          __html: replaceText,
         }}
       ></div>
     )
   } else {
     return content
   }
-}
+})
 
 export default FeedViewQuestion
