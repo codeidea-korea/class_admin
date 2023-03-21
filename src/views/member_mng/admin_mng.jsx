@@ -274,7 +274,7 @@ function AdminMng() {
 										<td>{item.userId}</td>
 										<td>{item.name}</td>
 										<td>
-											<select defaultValue={item.authority} className="form-select small w-24" 
+											<select value={item.authority} className="form-select small w-24" 
 											onChange={(event) => {handleAuthorityChange(item.id, event.currentTarget.value)}}>
 												<option value="NORMAL">일반</option>
 												<option value="ADMIN">관리자</option>
@@ -286,7 +286,7 @@ function AdminMng() {
 										<td>{item.email}</td>
 										<td>{item.creDate}</td>
 										<td>
-											<select defaultValue={item.status} className="form-select small w-24" 
+											<select value={item.status} className="form-select small w-24" 
 											onChange={(event) => {handleStatusChange(item.id, event.currentTarget.value)}}>
 												<option value="ACTIVE">재직</option>
 												<option value="SLEEP">휴직</option>
