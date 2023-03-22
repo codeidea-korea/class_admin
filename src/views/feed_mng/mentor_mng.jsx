@@ -465,7 +465,7 @@ function MentoMng() {
                 })
               }}
             >
-              <option value="">담당역역을 선택해주세요.</option>
+              <option value="">담당영역을 선택해주세요.</option>
               {fieldList?.map((item) => (
                 <option value={item.id} key={item.id}>
                   {item.name}

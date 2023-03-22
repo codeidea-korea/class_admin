@@ -132,10 +132,10 @@ function FeedMng() {
                         <td>{item.applicationTypeName}</td>
                         <td>
                           {item.status === "UNREAD" && (
-                            <span className="text-danger">미학인</span>
+                            <span className="text-danger">미확인</span>
                           )}
                           {item.status === "READ" && (
-                            <span className="text-primary">학인</span>
+                            <span className="text-primary">확인</span>
                           )}
                           {item.status === "COMPLETE" && (
                             <span className="text-slate-400">피드백 완료</span>
