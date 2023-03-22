@@ -20,7 +20,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [tab, setTab] = useState(0)
-  const renderContentRef = useRef()
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -37,47 +36,42 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     (prev, next) => ({ ...prev, ...next }),
     {
       id: 0,
-      start: 0,
-      end: 0,
       sentence: '',
       reply: '',
+      content: '',
     },
   )
-  const handleBlurRenderContent = () => {
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
-    const selectedText = range.toString().replace(/(<([^>]+)>)/gi, '')
-    const startContainer = range.startContainer
-    const startOffset = range.startOffset
-    const endContainer = range.endContainer
-    const endOffset = range.endOffset
-
-    console.log('Selected Text', selectedText)
-    console.log('Start Container', startContainer)
-    console.log('Start Offset', startOffset)
-    console.log('End Container', endContainer)
-    console.log('End Offset', endOffset)
-
-    setSelection({
-      fhId: feedId,
-      start: startOffset,
-      end: endOffset,
-      sentence: range.toString(),
-    })
-  }
 
   /** 피드백 달기 버튼 */
   const feedbackStart = async (id) => {
-    console.log('selectionStr', renderContentRef.current)
-    if (selection.end === 0) {
+    if (selection.sentence === '') {
       alert('피드백할 영역을 선택해주세요.')
       return
     }
     setSelection({
       id,
+      fhId: feedId,
     })
     setIsModal({ feedback: true })
   }
+
+  const { mutate: mutateSaveQuestion } = useMutation(
+    (data) => {
+      if (data.answerId) {
+        return request.put(
+          `/user/personal-statement/apply/answer/${data.answerId}`,
+          data,
+        )
+      } else {
+        return request.post('/user/personal-statement/apply/answer', data)
+      }
+    },
+    {
+      onSuccess: () => {
+        createFeedback(selection)
+      },
+    },
+  )
 
   const { mutate: createFeedback } = useMutation(
     (data) =>
@@ -91,10 +85,10 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
         setIsModal({ feedback: false })
         setSelection({
           id: 0,
-          start: 0,
-          end: 0,
+          fhId: 0,
           sentence: '',
           reply: '',
+          content: '',
         })
       },
     },
@@ -106,6 +100,12 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       alert('피드백 내용을 입력해주세요.')
       return
     }
+    // mutateSaveQuestion({
+    //   id: feedDetail.id,
+    //   answerId: feedDetail.qnaList[tab].answerId,
+    //   quetionId: feedDetail.qnaList[tab].questionId,
+    //   content: selection.content,
+    // })
     createFeedback(selection)
   }
 
@@ -249,24 +249,11 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       피드백 달기
                     </button>
                   </div>
-                  <div
-                    ref={renderContentRef}
-                    className="bg-slate-100 p-5 rounded-md mt-3"
-                    style={{ whiteSpace: 'pre-line', lineHeight: '1.3rem' }}
-                    // onMouseUp={handleBlurRenderContent}
-                  >
-                    {/* <Editor
-                      content={item.content}
-                      setSelection={setSelection}
-                    /> */}
-                    {/* <RenderContent
-                      content={item.content}
-                      feedback={item.feedbackList}
-                    ></RenderContent> */}
+                  <div className="bg-slate-100 p-5 rounded-md mt-3">
                     <Editor
                       value={item.content}
-                      feedback={item.feedbackList}
-                      onChange={(value) => console.log(value)}
+                      setSelection={setSelection}
+                      feedbackList={item.feedbackList}
                     ></Editor>
                   </div>
                   <div className="flex justify-between text-slate-400 mt-2 text-sm">
@@ -553,11 +540,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       {/* END: Modal 피드백 수정 팝업 */}
     </React.Fragment>
   )
-}
-
-const hightlightColor = {
-  0: 'hightlight-red',
-  1: 'hightlight-blue',
 }
 
 const RenderContent = ({ content, feedback }) => {

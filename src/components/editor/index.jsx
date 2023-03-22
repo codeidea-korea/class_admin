@@ -1,119 +1,142 @@
-import { useState, useMemo, useCallback } from 'react'
-import { createEditor, Editor, Transforms, Range, Text } from 'slate'
-import { Editable, withReact, Slate } from 'slate-react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createEditor,
+  Editor,
+  Node,
+  Range,
+  Transforms,
+  Element as SlateElement,
+} from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
+import { nanoid } from 'nanoid'
 
-const FeedbackEditor = ({ value, feedback, onChange }) => {
-  const [editorValue, setEditorValue] = useState(
-    value
-      ? [
-          {
-            type: 'paragraph',
-            children: [{ text: value }],
-          },
-        ]
-      : [
-          {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          },
-        ],
+const colors = [
+  'rgba(251, 0, 0, 0.3)',
+  'orange',
+  'yellow',
+  'green',
+  'blue',
+  'indigo',
+  'violet',
+]
+
+const FeedbackEditor = ({ value, feedbackList, setSelection }) => {
+  const nanoId = nanoid()
+  const editor = useMemo(
+    () => withInlines(withHistory(withReact(createEditor()))),
+    [],
   )
-  const editor = useMemo(() => withReact(createEditor()), [])
-  const renderLeaf = useCallback((props) => {
-    console.log(props.leaf.feedback)
-    if (props.leaf.feedback) {
-      return <span style={{ backgroundColor: 'yellow' }}>{props.children}</span>
-    }
-    return <span {...props.attributes}>{props.children}</span>
-  }, [])
+  const defaultValue = [
+    {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'qweqweqwe',
+        },
+        {
+          type: 'button',
+          children: [{ text: 'qqqq' }],
+        },
+        {
+          text: '3453tsertgserdt',
+        },
+      ],
+    },
+  ]
 
-  const decorate = useCallback(
-    ([node, path]) => {
-      const ranges = []
-
-      if (!Text.isText(node)) {
-        return ranges
+  const addHighlight = () => {
+    if (editor.selection) {
+      const { selection } = editor
+      const selectedText = Editor.string(editor, selection)
+      const isCollapsed = selection && Range.isCollapsed(selection)
+      if (isCollapsed) {
+        return
       }
-
-      feedback.forEach((item) => {
-        const { start, end } = item
-        const endOffset = start + (end - start)
-
-        if (path[0] === start && path[0] === end) {
-          ranges.push({
-            anchor: { path, offset: start },
-            focus: { path, offset: end },
-            feedback: item,
-          })
-        } else if (path[0] === start) {
-          ranges.push({
-            anchor: { path, offset: start },
-            focus: { path, offset: end },
-            feedback: item,
-          })
-        } else if (path[0] > start && path[0] < end) {
-          ranges.push({
-            anchor: { path, offset: 0 },
-            focus: { path, offset: node.text.length },
-            feedback: item,
-          })
-        } else if (path[0] === end) {
-          ranges.push({
-            anchor: { path, offset: 0 },
-            focus: { path, offset: end - path[0] },
-            feedback: item,
-          })
-        }
+      setSelection({
+        feedbackId: nanoId,
+        sentence: selectedText,
       })
 
-      return ranges
-    },
-    [feedback],
-  )
-
-  const handleOnChange = useCallback(
-    (newValue) => {
-      // add feedback to the leaf node
-      const withFeedback = newValue.map((node) => {
-        if (node.type === 'paragraph') {
-          return node.children.map((child) => {
-            if (child.text) {
-              return {
-                ...child,
-                feedback: false,
-              }
-            }
-            return child
-          })
-        }
-        return node
+      const [highlightNode] = Editor.nodes(editor, {
+        match: (n) => n.type === 'highlight',
       })
 
-      // check if the leaf node needs feedback
-      const updated = withFeedback.map((node) => {
-        return node.map((n) => {
-          if (n.feedback === false) {
-            const { text } = n
-            feedback.forEach((f) => {
-              const { start, end } = f
-              if (start <= text.length && end >= text.length) {
-                n.feedback = f
-              }
-            })
-          }
-          return n
+      if (!highlightNode) {
+        Transforms.wrapNodes(
+          editor,
+          {
+            type: 'highlight',
+            color: colors[feedbackList.length],
+            children: [],
+          },
+          { split: true },
+        )
+        Transforms.collapse(editor, { edge: 'end' })
+        editor.onChange()
+      } else {
+        Transforms.unwrapNodes(editor, {
+          match: (n) =>
+            !Editor.isEditor(n) &&
+            SlateElement.isElement(n) &&
+            n.type === 'highlight',
         })
-      })
-      onChange(updated)
-    },
-    [feedback, onChange],
-  )
+        setSelection({
+          sentence: '',
+        })
+      }
+    }
+  }
 
   return (
-    <Slate editor={editor} value={editorValue} onChange={handleOnChange}>
-      <Editable decorate={decorate} renderLeaf={renderLeaf} />
+    <Slate
+      editor={editor}
+      value={value ? JSON.parse(value) : defaultValue}
+      onChange={(value) => {
+        console.log(value)
+        setSelection({
+          content: JSON.stringify(value),
+        })
+      }}
+    >
+      <Editable
+        onSelect={() => addHighlight()}
+        onChange={(e) => e.preventDefault()}
+        renderElement={(props) => (
+          <Element {...props} feedbackList={feedbackList} />
+        )}
+        renderLeaf={(props) => <Text {...props} />}
+      />
     </Slate>
   )
+}
+
+const Element = (props) => {
+  const { attributes, children, element } = props
+  switch (element.type) {
+    case 'highlight':
+      return (
+        <span {...props.attributes} style={{ background: element.color }}>
+          {props.children}
+        </span>
+      )
+    default:
+      return <div {...attributes}>{children}</div>
+  }
+}
+
+const Text = (props) => {
+  const { attributes, children, leaf } = props
+  return <span {...attributes}>{children}</span>
+}
+
+const withInlines = (editor) => {
+  const { insertData, insertText, isInline } = editor
+
+  editor.isInline = (element) =>
+    ['highlight'].includes(element.type) || isInline(element)
+
+  return editor
 }
 
 export default FeedbackEditor
