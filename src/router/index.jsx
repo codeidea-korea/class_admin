@@ -3,6 +3,7 @@ import { PrivateRoute } from './private-route';
 import SideMenu from '../layouts/side-menu/Main'
 import AdminMng from '../views/member_mng/admin_mng'
 
+
 import MemberMng from '../views/member_mng/member_mng'
 import MemberView from '../views/member_mng/member_view'
 import MemberView2 from '../views/member_mng/member_view2'
@@ -85,7 +86,7 @@ function Router() {
 			// 자기소개서 관리
 			{
 				path: "/coverletter_mng",
-				element: <PrivateRoute element={<MemberMng />} role={['ADMIN', 'DIRECTOR']} />,
+				element: <PrivateRoute element={<CoverletterMng />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			// 생활기록부 관리
@@ -228,6 +229,7 @@ function Router() {
 	];
 
 	return useRoutes(routes);
+
 }
 
 export default Router
