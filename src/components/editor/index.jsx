@@ -1,68 +1,84 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  createEditor,
-  Editor,
-  Node,
-  Range,
-  Transforms,
-  Element as SlateElement,
-} from 'slate'
+import { useState, useImperativeHandle, useEffect } from 'react'
+import { createEditor, Editor, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
-import { nanoid } from 'nanoid'
 
 const colors = [
-  'rgba(251, 0, 0, 0.3)',
-  'orange',
-  'yellow',
-  'green',
-  'blue',
-  'indigo',
-  'violet',
+  '#BBE2F2',
+  '#F2E307',
+  '#F2BDD0',
+  '#CED9B8',
+  '#F2EAE4',
+  '#D9C9BA',
+  '#FFEAEA',
+  '#F5C6EC',
+  '#FFF2CC',
+  '#F5EBEB',
+  '#9D7BFF',
+  '#EDF1D6',
+  '#FFFFE8',
+  '#F5EBE0',
+  '#F5EBE0',
+  '#F0DBDB',
+  '#DBA39A',
+  '#EFF5F5',
+  '#D6E4E5',
+  '#D2DAFF',
+]
+const defaultValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '',
+      },
+    ],
+  },
 ]
 
-const FeedbackEditor = ({ value, feedbackList, setSelection }) => {
-  const nanoId = nanoid()
-  const editor = useMemo(
-    () => withInlines(withHistory(withReact(createEditor()))),
-    [],
+const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
+  const [editor] = useState(() =>
+    withInlines(withHistory(withReact(createEditor()))),
   )
-  const defaultValue = [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text: 'qweqweqwe',
-        },
-        {
-          type: 'button',
-          children: [{ text: 'qqqq' }],
-        },
-        {
-          text: '3453tsertgserdt',
-        },
-      ],
-    },
-  ]
+  const [editorValue, setEditorValue] = useState(
+    value ? JSON.parse(value) : defaultValue,
+  )
 
   const addHighlight = () => {
     if (editor.selection) {
       const { selection } = editor
-      const selectedText = Editor.string(editor, selection)
+      const selectedText = Editor.string(editor, selection).trim()
       const isCollapsed = selection && Range.isCollapsed(selection)
-      if (isCollapsed) {
+      if (isCollapsed || selectedText === '') {
         return
       }
+
       setSelection({
-        feedbackId: nanoId,
         sentence: selectedText,
+        color: colors[feedbackList.length],
       })
 
       const [highlightNode] = Editor.nodes(editor, {
         match: (n) => n.type === 'highlight',
       })
 
-      if (!highlightNode) {
+      Transforms.unwrapNodes(editor, {
+        at: [],
+        match: (n) =>
+          n.type === 'highlight' && n.color === colors[feedbackList.length],
+      })
+
+      if (highlightNode) {
+        Transforms.wrapNodes(
+          editor,
+          {
+            type: 'highlight',
+            color: colors[feedbackList.length],
+            children: [],
+          },
+          { split: true },
+        )
+      } else {
         Transforms.wrapNodes(
           editor,
           {
@@ -73,38 +89,55 @@ const FeedbackEditor = ({ value, feedbackList, setSelection }) => {
           { split: true },
         )
         Transforms.collapse(editor, { edge: 'end' })
-        editor.onChange()
-      } else {
-        Transforms.unwrapNodes(editor, {
-          match: (n) =>
-            !Editor.isEditor(n) &&
-            SlateElement.isElement(n) &&
-            n.type === 'highlight',
-        })
-        setSelection({
-          sentence: '',
-        })
       }
+      editor.onChange()
     }
+  }
+
+  useEffect(() => {
+    if (color) {
+      deleteFeedback(color)
+    }
+  }, [color])
+
+  const deleteFeedback = (col) => {
+    Transforms.unwrapNodes(editor, {
+      at: [],
+      match: (n) => n.type === 'highlight' && n.color === col,
+    })
+    editor.onChange()
+  }
+  const isKorean = (txt) => {
+    const c = txt.charCodeAt(0)
+    if (0x1100 <= c && c <= 0x11ff) return true
+    if (0x3130 <= c && c <= 0x318f) return true
+    if (0xac00 <= c && c <= 0xd7a3) return true
+    return false
   }
 
   return (
     <Slate
       editor={editor}
-      value={value ? JSON.parse(value) : defaultValue}
-      onChange={(value) => {
-        console.log(value)
+      value={editorValue}
+      onChange={(value) =>
         setSelection({
           content: JSON.stringify(value),
         })
-      }}
+      }
     >
       <Editable
+        onKeyDown={(e) => e.preventDefault()}
+        onKeyUp={(e) => {
+          // console.log(e)
+          // document.dispatchEvent(
+          //   new KeyboardEvent('keydown', { key: 'Backspace' }),
+          // )
+          // if (isKorean(e.key)) {
+          // }
+          e.preventDefault()
+        }}
         onSelect={() => addHighlight()}
-        onChange={(e) => e.preventDefault()}
-        renderElement={(props) => (
-          <Element {...props} feedbackList={feedbackList} />
-        )}
+        renderElement={(props) => <Element {...props} />}
         renderLeaf={(props) => <Text {...props} />}
       />
     </Slate>
@@ -116,7 +149,7 @@ const Element = (props) => {
   switch (element.type) {
     case 'highlight':
       return (
-        <span {...props.attributes} style={{ background: element.color }}>
+        <span {...props.attributes} style={{ backgroundColor: element.color }}>
           {props.children}
         </span>
       )
@@ -131,7 +164,7 @@ const Text = (props) => {
 }
 
 const withInlines = (editor) => {
-  const { insertData, insertText, isInline } = editor
+  const { isInline } = editor
 
   editor.isInline = (element) =>
     ['highlight'].includes(element.type) || isInline(element)

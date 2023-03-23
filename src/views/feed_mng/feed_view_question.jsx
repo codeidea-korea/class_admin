@@ -1,3 +1,4 @@
+import React, { useState, useReducer, useEffect, useRef } from 'react'
 import {
   Lucide,
   Modal,
@@ -5,7 +6,6 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useReducer, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
@@ -14,31 +14,37 @@ import FeedViewActivity from './feed_view_activity'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
+import { Transforms } from 'slate'
 
 function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
-  const api = useAxios()
-  const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [tab, setTab] = useState(0)
+  const [color, setColor] = useState(null)
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
       feedback: false,
       history: false,
+      editFeedback: false,
     },
   )
-  const [feedbackModParams, setFeedbackModParams] = useState({
-    elId: '',
-    sentence: '',
-    reply: '',
-  })
+  const [feedbackModParams, setFeedbackModParams] = useReducer(
+    (prev, next) => ({ ...prev, ...next }),
+    {
+      elId: '',
+      sentence: '',
+      reply: '',
+    },
+  )
   const [selection, setSelection] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
       id: 0,
+      fhId: '',
       sentence: '',
       reply: '',
       content: '',
+      color: '',
     },
   )
 
@@ -54,24 +60,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     })
     setIsModal({ feedback: true })
   }
-
-  const { mutate: mutateSaveQuestion } = useMutation(
-    (data) => {
-      if (data.answerId) {
-        return request.put(
-          `/user/personal-statement/apply/answer/${data.answerId}`,
-          data,
-        )
-      } else {
-        return request.post('/user/personal-statement/apply/answer', data)
-      }
-    },
-    {
-      onSuccess: () => {
-        createFeedback(selection)
-      },
-    },
-  )
 
   const { mutate: createFeedback } = useMutation(
     (data) =>
@@ -89,6 +77,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
           sentence: '',
           reply: '',
           content: '',
+          color: '',
         })
       },
     },
@@ -100,43 +89,36 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       alert('피드백 내용을 입력해주세요.')
       return
     }
-    // mutateSaveQuestion({
-    //   id: feedDetail.id,
-    //   answerId: feedDetail.qnaList[tab].answerId,
-    //   quetionId: feedDetail.qnaList[tab].questionId,
-    //   content: selection.content,
-    // })
     createFeedback(selection)
   }
 
+  const { mutate: updateFeedback } = useMutation(
+    () =>
+      request.put(
+        `/admin/feedback-management/application/answer-feedback/${feedbackModParams.id}`,
+        feedbackModParams,
+      ),
+    {
+      onSuccess: () => {
+        alert('피드백이 수정되었습니다.')
+        refetchFeedDetail()
+        setIsModal({ editFeedback: false })
+        setFeedbackModParams({
+          id: '',
+          sentence: '',
+          reply: '',
+        })
+      },
+    },
+  )
+
   /** 피드백 자기소개서 수정 */
-  const feedbackUpdate = async (fid) => {
+  const feedbackUpdate = () => {
     if (feedbackModParams.reply === '') {
       alert('피드백 내용을 입력해주세요.')
       return false
     }
-    await api
-      .put(
-        `/admin/feedback-management/application/answer-feedback/${fid}`,
-        feedbackModParams,
-        { headers: { Authorization: `Bearer ${user.token}` } },
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          feedbackModPopClose()
-          applicationFeedbackDetail()
-        }
-      })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        } else {
-          alert(err.response.data.msg)
-          return
-        }
-      })
+    updateFeedback()
   }
 
   const { mutate: removeFeedback } = useMutation(
@@ -178,7 +160,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
   //     item.classList.add('outline_red')
   //   })
   //   setFeedbackModParams({
-  //     ...feedbackModParams,
   //     elId: '',
   //     sentence: '',
   //     reply: '',
@@ -254,6 +235,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       value={item.content}
                       setSelection={setSelection}
                       feedbackList={item.feedbackList}
+                      color={color}
                     ></Editor>
                   </div>
                   <div className="flex justify-between text-slate-400 mt-2 text-sm">
@@ -286,7 +268,8 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                     <div
                       key={findex}
                       id={`hfdb_${item.number}_${findex}`}
-                      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative hfdb_highlight"
+                      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
+                      style={{ borderColor: item.color }}
                     >
                       <div className="absolute x_button">
                         <button
@@ -295,6 +278,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                             if (
                               confirm('선택하신 피드백을 삭제하시겠습니까?')
                             ) {
+                              setColor(item.color)
                               removeFeedback(item.id)
                             }
                           }}
@@ -318,8 +302,14 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       <button
                         className="btn bg-white w-full btn-sm mt-3"
                         onClick={() => {
-                          // setSelection({
-                          // })
+                          setFeedbackModParams({
+                            id: item.id,
+                            reply: item.reply,
+                            sentence: item.sentence,
+                          })
+                          setIsModal({
+                            editFeedback: true,
+                          })
                         }}
                       >
                         수정
@@ -443,11 +433,12 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
               <div className="w-full flex items-end">
                 <textarea
                   rows="7"
+                  value={selection.reply}
                   className="rounded-md w-full"
                   placeholder="피드백을 작성해 주세요."
                   onChange={(event) => {
                     setSelection({
-                      reply: event.currentTarget.value,
+                      reply: event.target.value,
                     })
                   }}
                 ></textarea>
@@ -477,10 +468,10 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       {/* END: Modal 피드백 입력 팝업 */}
 
       {/* BEGIN: Modal 피드백 수정 팝업 */}
-      {/* <Modal
+      <Modal
         size="modal-lg"
-        show={isModal.feedback}
-        onHidden={() => setIsModal({ feedback: false })}
+        show={isModal.editFeedback}
+        onHidden={() => setIsModal({ editFeedback: false })}
       >
         <ModalBody className="p-5">
           <div className="mt-6 box bg-slate-100 p-5 intro-y">
@@ -488,7 +479,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
               <h2 className="font-bold text-lg">피드백 : {user.name}</h2>
               <button
                 className="ml-auto"
-                onClick={() => setIsModal({ feedback: false })}
+                onClick={() => setIsModal({ editFeedback: false })}
               >
                 <Lucide icon="X" className="w-6 h-6"></Lucide>
               </button>
@@ -504,13 +495,13 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             <div className="mt-3 flex">
               <div className="w-full flex items-end">
                 <textarea
-                  cols=""
                   rows="7"
                   value={feedbackModParams.reply}
                   className="rounded-md w-full"
                   placeholder="피드백을 작성해 주세요."
                   onChange={(event) => {
-                    setSelection({
+                    setFeedbackModParams({
+                      reply: event.target.value,
                     })
                   }}
                 ></textarea>
@@ -522,7 +513,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
           <button
             type="button"
             className="btn btn-ouline-secondary w-24 mr-2"
-            onClick={feedbackModPopClose}
+            onClick={() => setIsModal({ editFeedback: false })}
           >
             취소
           </button>
@@ -530,47 +521,16 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             type="button"
             className="btn btn-primary w-24"
             onClick={() => {
-              feedbackUpdate(feedbackModParams.elId)
+              updateFeedback()
             }}
           >
             저장하기
           </button>
         </ModalFooter>
-      </Modal> */}
+      </Modal>
       {/* END: Modal 피드백 수정 팝업 */}
     </React.Fragment>
   )
-}
-
-const RenderContent = ({ content, feedback }) => {
-  const replaceAt = (str, start, end, chr) => {
-    return str.substring(0, start) + chr + str.substring(end, str.length)
-  }
-
-  const replaceContent = feedback.reduce((prev, item) => {
-    const { start, end, sentence } = item
-    const re = /<[^>]+>/g
-    const cleanPrev = prev.replace(re, '')
-    const replaced = replaceAt(
-      cleanPrev,
-      start,
-      end,
-      `<span style="background-color: yellow;">${sentence}</span>`,
-    )
-    return replaced
-  }, content)
-
-  if (feedback.length) {
-    return (
-      <div
-        dangerouslySetInnerHTML={{
-          __html: replaceContent,
-        }}
-      ></div>
-    )
-  } else {
-    return content
-  }
 }
 
 export default FeedViewQuestion

@@ -32,7 +32,6 @@ specifiers:
   lodash: ^4.17.21
   lucide: ^0.17.2
   lucide-react: ^0.37.0
-  nanoid: ^4.0.1
   postcss: ^8.4.5
   postcss-advanced-variables: ^3.0.1
   postcss-import: ^14.0.2
@@ -94,7 +93,6 @@ dependencies:
   litepicker: 2.0.12
   lucide: 0.17.17
   lucide-react: 0.37.0_sh5qlbywuemxd2y3xkrw2y2kr4
-  nanoid: 4.0.1
   prop-types: 15.8.1
   react: 18.2.0
   react-cookie: 4.1.1_react@18.2.0
@@ -2087,12 +2085,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
-
-  /nanoid/4.0.1:
-    resolution: {integrity: sha512-udKGtCCUafD3nQtJg9wBhRP3KMbPglUsgV5JVsXhvyBs/oefqb4sqMEhKBBgqZncYowu58p1prsZQBYvAj/Gww==}
-    engines: {node: ^14 || ^16 || >=18}
-    hasBin: true
-    dev: false
 
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
