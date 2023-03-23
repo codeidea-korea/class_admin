@@ -114,7 +114,7 @@ function Router() {
 			},
 			{
 				path: "/mento_mng",
-				element: <PrivateRoute element={<MentoMng />} role={['ADMIN', 'DIRECTOR', 'TEACHER']} />,
+				element: <PrivateRoute element={<MentoMng />} role={['ADMIN', 'DIRECTOR']} />,
 			},
 
 			// 콘텐츠 관리
