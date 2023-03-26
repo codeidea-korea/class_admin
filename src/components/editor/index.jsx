@@ -44,6 +44,8 @@ const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
     value && value !== '' ? JSON.parse(value) : defaultValue,
   )
 
+  console.log(value)
+
   const addHighlight = () => {
     const [highlightNode] = Editor.nodes(editor, {
       match: (n) => n.type === 'highlight',

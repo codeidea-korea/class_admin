@@ -343,84 +343,78 @@ function MentoMng() {
           </div>
         </div>
 
-        {mentorDataList?.map((item, index) => {
-          return (
-            <div className="intro-y p-5" key={index}>
-              <div className=" border p-5 rounded-md border-dotted">
-                <div className="flex flex-col gap-2">
-                  <div className="text-lg font-medium flex items-center">
-                    {item.fieldName}
-                    <button
-                      className="ml-auto"
-                      onClick={() => {
-                        removeTeacherProc(item.id)
-                      }}
-                    >
-                      <Lucide icon="X" className="w-6 h-6" />
-                    </button>
-                  </div>
-                  <div className="font-medium">
-                    담당선생님 : {item.teacherName} 선생님
-                  </div>
-                  <div className="flex items-center gap-2 font-medium">
-                    담당학생
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => {
-                        setPopSearchStrudentSelMentorId(item.id)
-                        setAddStudentPop(true)
-                      }}
-                    >
-                      <Lucide icon="Plus" className="w-4 h-4 mr-1"></Lucide>
-                      추가하기
-                    </button>
-                  </div>
+        {mentorDataList?.map((item) => (
+          <div className="intro-y p-5" key={item.id}>
+            <div className=" border p-5 rounded-md border-dotted">
+              <div className="flex flex-col gap-2">
+                <div className="text-lg font-medium flex items-center">
+                  {item.fieldName}
+                  <button
+                    className="ml-auto"
+                    onClick={() => {
+                      removeTeacherProc(item.id)
+                    }}
+                  >
+                    <Lucide icon="X" className="w-6 h-6" />
+                  </button>
                 </div>
-                <div className="overflow-x-auto mt-5">
-                  <table className="table table-hover">
-                    <tbody>
-                      <tr className="text-center bg-slate-100 font-medium">
-                        <td>번호</td>
-                        <td>아이디</td>
-                        <td>이름</td>
-                        <td>학교</td>
-                        <td>학년</td>
-                        <td>학생 등록일</td>
-                        <td>전형</td>
-                        <td></td>
-                      </tr>
-                      {item.mentorApplicationList?.map((item2, index2) => {
-                        return (
-                          <React.Fragment key={index2}>
-                            <tr className="text-center">
-                              <td>{index2 + 1}</td>
-                              <td>{item2.userId}</td>
-                              <td>{item2.name}</td>
-                              <td>{item2.schoolName}</td>
-                              <td>{userSchoolYear(item2.schoolYear)}</td>
-                              <td>{item2.creDate}</td>
-                              <td>{item2.applicationTypeName}</td>
-                              <td>
-                                <button
-                                  className="btn btn-outline-danger btn-sm"
-                                  onClick={() => {
-                                    removeStudentProc(item2.id)
-                                  }}
-                                >
-                                  담당 학생 삭제
-                                </button>
-                              </td>
-                            </tr>
-                          </React.Fragment>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                <div className="font-medium">
+                  담당선생님 : {item.teacherName} 선생님
+                </div>
+                <div className="flex items-center gap-2 font-medium">
+                  담당학생
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => {
+                      setPopSearchStrudentSelMentorId(item.id)
+                      setAddStudentPop(true)
+                    }}
+                  >
+                    <Lucide icon="Plus" className="w-4 h-4 mr-1"></Lucide>
+                    추가하기
+                  </button>
                 </div>
               </div>
+              <div className="overflow-x-auto mt-5">
+                <table className="table table-hover">
+                  <tbody>
+                    <tr className="text-center bg-slate-100 font-medium">
+                      <td>번호</td>
+                      <td>아이디</td>
+                      <td>이름</td>
+                      <td>학교</td>
+                      <td>학년</td>
+                      <td>학생 등록일</td>
+                      <td>전형</td>
+                      <td></td>
+                    </tr>
+                    {item.mentorApplicationList?.map((item2) => (
+                      <tr className="text-center" key={item2.id}>
+                        <td>{item2.id}</td>
+                        <td>{item2.userId}</td>
+                        <td>{item2.name}</td>
+                        <td>{item2.schoolName}</td>
+                        <td>{userSchoolYear(item2.schoolYear)}</td>
+                        <td>{item2.creDate}</td>
+                        <td>{item2.applicationTypeName}</td>
+                        <td>
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => {
+                              removeStudentProc(item2.id)
+                            }}
+                          >
+                            담당 학생 삭제
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          )
-        })}
+          </div>
+        ))}
 
         <div className="flex justify-center mt-5 pb-5">
           <button
