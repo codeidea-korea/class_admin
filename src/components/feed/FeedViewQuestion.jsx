@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from 'react'
+import React, { useState, useReducer } from 'react'
 import {
   Lucide,
   Modal,
@@ -6,15 +6,11 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import { Link, useNavigate } from 'react-router-dom'
-import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
-import FeedViewActivity from './feed_view_activity'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
-import { Transforms } from 'slate'
 
 function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
   const user = useRecoilValue(userState)
@@ -41,6 +37,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     {
       id: 0,
       fhId: '',
+      teacherName: user.name,
       sentence: '',
       reply: '',
       content: '',
@@ -74,6 +71,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
         setSelection({
           id: 0,
           fhId: 0,
+          teacherName: '',
           sentence: '',
           reply: '',
           content: '',
@@ -125,6 +123,11 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     (id) =>
       request.delete(
         `/admin/feedback-management/application/answer-feedback/${id}`,
+        {
+          params: {
+            content: JSON.stringify(selection.content),
+          },
+        },
       ),
     {
       onSuccess: () => {

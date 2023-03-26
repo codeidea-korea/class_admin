@@ -41,11 +41,14 @@ const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
     withInlines(withHistory(withReact(createEditor()))),
   )
   const [editorValue, setEditorValue] = useState(
-    value ? JSON.parse(value) : defaultValue,
+    value && value !== '' ? JSON.parse(value) : defaultValue,
   )
 
   const addHighlight = () => {
-    if (editor.selection) {
+    const [highlightNode] = Editor.nodes(editor, {
+      match: (n) => n.type === 'highlight',
+    })
+    if (editor.selection && !highlightNode) {
       const { selection } = editor
       const selectedText = Editor.string(editor, selection).trim()
       const isCollapsed = selection && Range.isCollapsed(selection)
@@ -53,44 +56,27 @@ const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
         return
       }
 
-      setSelection({
-        sentence: selectedText,
-        color: colors[feedbackList.length],
-      })
-
-      const [highlightNode] = Editor.nodes(editor, {
-        match: (n) => n.type === 'highlight',
-      })
-
       Transforms.unwrapNodes(editor, {
         at: [],
         match: (n) =>
           n.type === 'highlight' && n.color === colors[feedbackList.length],
       })
 
-      if (highlightNode) {
-        Transforms.wrapNodes(
-          editor,
-          {
-            type: 'highlight',
-            color: colors[feedbackList.length],
-            children: [],
-          },
-          { split: true },
-        )
-      } else {
-        Transforms.wrapNodes(
-          editor,
-          {
-            type: 'highlight',
-            color: colors[feedbackList.length],
-            children: [],
-          },
-          { split: true },
-        )
-        Transforms.collapse(editor, { edge: 'end' })
-      }
-      editor.onChange()
+      Transforms.wrapNodes(
+        editor,
+        {
+          type: 'highlight',
+          color: colors[feedbackList.length],
+          children: [],
+        },
+        { split: true },
+      )
+
+      setSelection({
+        content: JSON.stringify(editor.children),
+        sentence: selectedText,
+        color: colors[feedbackList.length],
+      })
     }
   }
 
@@ -105,27 +91,16 @@ const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
       at: [],
       match: (n) => n.type === 'highlight' && n.color === col,
     })
-    editor.onChange()
-  }
-  const isKorean = (txt) => {
-    const c = txt.charCodeAt(0)
-    if (0x1100 <= c && c <= 0x11ff) return true
-    if (0x3130 <= c && c <= 0x318f) return true
-    if (0xac00 <= c && c <= 0xd7a3) return true
-    return false
+    console.log(JSON.stringify(editor.children))
+    setSelection({
+      content: JSON.stringify(editor.children),
+    })
   }
 
   return (
-    <Slate
-      editor={editor}
-      value={editorValue}
-      onChange={(value) =>
-        setSelection({
-          content: JSON.stringify(value),
-        })
-      }
-    >
+    <Slate editor={editor} value={editorValue}>
       <Editable
+        style={{ minHeight: '400px' }}
         onKeyDown={(e) => e.preventDefault()}
         onKeyUp={(e) => {
           // console.log(e)

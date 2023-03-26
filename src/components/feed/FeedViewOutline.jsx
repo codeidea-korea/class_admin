@@ -10,13 +10,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
-import FeedViewActivity from './feed_view_activity'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
-import { Transforms } from 'slate'
 
-function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
+function FeedViewQuestion({
+  feedId,
+  feedDetail,
+  refetchFeedDetail,
+  setIsLoading,
+}) {
   const user = useRecoilValue(userState)
   const [tab, setTab] = useState(0)
   const [color, setColor] = useState(null)
@@ -41,6 +44,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     {
       id: 0,
       fhId: '',
+      teacherName: user.name,
       sentence: '',
       reply: '',
       content: '',
@@ -64,7 +68,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
   const { mutate: createFeedback } = useMutation(
     (data) =>
       request.post(
-        '/admin/feedback-management/application/answer-feedback',
+        '/admin/feedback-management/application/outline-feedback',
         data,
       ),
     {
@@ -129,42 +133,10 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     {
       onSuccess: () => {
         refetchFeedDetail()
+        setIsLoading(false)
       },
     },
   )
-  // const fdbCls = document.querySelectorAll('.fdb_highlight')
-  // fdbCls.forEach((item) => {
-  //   item.addEventListener('click', () => {
-  //     document.getElementById(item.id)?.classList.remove('hightlight-red')
-  //     document.getElementById(item.id)?.classList.add('hightlight-purple')
-  //     document.getElementById('h' + item.id)?.classList.remove('outline_red')
-  //     document.getElementById('h' + item.id)?.classList.add('outline_purple')
-  //     setFeedbackModParams({
-  //       ...feedbackModParams,
-  //       elId: item.getAttribute('data-fid').toString(),
-  //       sentence: item.getAttribute('data-sentence').toString(),
-  //       reply: item.getAttribute('data-reply').toString(),
-  //     })
-  //     setFeedbackModPop(true)
-  //   })
-  // })
-
-  // const feedbackModPopClose = () => {
-  //   document.querySelectorAll('.fdb_highlight').forEach((item) => {
-  //     item.classList.remove('hightlight-purple')
-  //     item.classList.add('hightlight-red')
-  //   })
-  //   document.querySelectorAll('.hfdb_highlight').forEach((item) => {
-  //     item.classList.remove('outline_purple')
-  //     item.classList.add('outline_red')
-  //   })
-  //   setFeedbackModParams({
-  //     elId: '',
-  //     sentence: '',
-  //     reply: '',
-  //   })
-  //   setFeedbackModPop(false)
-  // }
   return (
     <React.Fragment>
       <button className="btn bg-white flex items-center w-44">
@@ -187,139 +159,116 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
           </div>
         ))}
       </div>
-      <div className="mt-5 intro-y">
-        <ul className="nav nav-tabs">
-          {feedDetail?.qnaList.map((item, index) => (
-            <li className="nav-item flex-1" key={item.questionId}>
-              <button
-                className={`nav-link w-full py-2 ${tab === index && 'active'}`}
-                onClick={() => setTab(index)}
-              >
-                {item.number}번 문항
-              </button>
-            </li>
-          ))}
-          {feedDetail?.activityYN === 'Y' && (
-            <button className="w-full py-2">탐구 활동 증빙 자료</button>
-          )}
-        </ul>
-        <div className="tab-content w-full border-l border-r border-b">
-          {feedDetail?.qnaList.map((item, index) => (
-            <div
-              className={`tab-pane leading-relaxed p-5 ${
-                tab === index && 'active'
-              }`}
-              key={item.questionId}
-            >
-              <div className="text-base font-medium mt-5">
-                {item.number}. {item.title}
-                <span className="text-slate-400 text-sm ml-2">
-                  (띄어쓰기 포함 {item.limit}자 이내)
-                </span>
+      <div className="border mt-5 intro-y">
+        {feedDetail?.outlineQnaList?.map((item, index) => (
+          <div className="leading-relaxed p-5" key={item.outlineQuestionId}>
+            <div className="text-base font-medium mt-5">
+              {item.number}. {item.title}
+              <span className="text-slate-400 text-sm ml-2">
+                (띄어쓰기 포함 {item.limit}자 이내)
+              </span>
+            </div>
+            <div className="intro-y grid grid-cols-12 gap-6 mt-5">
+              <div className="col-span-8">
+                <div className="flex justify-end">
+                  <button
+                    className="btn btn-green btn-sm"
+                    onClick={() => {
+                      feedbackStart(item.outlineAnswerId)
+                    }}
+                  >
+                    피드백 달기
+                  </button>
+                </div>
+                <div className="bg-slate-100 p-5 rounded-md mt-3">
+                  <Editor
+                    value={item.content}
+                    setSelection={setSelection}
+                    feedbackList={item.feedbackList}
+                    color={color}
+                  ></Editor>
+                </div>
+                <div className="flex justify-between text-slate-400 mt-2 text-sm">
+                  <div>
+                    글자수(
+                    {item?.content
+                      ?.replace(/<br\s*\/?>/gm, '\n')
+                      ?.length.toString() ?? 0}
+                    /{item.limit})
+                  </div>
+                  <div>최종수정일 {item.modDate}</div>
+                </div>
               </div>
-              <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-                <div className="col-span-8">
-                  <div className="flex justify-end">
-                    <button
-                      className="btn btn-green btn-sm"
-                      onClick={() => {
-                        feedbackStart(item.answerId)
-                      }}
-                    >
-                      피드백 달기
-                    </button>
-                  </div>
-                  <div className="bg-slate-100 p-5 rounded-md mt-3">
-                    <Editor
-                      value={item.content}
-                      setSelection={setSelection}
-                      feedbackList={item.feedbackList}
-                      color={color}
-                    ></Editor>
-                  </div>
-                  <div className="flex justify-between text-slate-400 mt-2 text-sm">
-                    <div>
-                      글자수(
-                      {item?.content
-                        ?.replace(/<br\s*\/?>/gm, '\n')
-                        ?.length.toString() ?? 0}
-                      /{item.limit})
-                    </div>
-                    <div>최종수정일 {item.modDate}</div>
-                  </div>
+
+              <div className="col-span-4">
+                <div className="flex justify-end">
+                  <button
+                    className="btn btn-dark btn-sm"
+                    onClick={() => {
+                      setIsModal({
+                        history: true,
+                      })
+                    }}
+                  >
+                    히스토리 보기
+                  </button>
                 </div>
 
-                <div className="col-span-4">
-                  <div className="flex justify-end">
+                {item.feedbackList?.map((item, findex) => (
+                  <div
+                    key={findex}
+                    id={`hfdb_${item.number}_${findex}`}
+                    className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
+                    style={{ borderColor: item.color }}
+                  >
+                    <div className="absolute x_button">
+                      <button
+                        className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
+                        onClick={() => {
+                          if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
+                            setIsLoading(true)
+                            setColor(item.color)
+                            removeFeedback(item.id)
+                          }
+                        }}
+                      >
+                        <Lucide icon="X" className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex justify-between font-bold text-slate-500">
+                      <div>피드백</div>
+                      <div>{user.name}</div>
+                    </div>
+                    <div
+                      className="mt-3"
+                      style={{
+                        whiteSpace: 'pre-line',
+                        lineHeight: '1.3rem',
+                      }}
+                    >
+                      {item.reply}
+                    </div>
                     <button
-                      className="btn btn-dark btn-sm"
+                      className="btn bg-white w-full btn-sm mt-3"
                       onClick={() => {
+                        setFeedbackModParams({
+                          id: item.id,
+                          reply: item.reply,
+                          sentence: item.sentence,
+                        })
                         setIsModal({
-                          history: true,
+                          editFeedback: true,
                         })
                       }}
                     >
-                      히스토리 보기
+                      수정
                     </button>
                   </div>
-
-                  {item.feedbackList?.map((item, findex) => (
-                    <div
-                      key={findex}
-                      id={`hfdb_${item.number}_${findex}`}
-                      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
-                      style={{ borderColor: item.color }}
-                    >
-                      <div className="absolute x_button">
-                        <button
-                          className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
-                          onClick={() => {
-                            if (
-                              confirm('선택하신 피드백을 삭제하시겠습니까?')
-                            ) {
-                              setColor(item.color)
-                              removeFeedback(item.id)
-                            }
-                          }}
-                        >
-                          <Lucide icon="X" className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex justify-between font-bold text-slate-500">
-                        <div>피드백</div>
-                        <div>{user.name}</div>
-                      </div>
-                      <div
-                        className="mt-3"
-                        style={{
-                          whiteSpace: 'pre-line',
-                          lineHeight: '1.3rem',
-                        }}
-                      >
-                        {item.reply}
-                      </div>
-                      <button
-                        className="btn bg-white w-full btn-sm mt-3"
-                        onClick={() => {
-                          setFeedbackModParams({
-                            id: item.id,
-                            reply: item.reply,
-                            sentence: item.sentence,
-                          })
-                          setIsModal({
-                            editFeedback: true,
-                          })
-                        }}
-                      >
-                        수정
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
       {/* BEGIN: Modal 히스토리보기 */}

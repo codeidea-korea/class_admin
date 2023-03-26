@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import {
   Lucide,
   Dropdown,
@@ -9,61 +9,62 @@ import {
   DropdownItem,
   DropdownHeader,
   DropdownDivider,
-} from "@/base-components";
-import { faker as $f } from "@/utils";
-import * as $_ from "lodash";
-import classnames from "classnames";
-import { userState } from "@/states/userState";
-import { useRecoilValue, useRecoilState, useResetRecoilState } from "recoil";
+} from '@/base-components'
+import { faker as $f } from '@/utils'
+import classnames from 'classnames'
+import { userState } from '@/states/userState'
+import { useRecoilState } from 'recoil'
 
 function Main(props) {
-	const navigate = useNavigate();
-	const userReset = useResetRecoilState(userState);
-	const [searchDropdown, setSearchDropdown] = useState(false);
-	const showSearchDropdown = () => {
-		setSearchDropdown(true);
-	};
-	const hideSearchDropdown = () => {
-		setSearchDropdown(false);
-	};
+  const navigate = useNavigate()
+  const [user, setUser] = useRecoilState(userState)
+  const [searchDropdown, setSearchDropdown] = useState(false)
+  const showSearchDropdown = () => {
+    setSearchDropdown(true)
+  }
+  const hideSearchDropdown = () => {
+    setSearchDropdown(false)
+  }
 
-	// 로그아웃
-	const handleLogout = () => {
-		console.log('test')
-        userReset();
-        navigate('/login');
-    };
+  // 로그아웃
+  const handleLogout = () => {
+    setUser()
+    navigate('/login')
+  }
 
-	return (
-		<>
-		{/* BEGIN: Top Bar */}
-		<div className="top-bar">
-			{/* BEGIN: Breadcrumb */}
-			<Link to="">
-			<div className="text-2xl font-bold mr-6 text-white">
-				WP Apply
-			</div>
-			</Link>
-			
-			<nav
-			aria-label="breadcrumb"
-			className="-intro-x mr-auto hidden sm:flex"
-			>
-			<ol className="breadcrumb">
-				<li className="breadcrumb-item">
-				<a href="#" className="text-slate-400">회원관리</a>
-				</li>
-				<li className="">
-				<Lucide icon="ChevronRight" className="w-4 h-4 text-slate-400"></Lucide>
-				</li>
-				<li className=" text-white " aria-current="page">
-				회원관리
-				</li>
-			</ol>
-			</nav>
-			{/* END: Breadcrumb */}
-			{/* BEGIN: Search */}
-			{/* <div className="intro-x relative mr-3 sm:mr-6">
+  return (
+    <>
+      {/* BEGIN: Top Bar */}
+      <div className="top-bar">
+        {/* BEGIN: Breadcrumb */}
+        <Link to="">
+          <div className="text-2xl font-bold mr-6 text-white">WP Apply</div>
+        </Link>
+
+        <nav
+          aria-label="breadcrumb"
+          className="-intro-x mr-auto hidden sm:flex"
+        >
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item">
+              <a href="#" className="text-slate-400">
+                회원관리
+              </a>
+            </li>
+            <li className="">
+              <Lucide
+                icon="ChevronRight"
+                className="w-4 h-4 text-slate-400"
+              ></Lucide>
+            </li>
+            <li className=" text-white " aria-current="page">
+              회원관리
+            </li>
+          </ol>
+        </nav>
+        {/* END: Breadcrumb */}
+        {/* BEGIN: Search */}
+        {/* <div className="intro-x relative mr-3 sm:mr-6">
 			<div className="search hidden sm:block">
 				<input
 				type="text"
@@ -148,53 +149,52 @@ function Main(props) {
 				</div>
 			</div>
 			</div> */}
-			{/* END: Search  */}
-			{/* BEGIN: Notifications */}
-			<div className="intro-x mr-6">
-			<div className="notification notification--bullet cursor-pointer">
-			</div>
-			<Lucide
-				icon="Bell"
-				className="notification__icon dark:text-slate-500 text-white"
-				/>
-			</div>
-			{/* END: Notifications  */}
-			{/* BEGIN: Account Menu */}
-			<div className="mr-3 text-white">홍길동 님</div>
-			<Dropdown className="intro-x w-8 h-8">
-			<DropdownToggle
-				tag="div"
-				role="button"
-				className="w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in"
-			>
-				<img
-				alt="Midone Tailwind HTML Admin Template"
-				src={$f()[9].photos[0]}
-				/>
-			</DropdownToggle>
-			<DropdownMenu className="w-56">
-				<DropdownContent className="bg-black text-white">
-					<DropdownHeader tag="div" className="!font-normal">
-						<div className="font-medium">홍길동님</div>
-						<div className="text-xs text-white/70 mt-0.5 dark:text-slate-500">
-						관리자
-						</div>
-					</DropdownHeader>
-					<DropdownDivider className="border-white/[0.08]" />
-					<DropdownItem className="hover:bg-white/5">
-						<Lucide icon="User" className="w-4 h-4 mr-2" /> 프로필 수정하기
-					</DropdownItem>
-					<DropdownItem className="hover:bg-white/5" onClick={handleLogout}>
-						<Lucide icon="ToggleRight" className="w-4 h-4 mr-2"  /> Logout
-					</DropdownItem>
-				</DropdownContent>
-			</DropdownMenu>
-			</Dropdown>
-			{/* END: Account Menu */}
-		</div>
-		{/* END: Top Bar */}
-		</>
-	);
+        {/* END: Search  */}
+        {/* BEGIN: Notifications */}
+        <div className="intro-x mr-6">
+          <div className="notification notification--bullet cursor-pointer"></div>
+          <Lucide
+            icon="Bell"
+            className="notification__icon dark:text-slate-500 text-white"
+          />
+        </div>
+        {/* END: Notifications  */}
+        {/* BEGIN: Account Menu */}
+        <div className="mr-3 text-white">{user.name} 님</div>
+        <Dropdown className="intro-x w-8 h-8">
+          <DropdownToggle
+            tag="div"
+            role="button"
+            className="w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in"
+          >
+            <img
+              alt="Midone Tailwind HTML Admin Template"
+              src={$f()[9].photos[0]}
+            />
+          </DropdownToggle>
+          <DropdownMenu className="w-56">
+            <DropdownContent className="bg-black text-white">
+              <DropdownHeader tag="div" className="!font-normal">
+                <div className="font-medium">{user.name}</div>
+                <div className="text-xs text-white/70 mt-0.5 dark:text-slate-500">
+                  관리자
+                </div>
+              </DropdownHeader>
+              <DropdownDivider className="border-white/[0.08]" />
+              <DropdownItem className="hover:bg-white/5">
+                <Lucide icon="User" className="w-4 h-4 mr-2" /> 프로필 수정하기
+              </DropdownItem>
+              <DropdownItem className="hover:bg-white/5" onClick={handleLogout}>
+                <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Logout
+              </DropdownItem>
+            </DropdownContent>
+          </DropdownMenu>
+        </Dropdown>
+        {/* END: Account Menu */}
+      </div>
+      {/* END: Top Bar */}
+    </>
+  )
 }
 
-export default Main;
+export default Main
