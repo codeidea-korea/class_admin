@@ -5,7 +5,7 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
@@ -22,7 +22,7 @@ function MentoMng() {
     totalPages: 0,
     totalElements: 0,
     currentPage: 1,
-    pageRangeDisplayed: 10,
+    pageRangeDisplayed: 1000,
   })
   const [mentorDataList, setMentorDataList] = useState()
   const [searchedStudentList, setSearchedStudentList] = useState()
@@ -32,15 +32,21 @@ function MentoMng() {
     useState(0)
   const [addMentorPop, setAddMentorPop] = useState(false)
   const [addStudentPop, setAddStudentPop] = useState(false)
-  const [txtSearchWord, setTxtSearchWord] = useState({
-    searchStudentWord: '',
-    searchTeacherWord: '',
-    serachField: '',
-  })
-  const [addTeacherParams, setAddTeacherParams] = useState({
-    fieldId: 0,
-    teacherId: 0,
-  })
+  const [txtSearchWord, setTxtSearchWord] = useReducer(
+    (prev, next) => ({ ...prev, ...next }),
+    {
+      searchStudentWord: '',
+      searchTeacherWord: '',
+      serachField: '',
+    },
+  )
+  const [addTeacherParams, setAddTeacherParams] = useReducer(
+    (prev, next) => ({ ...prev, ...next }),
+    {
+      fieldId: 0,
+      teacherId: 0,
+    },
+  )
   const [addStudentIds, setAddStudentIds] = useState([])
 
   /** 멘토(학급) 전체 목록 */
@@ -115,7 +121,6 @@ function MentoMng() {
           setAddStudentPop(false)
           setPopSearchStrudentSelMentorId(0)
           setTxtSearchWord({
-            ...txtSearchWord,
             searchStudentWord: '',
             searchTeacherWord: '',
             serachField: '',
@@ -207,9 +212,8 @@ function MentoMng() {
       .then((res) => {
         if (res.status === 200) {
           setAddMentorPop(false)
-          setAddTeacherParams({ ...addTeacherParams, fieldId: 0, teacherId: 0 })
+          setAddTeacherParams({ fieldId: 0, teacherId: 0 })
           setTxtSearchWord({
-            ...txtSearchWord,
             searchStudentWord: '',
             searchTeacherWord: '',
             serachField: '',
@@ -240,6 +244,7 @@ function MentoMng() {
         .then((res) => {
           if (res.status === 200) {
             mentorFindAll()
+            alert('삭제되었습니다.')
           }
         })
         .catch((err) => {
@@ -280,7 +285,7 @@ function MentoMng() {
 
   const handleTxtSearchWord = (event) => {
     const { name, value } = event.currentTarget
-    setTxtSearchWord({ ...txtSearchWord, [name]: value })
+    setTxtSearchWord({ [name]: value })
   }
 
   useEffect(() => {
@@ -321,6 +326,13 @@ function MentoMng() {
               <button
                 className="btn btn-outline-primary border-dotted"
                 onClick={() => {
+                  setAddStudentIds([])
+                  setTxtSearchWord({
+                    searchStudentWord: '',
+                    searchTeacherWord: '',
+                    serachField: '',
+                  })
+                  setAddTeacherParams({ fieldId: '', teacherId: '' })
                   setAddMentorPop(true)
                 }}
               >
@@ -343,8 +355,8 @@ function MentoMng() {
           </div>
         </div>
 
-        {mentorDataList?.map((item) => (
-          <div className="intro-y p-5" key={item.id}>
+        {mentorDataList?.map((item, index) => (
+          <div className="intro-y p-5" key={`mentor-${index}`}>
             <div className=" border p-5 rounded-md border-dotted">
               <div className="flex flex-col gap-2">
                 <div className="text-lg font-medium flex items-center">
@@ -452,9 +464,9 @@ function MentoMng() {
             <div className="w-24 shrink-0 mr-3">담당 영역</div>
             <select
               className="form-select small"
+              value={addTeacherParams.fieldId}
               onChange={(event) => {
                 setAddTeacherParams({
-                  ...addTeacherParams,
                   fieldId: event.currentTarget.value,
                 })
               }}
@@ -502,7 +514,6 @@ function MentoMng() {
                           type="radio"
                           onChange={() => {
                             setAddTeacherParams({
-                              ...addTeacherParams,
                               teacherId: item.id,
                             })
                           }}
@@ -592,50 +603,41 @@ function MentoMng() {
                     <td>전화번호</td>
                     <td>아이디</td>
                   </tr>
-                  {searchedStudentList?.map((sitem, sindex) => {
-                    return (
-                      <React.Fragment key={sindex}>
-                        <tr className="text-center">
-                          <td>
-                            <input
-                              name="student[]"
-                              id={`sl_${sindex}`}
-                              className="form-check-input stu"
-                              type="checkbox"
-                              value={sitem.applicationId}
-                              onChange={(event) => {
-                                event.currentTarget.checked
-                                  ? setAddStudentIds([
-                                      ...addStudentIds,
-                                      event.currentTarget.value,
-                                    ])
-                                  : setAddStudentIds(
-                                      addStudentIds.filter(
-                                        (choice) =>
-                                          choice !=
-                                          event.currentTarget.navalueme,
-                                      ),
-                                    )
-                              }}
-                            />
-                          </td>
-                          <td>
-                            <label htmlFor={`sl_${sindex}`}>{sitem.name}</label>
-                          </td>
-                          <td>
-                            <label htmlFor={`sl_${sindex}`}>
-                              {sitem.phone}
-                            </label>
-                          </td>
-                          <td>
-                            <label htmlFor={`sl_${sindex}`}>
-                              {sitem.userId}
-                            </label>
-                          </td>
-                        </tr>
-                      </React.Fragment>
-                    )
-                  })}
+                  {searchedStudentList?.map((sitem, sindex) => (
+                    <tr className="text-center" key={sitem.id}>
+                      <td>
+                        <input
+                          name="student[]"
+                          id={`sl_${sindex}`}
+                          className="form-check-input stu"
+                          type="checkbox"
+                          value={sitem.applicationId}
+                          onChange={(event) => {
+                            event.currentTarget.checked
+                              ? setAddStudentIds([
+                                  ...addStudentIds,
+                                  event.currentTarget.value,
+                                ])
+                              : setAddStudentIds(
+                                  addStudentIds.filter(
+                                    (choice) =>
+                                      choice != event.currentTarget.navalueme,
+                                  ),
+                                )
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <label htmlFor={`sl_${sindex}`}>{sitem.name}</label>
+                      </td>
+                      <td>
+                        <label htmlFor={`sl_${sindex}`}>{sitem.phone}</label>
+                      </td>
+                      <td>
+                        <label htmlFor={`sl_${sindex}`}>{sitem.userId}</label>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
