@@ -290,7 +290,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       </div>
                       <div className="flex justify-between font-bold text-slate-500">
                         <div>피드백</div>
-                        <div>{user.name}</div>
+                        <div>{item.teacherName}</div>
                       </div>
                       <div
                         className="mt-3"
