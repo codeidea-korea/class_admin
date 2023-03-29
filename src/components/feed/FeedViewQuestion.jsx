@@ -203,7 +203,7 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             </li>
           ))}
           {feedDetail?.activityYN === 'Y' && (
-            <button className="w-full py-2">탐구 활동 증빙 자료</button>
+            <button className="w-full py-2" onClick={() => setTab(4)}>탐구 활동 증빙 자료</button>
           )}
         </ul>
         <div className="tab-content w-full border-l border-r border-b">
@@ -322,6 +322,11 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
               </div>
             </div>
           ))}
+          <div
+              className={`tab-pane leading-relaxed p-5 ${
+                tab === 4 && 'active'
+              }`}
+            >임과장 여기여</div>
         </div>
       </div>
 
