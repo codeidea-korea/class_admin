@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 import {
   Lucide,
   Modal,
@@ -6,16 +6,21 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useRecoilState } from 'recoil'
 import { userState } from '@/states/userState'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
+import ContentState from '@/stores/content'
 
 function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
   const user = useRecoilValue(userState)
+  const [content, setContent] = useRecoilState(ContentState)
   const [tab, setTab] = useState(0)
-  const [color, setColor] = useState(null)
+  const [feedbackParams, setFeedbackParams] = useState({
+    color: '',
+    tab: 0,
+  })
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -40,10 +45,12 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       teacherName: user.name,
       sentence: '',
       reply: '',
-      content: '',
       color: '',
     },
   )
+  useEffect(() => {
+    setContent(feedDetail.qnaList.map((item) => item.content))
+  }, [])
 
   /** 피드백 달기 버튼 */
   const feedbackStart = async (id) => {
@@ -87,7 +94,10 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       alert('피드백 내용을 입력해주세요.')
       return
     }
-    createFeedback(selection)
+    createFeedback({
+      ...selection,
+      content: content[tab],
+    })
   }
 
   const { mutate: updateFeedback } = useMutation(
@@ -124,8 +134,8 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       request.delete(
         `/admin/feedback-management/application/answer-feedback/${id}`,
         {
-          params: {
-            content: JSON.stringify(selection.content),
+          data: {
+            content: content[tab],
           },
         },
       ),
@@ -135,39 +145,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
       },
     },
   )
-  // const fdbCls = document.querySelectorAll('.fdb_highlight')
-  // fdbCls.forEach((item) => {
-  //   item.addEventListener('click', () => {
-  //     document.getElementById(item.id)?.classList.remove('hightlight-red')
-  //     document.getElementById(item.id)?.classList.add('hightlight-purple')
-  //     document.getElementById('h' + item.id)?.classList.remove('outline_red')
-  //     document.getElementById('h' + item.id)?.classList.add('outline_purple')
-  //     setFeedbackModParams({
-  //       ...feedbackModParams,
-  //       elId: item.getAttribute('data-fid').toString(),
-  //       sentence: item.getAttribute('data-sentence').toString(),
-  //       reply: item.getAttribute('data-reply').toString(),
-  //     })
-  //     setFeedbackModPop(true)
-  //   })
-  // })
-
-  // const feedbackModPopClose = () => {
-  //   document.querySelectorAll('.fdb_highlight').forEach((item) => {
-  //     item.classList.remove('hightlight-purple')
-  //     item.classList.add('hightlight-red')
-  //   })
-  //   document.querySelectorAll('.hfdb_highlight').forEach((item) => {
-  //     item.classList.remove('outline_purple')
-  //     item.classList.add('outline_red')
-  //   })
-  //   setFeedbackModParams({
-  //     elId: '',
-  //     sentence: '',
-  //     reply: '',
-  //   })
-  //   setFeedbackModPop(false)
-  // }
   return (
     <React.Fragment>
       <button className="btn bg-white flex items-center w-44">
@@ -205,8 +182,10 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
           {feedDetail?.activityYN === 'Y' && (
             <li className="nav-item flex-1">
               <button
-                className="nav-link w-full py-2"
-                onClick={() => setTab(4)}
+                className={`nav-link w-full py-2 ${
+                  tab === feedDetail?.qnaList.length && 'active'
+                }`}
+                onClick={() => setTab(feedDetail?.qnaList.length)}
               >
                 탐구 활동 증빙 자료
               </button>
@@ -240,17 +219,21 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                     </button>
                   </div>
                   <div className="bg-slate-100 p-5 rounded-md mt-3">
-                    <Editor
-                      value={item.content}
-                      setSelection={setSelection}
-                      feedbackList={item.feedbackList}
-                      color={color}
-                    ></Editor>
+                    {content[index] && (
+                      <Editor
+                        content={content[index]}
+                        setContent={setContent}
+                        contentIndex={index}
+                        feedbackParams={feedbackParams}
+                        setSelection={setSelection}
+                        feedbackList={item.feedbackList}
+                      ></Editor>
+                    )}
                   </div>
                   <div className="flex justify-between text-slate-400 mt-2 text-sm">
                     <div>
                       글자수(
-                      {item?.content
+                      {content[index]
                         ?.replace(/<br\s*\/?>/gm, '\n')
                         ?.length.toString() ?? 0}
                       /{item.limit})
@@ -272,7 +255,6 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       히스토리 보기
                     </button>
                   </div>
-
                   {item.feedbackList?.map((item, findex) => (
                     <div
                       key={findex}
@@ -287,8 +269,13 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                             if (
                               confirm('선택하신 피드백을 삭제하시겠습니까?')
                             ) {
-                              setColor(item.color)
-                              removeFeedback(item.id)
+                              setFeedbackParams({
+                                color: item.color,
+                                tab,
+                              })
+                              setTimeout(() => {
+                                removeFeedback(item.id)
+                              }, 100)
                             }
                           }}
                         >
@@ -330,7 +317,9 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             </div>
           ))}
           <div
-            className={`tab-pane leading-relaxed p-5 ${tab === 4 && 'active'}`}
+            className={`tab-pane leading-relaxed p-5 ${
+              tab === feedDetail?.qnaList.length && 'active'
+            }`}
           >
             {/* 1번 테이블 */}
             <div className="intro-y grid grid-cols-12 gap-6 mt-5">

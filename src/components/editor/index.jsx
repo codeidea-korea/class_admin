@@ -1,7 +1,8 @@
-import { useState, useImperativeHandle, useEffect } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import { createEditor, Editor, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
+import useDidMountEffect from '@/hooks/useDidMountEffect'
 
 const colors = [
   '#BBE2F2',
@@ -36,12 +37,16 @@ const defaultValue = [
   },
 ]
 
-const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
+const FeedbackEditor = ({
+  content,
+  feedbackList,
+  setContent,
+  setSelection,
+  feedbackParams,
+  contentIndex,
+}) => {
   const [editor] = useState(() =>
     withInlines(withHistory(withReact(createEditor()))),
-  )
-  const [editorValue, setEditorValue] = useState(
-    value && value !== '' ? JSON.parse(value) : defaultValue,
   )
 
   const addHighlight = () => {
@@ -71,44 +76,45 @@ const FeedbackEditor = ({ value, feedbackList, setSelection, color }) => {
         },
         { split: true },
       )
-
+      setContent((prev) => {
+        const newContent = [...prev]
+        newContent[contentIndex] = JSON.stringify(editor.children)
+        return newContent
+      })
       setSelection({
-        content: JSON.stringify(editor.children),
         sentence: selectedText,
         color: colors[feedbackList.length],
       })
     }
   }
 
-  useEffect(() => {
-    if (color) {
-      deleteFeedback(color)
+  useDidMountEffect(() => {
+    if (feedbackParams.tab === contentIndex) {
+      deleteFeedback(feedbackParams.color)
     }
-  }, [color])
+  }, [feedbackParams.color, feedbackParams.tab])
 
   const deleteFeedback = (col) => {
     Transforms.unwrapNodes(editor, {
       at: [],
       match: (n) => n.type === 'highlight' && n.color === col,
     })
-    console.log(JSON.stringify(editor.children))
-    setSelection({
-      content: JSON.stringify(editor.children),
+    setContent((prev) => {
+      const newContent = [...prev]
+      newContent[contentIndex] = JSON.stringify(editor.children)
+      return newContent
     })
   }
 
   return (
-    <Slate editor={editor} value={editorValue}>
+    <Slate
+      editor={editor}
+      value={content && content !== '' ? JSON.parse(content) : defaultValue}
+    >
       <Editable
         style={{ minHeight: '400px' }}
         onKeyDown={(e) => e.preventDefault()}
         onKeyUp={(e) => {
-          // console.log(e)
-          // document.dispatchEvent(
-          //   new KeyboardEvent('keydown', { key: 'Backspace' }),
-          // )
-          // if (isKorean(e.key)) {
-          // }
           e.preventDefault()
         }}
         onSelect={() => addHighlight()}

@@ -75,28 +75,34 @@ function FeedView() {
             <div
               className={`leading-relaxed ${tab === 0 ? 'block' : 'hidden'}`}
             >
-              <FeedViewQuestion
-                feedId={feedId}
-                feedDetail={feedDetail}
-                refetchFeedDetail={refetchFeedDetail}
-                setIsLoading={setIsLoading}
-              />
-              <button
-                className="btn btn-primary w-20 mt-3"
-                onClick={saveFeedback}
-              >
-                완료
-              </button>
+              {feedDetail && (
+                <>
+                  <FeedViewQuestion
+                    feedId={feedId}
+                    feedDetail={feedDetail}
+                    refetchFeedDetail={refetchFeedDetail}
+                    setIsLoading={setIsLoading}
+                  />
+                  <button
+                    className="btn btn-primary w-20 mt-3"
+                    onClick={saveFeedback}
+                  >
+                    완료
+                  </button>
+                </>
+              )}
             </div>
             <div
               className={`leading-relaxed ${tab === 1 ? 'block' : 'hidden'}`}
             >
-              <FeedViewOutline
-                feedId={feedId}
-                feedDetail={feedDetail}
-                refetchFeedDetail={refetchFeedDetail}
-                setIsLoading={setIsLoading}
-              />
+              {/* {feedDetail && (
+                <FeedViewOutline
+                  feedId={feedId}
+                  feedDetail={feedDetail}
+                  refetchFeedDetail={refetchFeedDetail}
+                  setIsLoading={setIsLoading}
+                />
+              )} */}
             </div>
           </div>
           {/* <TabGroup>
