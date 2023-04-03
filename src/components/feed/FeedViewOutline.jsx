@@ -6,13 +6,12 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import { Link, useNavigate } from 'react-router-dom'
-import useAxios from '@/hooks/useAxios'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useRecoilState } from 'recoil'
 import { userState } from '@/states/userState'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
+import { OutlineContent } from '@/stores/content'
 
 function FeedViewQuestion({
   feedId,
@@ -21,8 +20,11 @@ function FeedViewQuestion({
   setIsLoading,
 }) {
   const user = useRecoilValue(userState)
-  const [tab, setTab] = useState(0)
-  const [color, setColor] = useState(null)
+  const [content, setContent] = useRecoilState(OutlineContent)
+  const [feedbackParams, setFeedbackParams] = useState({
+    color: '',
+    tab: 0,
+  })
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -47,17 +49,15 @@ function FeedViewQuestion({
       teacherName: user.name,
       sentence: '',
       reply: '',
-      content: '',
       color: '',
     },
   )
+  useEffect(() => {
+    setContent(feedDetail.qnaList.map((item) => item.content))
+  }, [])
 
   /** 피드백 달기 버튼 */
   const feedbackStart = async (id) => {
-    if (selection.sentence === '') {
-      alert('피드백할 영역을 선택해주세요.')
-      return
-    }
     setSelection({
       id,
       fhId: feedId,
@@ -182,10 +182,12 @@ function FeedViewQuestion({
                 </div>
                 <div className="bg-slate-100 p-5 rounded-md mt-3">
                   <Editor
-                    value={item.content}
+                    content={content[index]}
+                    setContent={setContent}
+                    contentIndex={index}
+                    feedbackParams={feedbackParams}
                     setSelection={setSelection}
                     feedbackList={item.feedbackList}
-                    color={color}
                   ></Editor>
                 </div>
                 <div className="flex justify-between text-slate-400 mt-2 text-sm">
@@ -226,9 +228,13 @@ function FeedViewQuestion({
                         className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
                         onClick={() => {
                           if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
-                            setIsLoading(true)
-                            setColor(item.color)
-                            removeFeedback(item.id)
+                            setFeedbackParams({
+                              color: item.color,
+                              tab,
+                            })
+                            setTimeout(() => {
+                              removeFeedback(item.id)
+                            }, 100)
                           }
                         }}
                       >

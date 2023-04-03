@@ -1,8 +1,13 @@
 import { atom } from 'recoil'
 
-const content = atom({
-  key: 'content',
+const QuestionContent = atom({
+  key: 'QuestionContent',
   default: [],
 })
 
-export default content
+const OutlineContent = atom({
+  key: 'OutlineContent',
+  default: [],
+})
+
+export { QuestionContent, OutlineContent }

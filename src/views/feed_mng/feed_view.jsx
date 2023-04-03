@@ -95,14 +95,14 @@ function FeedView() {
             <div
               className={`leading-relaxed ${tab === 1 ? 'block' : 'hidden'}`}
             >
-              {/* {feedDetail && (
+              {feedDetail && (
                 <FeedViewOutline
                   feedId={feedId}
                   feedDetail={feedDetail}
                   refetchFeedDetail={refetchFeedDetail}
                   setIsLoading={setIsLoading}
                 />
-              )} */}
+              )}
             </div>
           </div>
           {/* <TabGroup>

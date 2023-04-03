@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from 'react'
+import { Fragment, useState, useReducer, useEffect } from 'react'
 import {
   Lucide,
   Modal,
@@ -11,11 +11,17 @@ import { userState } from '@/states/userState'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
 import Editor from '@/components/editor'
-import ContentState from '@/stores/content'
+import { QuestionContent } from '@/stores/content'
+import dayjs from 'dayjs'
 
-function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
+function FeedViewQuestion({
+  feedId,
+  feedDetail,
+  refetchFeedDetail,
+  setIsLoading,
+}) {
   const user = useRecoilValue(userState)
-  const [content, setContent] = useRecoilState(ContentState)
+  const [content, setContent] = useRecoilState(QuestionContent)
   const [tab, setTab] = useState(0)
   const [feedbackParams, setFeedbackParams] = useState({
     color: '',
@@ -133,20 +139,16 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
     (id) =>
       request.delete(
         `/admin/feedback-management/application/answer-feedback/${id}`,
-        {
-          data: {
-            content: content[tab],
-          },
-        },
       ),
     {
       onSuccess: () => {
         refetchFeedDetail()
+        setIsLoading(false)
       },
     },
   )
   return (
-    <React.Fragment>
+    <Fragment>
       <button className="btn bg-white flex items-center w-44">
         <Lucide icon="Info" className="w-4 h-4 mr-2"></Lucide>자소서 작성 꿀팁
         <Lucide icon="ChevronDown" className="w-4 h-4 ml-auto"></Lucide>
@@ -255,62 +257,14 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
                       히스토리 보기
                     </button>
                   </div>
-                  {item.feedbackList?.map((item, findex) => (
-                    <div
-                      key={findex}
-                      id={`hfdb_${item.number}_${findex}`}
-                      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
-                      style={{ borderColor: item.color }}
-                    >
-                      <div className="absolute x_button">
-                        <button
-                          className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
-                          onClick={() => {
-                            if (
-                              confirm('선택하신 피드백을 삭제하시겠습니까?')
-                            ) {
-                              setFeedbackParams({
-                                color: item.color,
-                                tab,
-                              })
-                              setTimeout(() => {
-                                removeFeedback(item.id)
-                              }, 100)
-                            }
-                          }}
-                        >
-                          <Lucide icon="X" className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex justify-between font-bold text-slate-500">
-                        <div>피드백</div>
-                        <div>{item.teacherName}</div>
-                      </div>
-                      <div
-                        className="mt-3"
-                        style={{
-                          whiteSpace: 'pre-line',
-                          lineHeight: '1.3rem',
-                        }}
-                      >
-                        {item.reply}
-                      </div>
-                      <button
-                        className="btn bg-white w-full btn-sm mt-3"
-                        onClick={() => {
-                          setFeedbackModParams({
-                            id: item.id,
-                            reply: item.reply,
-                            sentence: item.sentence,
-                          })
-                          setIsModal({
-                            editFeedback: true,
-                          })
-                        }}
-                      >
-                        수정
-                      </button>
-                    </div>
+                  {item.feedbackList?.map((item) => (
+                    <FeedbackList
+                      key={`feed-${item.id}`}
+                      item={item}
+                      setFeedbackParams={setFeedbackParams}
+                      setFeedbackModParams={setFeedbackModParams}
+                      removeFeedback={removeFeedback}
+                    />
                   ))}
                 </div>
               </div>
@@ -322,225 +276,107 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
             }`}
           >
             {/* 1번 테이블 */}
-            <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-              <div className="col-span-8">
-                <div className="flex justify-end">
-                  <button className="btn btn-green btn-sm">피드백</button>
+            {feedDetail?.activityList?.map((item, index) => (
+              <Fragment key={`activity-${item.id}`}>
+                <div className="intro-y grid grid-cols-12 gap-6 mt-5">
+                  <div className="col-span-8">
+                    <div className="flex justify-end">
+                      <button className="btn btn-green btn-sm">피드백</button>
+                    </div>
+                  </div>
+                  <div className="col-span-4">
+                    <div className="flex justify-end">
+                      <button className="btn btn-dark btn-sm">
+                        히스토리 보기
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="col-span-4">
-                <div className="flex justify-end">
-                  <button className="btn btn-dark btn-sm">히스토리 보기</button>
+                <div className="intro-y grid grid-cols-12 gap-6">
+                  <div className="col-span-8">
+                    <table className="table table-bordered mt-3">
+                      <tbody>
+                        <tr>
+                          <td className="bg-slate-100">연번</td>
+                          <td className="bg-slate-100">증빙 자료 유형</td>
+                          <td className="bg-slate-100">제작 연월일</td>
+                          <td className="bg-slate-100  w-96">제목</td>
+                        </tr>
+                        <tr>
+                          <td className="bg-slate-100">{index + 1}</td>
+                          <td>-</td>
+                          <td>
+                            {dayjs(item.productAt).format('YYYY년 M월 D일')}
+                          </td>
+                          <td>{item.title}</td>
+                        </tr>
+                        <tr>
+                          <td className="bg-slate-100">첨부파일</td>
+                          <td colSpan={4}>
+                            {item.fileName ? (
+                              <div className="flex items-center">
+                                <div className="w-full">파일명: *.jpg</div>
+                                <div className="ml-auto">
+                                  <button className="btn btn-primary w-20 btn-sm">
+                                    다운로드
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              '파일없음'
+                            )}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td rowSpan={3} className="bg-slate-100">
+                            내용
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4}>
+                            <p className="btn btn-sm btn-secondary">
+                              증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여
+                              200자 이내)
+                            </p>
+                            <div className="mt-3">{item.content}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3}>
+                            <div className="flex items-center">
+                              <div className="btn mr-2">글자 수</div>
+                              <div className="mr-10">
+                                ({item.content.length} / 200)
+                              </div>
+                              <div className="btn mr-2">최종 수정일</div>
+                              <div className="">
+                                {dayjs(item.modDate).format('YYYY년 M월 D일')}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="col-span-4">
+                    {item.feedbackList?.map((item) => (
+                      <FeedbackList
+                        key={`feed-${item.id}`}
+                        item={item}
+                        setFeedbackParams={setFeedbackParams}
+                        setFeedbackModParams={setFeedbackModParams}
+                        removeFeedback={removeFeedback}
+                      />
+                    ))}
+                    {/* <div className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative">
+            <div className="font-bold text-slate-500">피드백</div>
+            <div className="mt-3">피드백 내용 출력</div>
+            <button className="btn bg-white w-full btn-sm mt-3">수정</button>
+          </div> */}
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="intro-y grid grid-cols-12 gap-6">
-              <div className="col-span-8">
-                <table className="table table-bordered mt-3">
-                  <tbody>
-                    <tr>
-                      <td className="bg-slate-100">연번</td>
-                      <td className="bg-slate-100">증빙 자료 유형</td>
-                      <td className="bg-slate-100">제작 연월일</td>
-                      <td className="bg-slate-100  w-96">제목</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">1</td>
-                      <td>-</td>
-                      <td>2019년 5월 30일</td>
-                      <td>-</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">첨부파일</td>
-                      <td colSpan={4}>
-                        <div className="flex items-center">
-                          <div className="w-full">파일명: *.jpg</div>
-                          <div className="ml-auto">
-                            <button className="btn btn-primary w-20 btn-sm">
-                              다운로드
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td rowSpan={3} className="bg-slate-100">
-                        내용
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={4}>
-                        <p className="btn btn-sm btn-secondary">
-                          증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여 200자
-                          이내)
-                        </p>
-                        <div className="mt-3">내용출력</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3}>
-                        <div className="flex items-center">
-                          <div className="btn mr-2">글자 수</div>
-                          <div className="mr-10">(0 / 200)</div>
-                          <div className="btn mr-2">최종 수정일</div>
-                          <div className="">23년 05 30일</div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="col-span-4">
-                <div className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative">
-                  <div className="font-bold text-slate-500">피드백</div>
-                  <div className="mt-3">피드백 내용 출력</div>
-                  <button className="btn bg-white w-full btn-sm mt-3">
-                    수정
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 2번 테이블 */}
-            <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-              <div className="col-span-8">
-                <table className="table table-bordered mt-3">
-                  <tbody>
-                    <tr>
-                      <td className="bg-slate-100">연번</td>
-                      <td className="bg-slate-100">증빙 자료 유형</td>
-                      <td className="bg-slate-100">제작 연월일</td>
-                      <td className="bg-slate-100  w-96">제목</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">2</td>
-                      <td>-</td>
-                      <td>2019년 5월 30일</td>
-                      <td>-</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">첨부파일</td>
-                      <td colSpan={4}>
-                        <div className="flex items-center">
-                          <div className="w-full">파일명: *.jpg</div>
-                          <div className="ml-auto">
-                            <button className="btn btn-primary w-20 btn-sm">
-                              다운로드
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td rowSpan={3} className="bg-slate-100">
-                        내용
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={4}>
-                        <p className="btn btn-sm btn-secondary">
-                          증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여 200자
-                          이내)
-                        </p>
-                        <div className="mt-3">내용출력</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3}>
-                        <div className="flex items-center">
-                          <div className="btn mr-2">글자 수</div>
-                          <div className="mr-10">(0 / 200)</div>
-                          <div className="btn mr-2">최종 수정일</div>
-                          <div className="">23년 05 30일</div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="col-span-4">
-                <div className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative">
-                  <div className="font-bold text-slate-500">피드백</div>
-                  <div className="mt-3">피드백 내용 출력</div>
-                  <button className="btn bg-white w-full btn-sm mt-3">
-                    수정
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 3번 테이블 */}
-            <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-              <div className="col-span-8">
-                <table className="table table-bordered mt-3">
-                  <tbody>
-                    <tr>
-                      <td className="bg-slate-100">연번</td>
-                      <td className="bg-slate-100">증빙 자료 유형</td>
-                      <td className="bg-slate-100">제작 연월일</td>
-                      <td className="bg-slate-100  w-96">제목</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">3</td>
-                      <td>-</td>
-                      <td>2019년 5월 30일</td>
-                      <td>-</td>
-                    </tr>
-                    <tr>
-                      <td className="bg-slate-100">첨부파일</td>
-                      <td colSpan={4}>
-                        <div className="flex items-center">
-                          <div className="w-full">파일명: *.jpg</div>
-                          <div className="ml-auto">
-                            <button className="btn btn-primary w-20 btn-sm">
-                              다운로드
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td rowSpan={3} className="bg-slate-100">
-                        내용
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={4}>
-                        <p className="btn btn-sm btn-secondary">
-                          증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여 200자
-                          이내)
-                        </p>
-                        <div className="mt-3">내용출력</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3}>
-                        <div className="flex items-center">
-                          <div className="btn mr-2">글자 수</div>
-                          <div className="mr-10">(0 / 200)</div>
-                          <div className="btn mr-2">최종 수정일</div>
-                          <div className="">23년 05 30일</div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="col-span-4">
-                <div className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative">
-                  <div className="font-bold text-slate-500">피드백</div>
-                  <div className="mt-3">피드백 내용 출력</div>
-                  <button
-                    className="btn bg-white w-full btn-sm mt-3"
-                    onClick={() => {
-                      setIsModal(true)
-                    }}
-                  >
-                    수정
-                  </button>
-                </div>
-              </div>
-            </div>
+              </Fragment>
+            ))}
           </div>
         </div>
       </div>
@@ -751,7 +587,68 @@ function FeedViewQuestion({ feedId, feedDetail, refetchFeedDetail }) {
         </ModalFooter>
       </Modal>
       {/* END: Modal 피드백 수정 팝업 */}
-    </React.Fragment>
+    </Fragment>
+  )
+}
+
+const FeedbackList = ({
+  setFeedbackParams,
+  setFeedbackModParams,
+  removeFeedback,
+  item,
+}) => {
+  return (
+    <div
+      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
+      style={{ borderColor: item.color }}
+    >
+      <div className="absolute x_button">
+        <button
+          className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
+          onClick={() => {
+            if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
+              setFeedbackParams({
+                color: item.color,
+                tab,
+              })
+              setTimeout(() => {
+                removeFeedback(item.id)
+              }, 100)
+            }
+          }}
+        >
+          <Lucide icon="X" className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex justify-between font-bold text-slate-500">
+        <div>피드백</div>
+        <div>{item.teacherName}</div>
+      </div>
+      <div
+        className="mt-3"
+        style={{
+          whiteSpace: 'pre-line',
+          lineHeight: '1.3rem',
+        }}
+      >
+        {item.reply}
+      </div>
+      <button
+        className="btn bg-white w-full btn-sm mt-3"
+        onClick={() => {
+          setFeedbackModParams({
+            id: item.id,
+            reply: item.reply,
+            sentence: item.sentence,
+          })
+          setIsModal({
+            editFeedback: true,
+          })
+        }}
+      >
+        수정
+      </button>
+    </div>
   )
 }
 
