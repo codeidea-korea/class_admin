@@ -53,7 +53,7 @@ function FeedViewQuestion({
     },
   )
   useEffect(() => {
-    setContent(feedDetail.qnaList.map((item) => item.content))
+    setContent(feedDetail.outlineQnaList.map((item) => item.content))
   }, [])
 
   /** 피드백 달기 버튼 */
@@ -181,14 +181,16 @@ function FeedViewQuestion({
                   </button>
                 </div>
                 <div className="bg-slate-100 p-5 rounded-md mt-3">
-                  <Editor
-                    content={content[index]}
-                    setContent={setContent}
-                    contentIndex={index}
-                    feedbackParams={feedbackParams}
-                    setSelection={setSelection}
-                    feedbackList={item.feedbackList}
-                  ></Editor>
+                  {content[index] && (
+                    <Editor
+                      content={content[index]}
+                      setContent={setContent}
+                      contentIndex={index}
+                      feedbackParams={feedbackParams}
+                      setSelection={setSelection}
+                      feedbackList={item.feedbackList}
+                    ></Editor>
+                  )}
                 </div>
                 <div className="flex justify-between text-slate-400 mt-2 text-sm">
                   <div>
