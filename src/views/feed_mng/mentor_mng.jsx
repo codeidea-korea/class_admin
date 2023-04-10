@@ -11,22 +11,19 @@ import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
 import { userSchoolYear } from '@/components/helpers'
-import { useQuery } from 'react-query'
+import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
+import Loading from '@/components/loading'
 
 function MentoMng() {
   const api = useAxios()
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [pageParams, setPageParams] = useState({
-    totalPages: 0,
-    totalElements: 0,
-    currentPage: 1,
-    pageRangeDisplayed: 1000,
+    page: 1,
+    limit: 1000,
   })
-  const [mentorDataList, setMentorDataList] = useState()
   const [searchedStudentList, setSearchedStudentList] = useState()
-  const [searchedTeacherList, setSearchedTeacherList] = useState()
   const [popSearchStrudentSelMentorId, setPopSearchStrudentSelMentorId] =
     useState(0)
   const [addMentorPop, setAddMentorPop] = useState(false)
@@ -47,26 +44,42 @@ function MentoMng() {
     },
   )
   const [addStudentIds, setAddStudentIds] = useState([])
+  const [page, setPage] = useState(1)
+  const limit = 10
+
+  const {
+    data: teacherList,
+    refetch: refetchTeacherList,
+    isLoading: isGetTeacherList,
+  } = useQuery(['getTeacherList', page], () =>
+    request.get('/admin/mentor-management/application/teacher', {
+      params: {
+        page,
+        limit,
+        searchWord: txtSearchWord.searchTeacherWord,
+      },
+    }),
+  )
+
+  const { data: fieldList } = useQuery(
+    'getFieldList',
+    () => request.get('/admin/mentor-management/application/field'),
+    {
+      select: (data) => data.fieldList,
+    },
+  )
 
   /** 멘토(학급) 전체 목록 */
-  const mentorFindAll = async () => {
-    await api
-      .get(
-        `/admin/mentor-management/application/mentor?page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`,
-        { headers: { Authorization: `Bearer ${user.token}` } },
-      )
-      .then((res) => {
-        console.log('mentorFindAll', res)
-        if (res.status === 200) {
-          setMentorDataList(res.data.content)
-          setPageParams({
-            ...pageParams,
-            totalPages: res.data.totalPages,
-            totalElements: res.data.totalElements,
-          })
-        }
-      })
-  }
+  const { data: mentorList, refetch: refetchMentorList } = useQuery(
+    'getMentorList',
+    () =>
+      request.get('/admin/mentor-management/application/mentor', {
+        params: { page: pageParams.page, limit: pageParams.limit },
+      }),
+    {
+      select: (data) => data.content,
+    },
+  )
 
   /** 학생 검색 */
   const searchStudent = async () => {
@@ -117,69 +130,63 @@ function MentoMng() {
       })
   }
 
+  const { mutate: deleteStudent } = useMutation(
+    (id) =>
+      request.delete(`/admin/mentor-management/application/student?id=${id}`),
+    {
+      onSuccess: () => {
+        refetchMentorList()
+      },
+    },
+  )
+
   /** 학생 삭제 */
-  const removeStudentProc = async (sid) => {
+  const removeStudentProc = (id) => {
     if (confirm('선택하신 학생을 삭제하시겠습니까?')) {
-      await api
-        .delete(`/admin/mentor-management/application/student?id=${sid}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            mentorFindAll()
-          }
-        })
-    } else {
-      return false
+      deleteStudent(id)
     }
   }
 
   /** 멘토(선생님) 검색 */
-  const searchTeacher = async () => {
+  const searchTeacher = (e) => {
+    e.preventDefault()
     if (txtSearchWord.searchTeacherWord === '') {
       alert('검색할 선생님의 아이디/전화번호/이름을 입력해주세요.')
       return false
     }
-    await api
-      .get(
-        `/admin/mentor-management/application/teacher?searchWord=${txtSearchWord.searchTeacherWord}`,
-        { headers: { Authorization: `Bearer ${user.token}` } },
-      )
-      .then((res) => {
-        console.log('searchTeacher', res)
-        if (res.status === 200) {
-          setSearchedTeacherList(res.data.teacherList)
-        }
-      })
+    refetchTeacherList()
   }
+
+  const { mutate: addMentor } = useMutation(
+    () =>
+      request.post(
+        '/admin/mentor-management/application/mentor',
+        addTeacherParams,
+      ),
+    {
+      onSuccess: () => {
+        setAddMentorPop(false)
+        setAddTeacherParams({ fieldId: '', teacherId: '' })
+        setTxtSearchWord({
+          searchStudentWord: '',
+          searchTeacherWord: '',
+          serachField: '',
+        })
+      },
+    },
+  )
 
   /** 멘토(선생님) 등록 */
   const addTeacherProc = async () => {
-    if (addTeacherParams.teacherId === 0) {
+    if (addTeacherParams.teacherId === '') {
       alert('등록할 선생님의 아이디/전화번호/이름을 입력해주세요.')
       return false
     }
-    if (addTeacherParams.fieldId === 0) {
+    if (addTeacherParams.fieldId === '') {
       alert('담당영역을 선택해주세요.')
       return false
     }
-    await api
-      .post(`/admin/mentor-management/application/mentor`, addTeacherParams, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          setAddMentorPop(false)
-          setAddTeacherParams({ fieldId: '', teacherId: '' })
-          setTxtSearchWord({
-            searchStudentWord: '',
-            searchTeacherWord: '',
-            serachField: '',
-          })
-          setSearchedTeacherList()
-          mentorFindAll()
-        }
-      })
+    addMentor()
   }
 
   /** 멘토(선생님) 삭제 */
@@ -200,56 +207,10 @@ function MentoMng() {
     }
   }
 
-  /** 담당 영역 목록 */
-  // const getFieldList = async () => {
-  //   await api
-  //     .get(`/admin/mentor-management/application/field`, {
-  //       headers: { Authorization: `Bearer ${user.token}` },
-  //     })
-  //     .then((res) => {
-  //       console.log('getFieldList', res)
-  //       if (res.status === 200) {
-  //         setFieldList(res.data.fieldList)
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log('error', err)
-  //       if (err.response.status === 403) {
-  //         alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-  //         navigate('/login')
-  //       }
-  //     })
-  // }
-
   const handleTxtSearchWord = (event) => {
     const { name, value } = event.currentTarget
     setTxtSearchWord({ [name]: value })
   }
-
-  useEffect(() => {
-    ;(async () => {
-      mentorFindAll()
-    })()
-  }, [])
-  const [page, setPage] = useState(1)
-  const limit = 10
-
-  const { data: teacherList } = useQuery(['getTeacherList', page], () =>
-    request.get('/admin/mentor-management/application/teacher', {
-      params: {
-        page,
-        limit,
-      },
-    }),
-  )
-
-  const { data: fieldList } = useQuery(
-    'getFieldList',
-    () => request.get('/admin/mentor-management/application/field'),
-    {
-      select: (data) => data.fieldList,
-    },
-  )
 
   return (
     <React.Fragment>
@@ -300,8 +261,8 @@ function MentoMng() {
           </div>
         </div>
 
-        {mentorDataList?.map((item, index) => (
-          <div className="intro-y p-5" key={`mentor-${index}`}>
+        {mentorList?.map((item) => (
+          <div className="intro-y p-5" key={`mentor-${item.id}`}>
             <div className=" border p-5 rounded-md border-dotted">
               <div className="flex flex-col gap-2">
                 <div className="text-lg font-medium flex items-center">
@@ -345,20 +306,20 @@ function MentoMng() {
                       <td>전형</td>
                       <td></td>
                     </tr>
-                    {item.mentorApplicationList?.map((item2) => (
-                      <tr className="text-center" key={item2.id}>
-                        <td>{item2.id}</td>
-                        <td>{item2.userId}</td>
-                        <td>{item2.name}</td>
-                        <td>{item2.schoolName}</td>
-                        <td>{userSchoolYear(item2.schoolYear)}</td>
-                        <td>{item2.creDate}</td>
-                        <td>{item2.applicationTypeName}</td>
+                    {item.mentorApplicationList?.map((child, index) => (
+                      <tr className="text-center" key={`student-${child.id}`}>
+                        <td>{index + 1}</td>
+                        <td>{child.userId}</td>
+                        <td>{child.name}</td>
+                        <td>{child.schoolName}</td>
+                        <td>{userSchoolYear(child.schoolYear)}</td>
+                        <td>{child.creDate}</td>
+                        <td>{child.applicationTypeName}</td>
                         <td>
                           <button
                             className="btn btn-outline-danger btn-sm"
                             onClick={() => {
-                              removeStudentProc(item2.id)
+                              removeStudentProc(child.id)
                             }}
                           >
                             담당 학생 삭제
@@ -425,13 +386,15 @@ function MentoMng() {
             </select>
           </div>
           <div className="mt-5">
-            <div className="flex gap-3 justify-end">
+            <form onSubmit={searchTeacher} className="flex gap-3 justify-end">
               <input
                 type="text"
                 name={'searchTeacherWord'}
                 className="form-control w-52"
                 placeholder="아이디/전화번호/이름"
-                onChange={handleTxtSearchWord}
+                onChange={(e) =>
+                  setTxtSearchWord({ searchTeacherWord: e.target.value })
+                }
               />
               <button
                 className="btn btn-primary shrink-0"
@@ -439,8 +402,9 @@ function MentoMng() {
               >
                 <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>검색
               </button>
-            </div>
-            <div>
+            </form>
+            <div className="relative">
+              {isGetTeacherList && <Loading />}
               <table className="table table-hover mt-3">
                 <tbody>
                   <tr className="bg-slate-100 font-medium text-center">
@@ -449,14 +413,17 @@ function MentoMng() {
                     <td>전화번호</td>
                     <td>아이디</td>
                   </tr>
+                  {!teacherList?.teacherList.length && (
+                    <tr className="text-center">
+                      <td colSpan={4}>검색된 선생님이 없습니다.</td>
+                    </tr>
+                  )}
                   {teacherList?.teacherList.map((item) => (
                     <tr className="text-center" key={item.id}>
                       <td>
                         <input
-                          name={'teacher'}
-                          id={`tl_${item.id}`}
-                          className="form-check-input"
                           type="radio"
+                          className="form-check-input"
                           checked={addTeacherParams.teacherId === item.id}
                           onChange={() => {
                             setAddTeacherParams({
