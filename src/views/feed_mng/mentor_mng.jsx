@@ -27,7 +27,6 @@ function MentoMng() {
   const [mentorDataList, setMentorDataList] = useState()
   const [searchedStudentList, setSearchedStudentList] = useState()
   const [searchedTeacherList, setSearchedTeacherList] = useState()
-  const [fieldList, setFieldList] = useState()
   const [popSearchStrudentSelMentorId, setPopSearchStrudentSelMentorId] =
     useState(0)
   const [addMentorPop, setAddMentorPop] = useState(false)
@@ -67,13 +66,6 @@ function MentoMng() {
           })
         }
       })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        }
-      })
   }
 
   /** 학생 검색 */
@@ -91,13 +83,6 @@ function MentoMng() {
         console.log('searchStudent', res)
         if (res.status === 200) {
           setSearchedStudentList(res.data.studentList)
-        }
-      })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
         }
       })
   }
@@ -130,16 +115,6 @@ function MentoMng() {
           mentorFindAll()
         }
       })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        } else {
-          alert(err.response.data.msg)
-          return
-        }
-      })
   }
 
   /** 학생 삭제 */
@@ -152,16 +127,6 @@ function MentoMng() {
         .then((res) => {
           if (res.status === 200) {
             mentorFindAll()
-          }
-        })
-        .catch((err) => {
-          console.log('error', err)
-          if (err.response.status === 403) {
-            alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-            navigate('/login')
-          } else {
-            alert(err.response.data.msg)
-            return
           }
         })
     } else {
@@ -186,13 +151,6 @@ function MentoMng() {
           setSearchedTeacherList(res.data.teacherList)
         }
       })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        }
-      })
   }
 
   /** 멘토(선생님) 등록 */
@@ -212,7 +170,7 @@ function MentoMng() {
       .then((res) => {
         if (res.status === 200) {
           setAddMentorPop(false)
-          setAddTeacherParams({ fieldId: 0, teacherId: 0 })
+          setAddTeacherParams({ fieldId: '', teacherId: '' })
           setTxtSearchWord({
             searchStudentWord: '',
             searchTeacherWord: '',
@@ -220,16 +178,6 @@ function MentoMng() {
           })
           setSearchedTeacherList()
           mentorFindAll()
-        }
-      })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        } else {
-          alert(err.response.data.msg)
-          return
         }
       })
   }
@@ -247,41 +195,31 @@ function MentoMng() {
             alert('삭제되었습니다.')
           }
         })
-        .catch((err) => {
-          console.log('error', err)
-          if (err.response.status === 403) {
-            alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-            navigate('/login')
-          } else {
-            alert(err.response.data.msg)
-            return
-          }
-        })
     } else {
       return false
     }
   }
 
   /** 담당 영역 목록 */
-  const getFieldList = async () => {
-    await api
-      .get(`/admin/mentor-management/application/field`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then((res) => {
-        console.log('getFieldList', res)
-        if (res.status === 200) {
-          setFieldList(res.data.fieldList)
-        }
-      })
-      .catch((err) => {
-        console.log('error', err)
-        if (err.response.status === 403) {
-          alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
-          navigate('/login')
-        }
-      })
-  }
+  // const getFieldList = async () => {
+  //   await api
+  //     .get(`/admin/mentor-management/application/field`, {
+  //       headers: { Authorization: `Bearer ${user.token}` },
+  //     })
+  //     .then((res) => {
+  //       console.log('getFieldList', res)
+  //       if (res.status === 200) {
+  //         setFieldList(res.data.fieldList)
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log('error', err)
+  //       if (err.response.status === 403) {
+  //         alert('토큰이 만료되었습니다. 다시 로그인해주세요.')
+  //         navigate('/login')
+  //       }
+  //     })
+  // }
 
   const handleTxtSearchWord = (event) => {
     const { name, value } = event.currentTarget
@@ -291,7 +229,6 @@ function MentoMng() {
   useEffect(() => {
     ;(async () => {
       mentorFindAll()
-      getFieldList()
     })()
   }, [])
   const [page, setPage] = useState(1)
@@ -304,6 +241,14 @@ function MentoMng() {
         limit,
       },
     }),
+  )
+
+  const { data: fieldList } = useQuery(
+    'getFieldList',
+    () => request.get('/admin/mentor-management/application/field'),
+    {
+      select: (data) => data.fieldList,
+    },
   )
 
   return (
@@ -512,6 +457,7 @@ function MentoMng() {
                           id={`tl_${item.id}`}
                           className="form-check-input"
                           type="radio"
+                          checked={addTeacherParams.teacherId === item.id}
                           onChange={() => {
                             setAddTeacherParams({
                               teacherId: item.id,
