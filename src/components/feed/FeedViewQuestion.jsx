@@ -286,7 +286,14 @@ function FeedViewQuestion({
                   </div>
                   <div className="col-span-4">
                     <div className="flex justify-end">
-                      <button className="btn btn-dark btn-sm">
+                      <button
+                        className="btn btn-dark btn-sm"
+                        onClick={() =>
+                          setIsModal({
+                            history: true,
+                          })
+                        }
+                      >
                         히스토리 보기
                       </button>
                     </div>
@@ -414,25 +421,25 @@ function FeedViewQuestion({
               <span className="text-slate-400 text-sm">2023년 1월20일</span>
             </div>
           </div> */}
-          {Object.entries(feedDetail?.qnaList[tab]) &&
-            Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)?.map(
-              ([key, value]) => (
-                <div
-                  className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
-                  key={key}
-                >
-                  <div>{value[0].reply}</div>
-                  <div className="flex justify-end mt-3">
-                    <span className="font-medium mr-2 text-sm">
-                      {value[0].teacherName} 선생님 피드백
-                    </span>{' '}
-                    <span className="text-slate-400 text-sm">
-                      {value[0].creDate}
-                    </span>
-                  </div>
-                </div>
-              ),
-            )}
+          {(tab === feedDetail?.qnaList.length
+            ? Object.entries(feedDetail?.activityList[0].feedbackHistory)
+            : Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)
+          ).map(([key, value]) => (
+            <div
+              className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
+              key={key}
+            >
+              <div>{value[0].reply}</div>
+              <div className="flex justify-end mt-3">
+                <span className="font-medium mr-2 text-sm">
+                  {value[0].teacherName} 선생님 피드백
+                </span>{' '}
+                <span className="text-slate-400 text-sm">
+                  {value[0].creDate}
+                </span>
+              </div>
+            </div>
+          ))}
         </ModalBody>
       </Modal>
       {/* END: Modal 히스토리보기 */}
