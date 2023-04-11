@@ -214,6 +214,9 @@ function FeedViewQuestion({
                   <button
                     className="btn btn-dark btn-sm"
                     onClick={() => {
+                      setSelection({
+                        index,
+                      })
                       setIsModal({
                         history: true,
                       })
@@ -308,7 +311,7 @@ function FeedViewQuestion({
           </button>
         </ModalHeader>
         <ModalBody className="p-5 flex flex-col gap-5 h-500 overflow-x-scroll">
-          <div className="p-3 border rounded-md mr-12">
+          {/* <div className="p-3 border rounded-md mr-12">
             Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
             gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
             poskap.
@@ -316,47 +319,26 @@ function FeedViewQuestion({
               <span className="font-medium mr-2 text-sm">OOO학생 자소서</span>{' '}
               <span className="text-slate-400 text-sm">2023년 1월20일</span>
             </div>
-          </div>
-          <div className="p-3 border rounded-md ml-12 bg-slate-100">
-            Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
-            gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
-            poskap.
-            <div className="flex justify-end mt-3">
-              <span className="font-medium mr-2 text-sm">
-                000 선생님 피드백
-              </span>{' '}
-              <span className="text-slate-400 text-sm">2023년 1월20일</span>
-            </div>
-          </div>
-          <div className="p-3 border rounded-md mr-12">
-            Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
-            gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
-            poskap.
-            <div className="flex justify-end mt-3">
-              <span className="font-medium mr-2 text-sm">OOO학생 자소서</span>{' '}
-              <span className="text-slate-400 text-sm">2023년 1월20일</span>
-            </div>
-          </div>
-          <div className="p-3 border rounded-md ml-12 bg-slate-100">
-            Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
-            gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
-            poskap.
-            <div className="flex justify-end mt-3">
-              <span className="font-medium mr-2 text-sm">
-                000 선생님 피드백
-              </span>{' '}
-              <span className="text-slate-400 text-sm">2023년 1월20일</span>
-            </div>
-          </div>
-          <div className="p-3 border rounded-md mr-12">
-            Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
-            gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
-            poskap.
-            <div className="flex justify-end mt-3">
-              <span className="font-medium mr-2 text-sm">OOO학생 자소서</span>{' '}
-              <span className="text-slate-400 text-sm">2023년 1월20일</span>
-            </div>
-          </div>
+          </div> */}
+          {feedDetail?.outlineQnaList[selection.index] &&
+            Object.entries(
+              feedDetail?.outlineQnaList[selection.index]?.feedbackHistory,
+            )?.map(([key, value]) => (
+              <div
+                className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
+                key={key}
+              >
+                <div>{value[0].reply}</div>
+                <div className="flex justify-end mt-3">
+                  <span className="font-medium mr-2 text-sm">
+                    {value[0].teacherName} 선생님 피드백
+                  </span>{' '}
+                  <span className="text-slate-400 text-sm">
+                    {value[0].creDate}
+                  </span>
+                </div>
+              </div>
+            ))}
         </ModalBody>
       </Modal>
       {/* END: Modal 히스토리보기 */}
