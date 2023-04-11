@@ -57,9 +57,10 @@ function FeedViewQuestion({
   }, [])
 
   /** 피드백 달기 버튼 */
-  const feedbackStart = async (id) => {
+  const feedbackStart = (id, index) => {
     setSelection({
       id,
+      index,
       fhId: feedId,
     })
     setIsModal({ feedback: true })
@@ -77,6 +78,7 @@ function FeedViewQuestion({
         setIsModal({ feedback: false })
         setSelection({
           id: 0,
+          index: 0,
           fhId: 0,
           sentence: '',
           reply: '',
@@ -93,7 +95,10 @@ function FeedViewQuestion({
       alert('피드백 내용을 입력해주세요.')
       return
     }
-    createFeedback(selection)
+    createFeedback({
+      ...selection,
+      content: content[selection.index],
+    })
   }
 
   const { mutate: updateFeedback } = useMutation(
@@ -174,7 +179,7 @@ function FeedViewQuestion({
                   <button
                     className="btn btn-green btn-sm"
                     onClick={() => {
-                      feedbackStart(item.outlineAnswerId)
+                      feedbackStart(item.outlineAnswerId, index)
                     }}
                   >
                     피드백 달기

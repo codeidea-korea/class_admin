@@ -48,7 +48,6 @@ const FeedbackEditor = ({
   const [editor] = useState(() =>
     withInlines(withHistory(withReact(createEditor()))),
   )
-  console.log(content)
 
   const addHighlight = () => {
     const [highlightNode] = Editor.nodes(editor, {

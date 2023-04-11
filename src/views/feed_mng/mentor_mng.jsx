@@ -189,21 +189,21 @@ function MentoMng() {
     addMentor()
   }
 
+  const { mutate: deleteMentor } = useMutation(
+    (id) =>
+      request.delete(`/admin/mentor-management/application/mentor?id=${id}`),
+    {
+      onSuccess: () => {
+        refetchMentorList()
+        alert('삭제되었습니다.')
+      },
+    },
+  )
+
   /** 멘토(선생님) 삭제 */
-  const removeTeacherProc = async (tid) => {
+  const removeTeacherProc = async (id) => {
     if (confirm('선택하신 멘토를 삭제하시겠습니까?')) {
-      await api
-        .delete(`/admin/mentor-management/application/mentor?id=${tid}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            mentorFindAll()
-            alert('삭제되었습니다.')
-          }
-        })
-    } else {
-      return false
+      deleteMentor(id)
     }
   }
 
