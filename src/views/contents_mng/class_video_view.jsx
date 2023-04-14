@@ -1,12 +1,12 @@
-import { Lucide, Modal, ModalBody } from "@/base-components";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Lucide, Modal, ModalBody } from '@/base-components'
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
-import Default_img from "@/assets/images/default_image.jpg";
+import Default_img from '@/assets/images/default_image.jpg'
 
 function ClassVideoView() {
   // 비디오 영상 모달
-  const [video, videoDetail] = useState(false);
+  const [video, videoDetail] = useState(false)
 
   return (
     <>
@@ -58,7 +58,7 @@ function ClassVideoView() {
                 <button
                   className="btn btn-outline-primary flex items-center gap-2"
                   onClick={() => {
-                    videoDetail(true);
+                    videoDetail(true)
                   }}
                 >
                   <Lucide icon="Video" className="w-4 h-4"></Lucide>
@@ -88,7 +88,7 @@ function ClassVideoView() {
                 <button
                   className="btn btn-outline-primary flex items-center gap-2"
                   onClick={() => {
-                    videoDetail(true);
+                    videoDetail(true)
                   }}
                 >
                   <Lucide icon="Video" className="w-4 h-4"></Lucide>
@@ -109,10 +109,10 @@ function ClassVideoView() {
         <div className="flex mt-3">
           <button className="btn btn-outline-danger w-24">삭제</button>
           <div className="flex gap-2 ml-auto">
-            <Link to="/class_video">
+            <Link to="/classVideo">
               <button className="btn bg-white w-24">목록</button>
             </Link>
-            <Link to="/class_video_form">
+            <Link to="/classVideo">
               <button className="btn btn-sky w-24">수정하기</button>
             </Link>
           </div>
@@ -125,14 +125,14 @@ function ClassVideoView() {
         backdrop=""
         show={video}
         onHidden={() => {
-          videoDetail(false);
+          videoDetail(false)
         }}
       >
         <ModalBody className="video_frame">
           <button
             className="video_x"
             onClick={() => {
-              videoDetail(false);
+              videoDetail(false)
             }}
           >
             <Lucide icon="X" className="w-8 h-8 text-white" />
@@ -148,7 +148,7 @@ function ClassVideoView() {
       </Modal>
       {/* END: Modal 영상보기 */}
     </>
-  );
+  )
 }
 
-export default ClassVideoView;
+export default ClassVideoView

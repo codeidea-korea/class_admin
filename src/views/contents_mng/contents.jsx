@@ -5,11 +5,6 @@ import {
   DropdownMenu,
   DropdownContent,
   DropdownItem,
-  TabGroup,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
 } from '@/base-components'
 import { useState, useReducer, useEffect } from 'react'
 import { useQuery, useMutation } from 'react-query'
@@ -26,11 +21,6 @@ function Contents() {
     menuDetailList: [],
   })
   const subMenuCode = new Map()
-  const [fileName, setFileName] = useState('')
-
-  const handleChange = (event) => {
-    setFileName(event.target.files[0].name)
-  }
 
   const { isLoading: isGetMenus } = useQuery(
     'getMenus',
@@ -71,6 +61,35 @@ function Contents() {
         },
       },
     )
+
+  const handleChangeFile = (e, id) => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    const omit = (obj, ...props) => {
+      const result = { ...obj }
+      props.forEach((prop) => {
+        delete result[prop]
+      })
+      return result
+    }
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      setMenu({
+        menuDetailList: menu.menuDetailList.map((child) => {
+          const newChild = { ...child }
+          if (child.id === id) {
+            return {
+              ...omit(newChild, ['fileId']),
+              savedFileDelYN: 'N',
+              file: reader.result.split(',')[1],
+            }
+          } else {
+            return omit(newChild, ['fileId'])
+          }
+        }),
+      })
+    }
+  }
 
   useDidMountEffect(() => {
     if (!menu.subMenuList) return
@@ -161,35 +180,32 @@ function Contents() {
                 <td>{item.screen_name}</td>
                 <td>{item.btn_name}</td>
                 <td>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={item.link_url}
-                    onChange={(e) =>
-                      setMenu({
-                        menuDetailList: menu.menuDetailList.map((child) =>
-                          child.id === item.id
-                            ? { ...child, link_url: e.target.value }
-                            : child,
-                        ),
-                      })
-                    }
-                  />
-                  {/* <div className="grid input-group">
-                    <input type="file" className="dp_none" id="file-upload" />
-                    <label htmlFor="file-upload" className="flex items-center">
+                  {item.tf_file ? (
+                    item.fileName ? (
+                      <div>{item.fileName}</div>
+                    ) : (
                       <input
-                        type="text"
-                        className="form-control file_up bg-white border-r-0 !text-left"
-                        placeholder="파일을 선택해주세요."
-                        value={fileName}
-                        readOnly
+                        type="file"
+                        className="form-control"
+                        onChange={(e) => handleChangeFile(e, item.id)}
                       />
-                      <div className="input-group-text whitespace-nowrap file_up_btn cursor-pointer">
-                        파일찾기
-                      </div>
-                    </label>
-                  </div> */}
+                    )
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={item.link_url}
+                      onChange={(e) =>
+                        setMenu({
+                          menuDetailList: menu.menuDetailList.map((child) =>
+                            child.id === item.id
+                              ? { ...child, link_url: e.target.value }
+                              : child,
+                          ),
+                        })
+                      }
+                    />
+                  )}
                 </td>
               </tr>
             ))}
