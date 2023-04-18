@@ -1,4 +1,4 @@
-import { Lucide } from "@/base-components";
+import { Lucide, Litepicker } from "@/base-components";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
 
@@ -38,7 +38,18 @@ function MockExamForm() {
               <input type="text" className="form-control" />
             </td>
             <td>
-              <input type="text" className="form-control" />
+              <Litepicker className="form-control" 
+									options={{
+										numberOfMonths: 1, 
+										format: 'YYYY-MM-DD', 
+										autoApply: true,
+										dropdowns: {
+											minYear: 1950,
+											maxYear: null,
+											months: true,
+											years: true,
+										},
+									}} />
             </td>
             <td>
               <input type="text" className="form-control" />
