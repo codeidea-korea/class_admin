@@ -26,11 +26,19 @@ function MockExam() {
         </button>
       </div>
       <div className="intro-y box p-5 mt-5">
-        <div className="flex justify-end">
-          <Link to="/mock_exam_form">
-            <button className="btn btn-sky w-24">수정</button>
-          </Link>
+        <div className="flex">
+          <select name="" id="" className="form-select w-52">
+            <option value="">연도</option>
+            <option value="2023">2023년</option>
+            <option value="2022">2022년</option>
+          </select>
+          <div className="flex ml-auto">
+            <Link to="/mock_exam_form">
+              <button className="btn btn-sky w-24">수정</button>
+            </Link>
+          </div>
         </div>
+
         <table className="table table-hover mt-5">
           <tr className="bg-slate-100 text-center">
             <td className="">회차</td>

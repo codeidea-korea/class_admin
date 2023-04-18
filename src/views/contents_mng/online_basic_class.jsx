@@ -83,7 +83,6 @@ function OnlinebasicClass() {
             <tr className="bg-slate-100 text-center">
               <td className="">번호</td>
               <td>수업구분</td>
-              <td>수업일자</td>
               <td>단원</td>
               <td>학습내용</td>
               <td>영상학습</td>
@@ -91,7 +90,6 @@ function OnlinebasicClass() {
             </tr>
             <tr className="text-center">
               <td>1</td>
-              <td>주중 B반</td>
               <td>1월 3일(화)</td>
               <td>물질의 상태</td>
               <td className="text-left">
@@ -122,7 +120,6 @@ function OnlinebasicClass() {
             <tr className="text-center">
               <td>1</td>
               <td>주중 B반</td>
-              <td>1월 3일(화)</td>
               <td>물질의 상태</td>
               <td className="text-left">
                 물질, 물질의 상태, 물의 특이한 상태변화, 물의 가열 곡선
