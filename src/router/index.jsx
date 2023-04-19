@@ -42,6 +42,7 @@ import MockExam from '../views/contents_mng/mock_exam'
 import MockExamForm from '../views/contents_mng/mock_exam_form'
 
 import Contents from '../views/contents_mng/contents'
+import Contents2 from '../views/contents_mng/contents2'
 
 import Login from '../views/login/login'
 import Join from '../views/login/join'
@@ -314,6 +315,14 @@ function Router() {
           path: '/contents', // 컨텐츠 URL 및 다운로드
           element: (
             <PrivateRoute element={<Contents />} role={['ADMIN', 'DIRECTOR']} />
+          ),
+        },
+
+        // 컨텐츠 URL 및 다운로드
+        {
+          path: '/contents2', // 컨텐츠 URL 및 다운로드
+          element: (
+            <PrivateRoute element={<Contents2 />} role={['ADMIN', 'DIRECTOR']} />
           ),
         },
       ],
