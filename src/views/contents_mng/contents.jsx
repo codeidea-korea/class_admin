@@ -54,7 +54,7 @@ function Contents() {
 
   const { mutate: updateMenuDetail, isLoading: isUpdateMenuDetail } =
     useMutation(
-      (data) => request.put('/admin/content-management/update', data),
+      (data) => request.post('/admin/content-management/update', data),
       {
         onSuccess: () => {
           alert('저장되었습니다.')
@@ -101,7 +101,6 @@ function Contents() {
       'menuDetailList',
       new Blob([JSON.stringify(omit(data, 'file'))]),
     )
-    console.log(data)
     updateMenuDetail(formData)
   }
 
