@@ -65,30 +65,44 @@ function Contents() {
   const handleChangeFile = (e, id) => {
     const file = e.target.files[0]
     const reader = new FileReader()
-    const omit = (obj, ...props) => {
-      const result = { ...obj }
-      props.forEach((prop) => {
-        delete result[prop]
-      })
-      return result
-    }
     reader.readAsDataURL(file)
     reader.onload = () => {
       setMenu({
         menuDetailList: menu.menuDetailList.map((child) => {
-          const newChild = { ...child }
           if (child.id === id) {
             return {
-              ...omit(newChild, ['fileId']),
+              ...child,
               savedFileDelYN: 'N',
-              file: reader.result.split(',')[1],
+              file: file,
             }
           } else {
-            return omit(newChild, ['fileId'])
+            return child
           }
         }),
       })
     }
+  }
+
+  const omit = (obj, ...props) => {
+    const result = { ...obj }
+    props.forEach((prop) => {
+      delete result[prop]
+    })
+    return result
+  }
+
+  const handleSubmit = (data) => {
+    const formData = new FormData()
+    data.map((item) => {
+      if (!item.tf_file || !item.file) return
+      formData.append('files[]', item.file)
+    })
+    formData.append(
+      'menuDetailList',
+      new Blob([JSON.stringify(omit(data, 'file'))]),
+    )
+    console.log(data)
+    updateMenuDetail(formData)
   }
 
   useDidMountEffect(() => {
@@ -163,7 +177,7 @@ function Contents() {
         <div className="flex justify-end">
           <button
             className="btn btn-sky w-24"
-            onClick={() => updateMenuDetail(menu.menuDetailList)}
+            onClick={() => handleSubmit(menu.menuDetailList)}
           >
             저장
           </button>
