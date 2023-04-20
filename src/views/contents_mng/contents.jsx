@@ -11,6 +11,7 @@ import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 import useDidMountEffect from '@/hooks/useDidMountEffect'
+import _ from 'lodash'
 
 function Contents() {
   const [menu, setMenu] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -76,7 +77,10 @@ function Contents() {
               file: file,
             }
           } else {
-            return child
+            return {
+              ...child,
+              savedFileDelYN: 'N',
+            }
           }
         }),
       })
@@ -93,14 +97,23 @@ function Contents() {
 
   const handleSubmit = (data) => {
     const formData = new FormData()
+    const newFileDelYN = []
     data.map((item) => {
-      if (!item.tf_file || !item.file) return
-      formData.append('files[]', item.file)
+      if (item.file) {
+        formData.append('file', item.file)
+      } else {
+        formData.append('file', null)
+      }
+      if (item.fileId) {
+        newFileDelYN.push('Y')
+      } else {
+        newFileDelYN.push('N')
+      }
     })
-    formData.append(
-      'menuDetailList',
-      new Blob([JSON.stringify(omit(data, 'file'))]),
-    )
+    formData.append('id', _.map(data, 'id').join(','))
+    formData.append('link_url', _.map(data, 'link_url').join(','))
+    formData.append('savedFileDelYN', newFileDelYN.join(','))
+    console.log(formData.get('id'))
     updateMenuDetail(formData)
   }
 
