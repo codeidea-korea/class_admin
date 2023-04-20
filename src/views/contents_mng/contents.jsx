@@ -95,6 +95,9 @@ function Contents() {
     return result
   }
 
+  const null_blob = new Blob(['null'], { type: 'image/png' });
+  const null_file = new File([null_blob], 'null.png', { type: 'image/png' });
+
   const handleSubmit = (data) => {
     const formData = new FormData()
     const newFileDelYN = []
@@ -102,7 +105,7 @@ function Contents() {
       if (item.file) {
         formData.append('file', item.file)
       } else {
-        formData.append('file', null)
+        formData.append('file', null_file)
       }
       if (item.fileId) {
         newFileDelYN.push('Y')
