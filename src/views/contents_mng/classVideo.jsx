@@ -45,29 +45,32 @@ function ClassVideo() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {videoList?.mathematics?.subClassVideoResponseList.map((item) => (
-              <li>
-                <div className="inner">
-                  <div className="subject">
-                    {item.teacher_name} 선생님<span className="sub">수학</span>
+            {videoList?.mathematics?.subClassVideoResponseList.map(
+              (item, key) => (
+                <li key={`video-${key}`}>
+                  <div className="inner">
+                    <div className="subject">
+                      {item.teacher_name} 선생님
+                      <span className="sub">수학</span>
+                    </div>
+                    <div className="thumb">
+                      <img src={Person} />
+                    </div>
+                    <div className="btnSet w-full">
+                      <Link to="/class_video_view" className="w-full">
+                        <button className="btn btn-sky w-full rounded-full">
+                          영상 학습하기
+                          <Lucide
+                            icon="ChevronRight"
+                            className="w-4 h-4"
+                          ></Lucide>
+                        </button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="thumb">
-                    <img src={Person} />
-                  </div>
-                  <div className="btnSet w-full">
-                    <Link to="/class_video_view" className="w-full">
-                      <button className="btn btn-sky w-full rounded-full">
-                        영상 학습하기
-                        <Lucide
-                          icon="ChevronRight"
-                          className="w-4 h-4"
-                        ></Lucide>
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              ),
+            )}
             <li className="add zoom-in">
               <Link to="/classVideo/create?subject=수학" className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
@@ -83,8 +86,8 @@ function ClassVideo() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {videoList?.science?.subClassVideoResponseList.map((item) => (
-              <li>
+            {videoList?.science?.subClassVideoResponseList.map((item, key) => (
+              <li key={`sub-${key}`}>
                 <div className="inner">
                   <div className="subject">
                     {item.teacher_name} 선생님<span className="sub">수학</span>

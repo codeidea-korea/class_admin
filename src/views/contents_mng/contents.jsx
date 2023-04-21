@@ -59,7 +59,7 @@ function Contents() {
       {
         onSuccess: () => {
           alert('저장되었습니다.')
-          getMenuDetail(subMenuCode.get('code'))
+          getMenuDetail()
         },
       },
     )

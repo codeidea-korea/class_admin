@@ -82,6 +82,15 @@ function ClassVideoForm({ isCreate }) {
       setValue('profile', reader.result.split(',')[1])
     }
   }
+
+  const handleDeleteVideo = (index) => {
+    if (confirm('삭제하시겠습니까?')) {
+      const newVideoList = getValues('classVideoScheduleRequests').filter(
+        (item, i) => i !== index,
+      )
+      setValue('classVideoScheduleRequests', newVideoList)
+    }
+  }
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="intro-y box mt-5">
@@ -252,7 +261,11 @@ function ClassVideoForm({ isCreate }) {
                 </td>
                 {index !== 0 && (
                   <td>
-                    <button className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap">
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                      onClick={() => handleDeleteVideo(index)}
+                    >
                       삭제
                     </button>
                   </td>

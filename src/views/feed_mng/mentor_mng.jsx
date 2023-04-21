@@ -5,8 +5,8 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useEffect, useReducer } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useReducer } from 'react'
+import { Link } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
@@ -17,7 +17,6 @@ import Loading from '@/components/loading'
 
 function MentoMng() {
   const api = useAxios()
-  const navigate = useNavigate()
   const user = useRecoilValue(userState)
   const [pageParams, setPageParams] = useState({
     page: 1,
@@ -125,7 +124,7 @@ function MentoMng() {
           })
           setSearchedStudentList()
           setAddStudentIds([])
-          mentorFindAll()
+          refetchMentorList()
         }
       })
   }
