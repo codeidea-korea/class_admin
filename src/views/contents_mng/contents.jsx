@@ -40,10 +40,12 @@ function Contents() {
   )
 
   const { mutate: getMenuDetail, isLoading: isMutateMenuDetail } = useMutation(
-    () =>
-      request.get(
+    () => {
+      console.log(subMenuCode.get('code'))
+      return request.get(
         `/admin/content-management/detail/${subMenuCode.get('code')}`,
-      ),
+      )
+    },
     {
       onSuccess: (data) => {
         setMenu({
@@ -213,7 +215,12 @@ function Contents() {
                   {item.tf_file ? (
                     item.fileName ? (
                       <div className="flex items-center">
-                        {item.fileName}{' '}
+                        <a
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
+                          className="cursor-pointer text-blue underline"
+                        >
+                          {item.fileName}
+                        </a>
                         <a
                           className="text-danger ml-4 cursor-pointer"
                           onClick={() => {
