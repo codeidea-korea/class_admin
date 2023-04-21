@@ -59,6 +59,7 @@ function Contents() {
       {
         onSuccess: () => {
           alert('저장되었습니다.')
+          getMenuDetail(subMenuCode.get('code'))
         },
       },
     )
@@ -95,8 +96,8 @@ function Contents() {
     return result
   }
 
-  const null_blob = new Blob(['null'], { type: 'image/png' });
-  const null_file = new File([null_blob], 'null.png', { type: 'image/png' });
+  const null_blob = new Blob(['null'], { type: 'image/png' })
+  const null_file = new File([null_blob], 'null.png', { type: 'image/png' })
 
   const handleSubmit = (data) => {
     const formData = new FormData()
@@ -211,7 +212,29 @@ function Contents() {
                 <td>
                   {item.tf_file ? (
                     item.fileName ? (
-                      <div>{item.fileName}</div>
+                      <div className="flex items-center">
+                        {item.fileName}{' '}
+                        <a
+                          className="text-danger ml-4 cursor-pointer"
+                          onClick={() => {
+                            setMenu({
+                              menuDetailList: menu.menuDetailList.map((child) =>
+                                child.id === item.id
+                                  ? {
+                                      ...child,
+                                      file: '',
+                                      tf_file: true,
+                                      fileName: false,
+                                      savedFileDelYN: 'Y',
+                                    }
+                                  : child,
+                              ),
+                            })
+                          }}
+                        >
+                          삭제
+                        </a>
+                      </div>
                     ) : (
                       <input
                         type="file"
