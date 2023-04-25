@@ -44,15 +44,15 @@ function MockExam() {
                     id="input-group-email"
                     className="input-group-text whitespace-nowrap"
                   >
-                    과목
+                    구분
                   </div>
-                  <input type="text" className="form-control" value={'화학'} />
+                  <input type="text" className="form-control" value={'2022년도 모의고사'} />
                 </div>
               </DropdownToggle>
               <DropdownMenu className="w-40">
                 <DropdownContent>
-                  <DropdownItem>화학</DropdownItem>
-                  <DropdownItem>물리</DropdownItem>
+                  <DropdownItem>2022년도 모의고사</DropdownItem>
+                  <DropdownItem>2023년도 모의고사</DropdownItem>
                 </DropdownContent>
               </DropdownMenu>
             </Dropdown>
@@ -69,6 +69,7 @@ function MockExam() {
           </div>
 
           <div className="flex ml-auto">
+            <button className="btn btn-danger w-24">과목삭제</button>
             <Link to="/mock_exam_form">
               <button className="btn btn-sky w-24">수정</button>
             </Link>
@@ -178,7 +179,7 @@ function MockExam() {
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">과목 추가하기</h2>
+          <h2 className="font-medium text-base mr-auto">구분 추가하기</h2>
           <button
             className="btn btn-rounded-secondary hidden sm:flex p-1"
             onClick={() => {
@@ -190,7 +191,7 @@ function MockExam() {
         </ModalHeader>
         <ModalBody>
           <div className="flex items-center">
-            <div className="w-16 shrink-0">과목</div>
+            <div className="w-16 shrink-0">구분</div>
             <input type="text" className="form-control w-full" />
           </div>
         </ModalBody>
