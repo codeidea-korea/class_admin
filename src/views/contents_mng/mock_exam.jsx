@@ -30,11 +30,11 @@ function MockExam() {
       </div>
       <div className="intro-y box p-5 mt-5">
         <div className="flex gap-3">
-          <select name="" id="" className="form-select w-52">
+          {/* <select name="" id="" className="form-select w-52">
             <option value="">연도</option>
             <option value="2023">2023년</option>
             <option value="2022">2022년</option>
-          </select>
+          </select> */}
 
           <div className="flex items-center gap-3">
             <Dropdown>
