@@ -142,7 +142,7 @@ function Notice() {
             <button
               className="btn btn-outline-danger"
               onClick={() => {
-                if (!notice?.list?.filter((item) => item.check).length) {
+                if (!notice.list.filter((item) => item.check).length) {
                   alert('삭제할 항목을 선택해주세요.')
                 } else {
                   handleDelete()

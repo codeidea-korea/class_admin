@@ -22,11 +22,11 @@ import MentoMng from '../views/feed_mng/mentor_mng'
 
 import Notice from '../views/contents_mng/notice'
 import NoticeCreate from '../views/contents_mng/noticeCreate'
-import NoticeView from '../views/contents_mng/noticeView'
+import NoticeDetail from '../views/contents_mng/noticeDetail'
 
 import Profit from '../views/contents_mng/profit'
-import ProfitView from '../views/contents_mng/profit_view'
-import ProfitEdit from '../views/contents_mng/profit_edit'
+import ProfitCreate from '../views/contents_mng/profitCreate'
+import ProfitDetail from '../views/contents_mng/profitDetail'
 
 import CurriCulum from '../views/contents_mng/curriculum'
 import CurriCulumView from '../views/contents_mng/curriculum_view'
@@ -190,7 +190,7 @@ function Router() {
           path: '/notice/:id',
           element: (
             <PrivateRoute
-              element={<NoticeView />}
+              element={<NoticeDetail />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
@@ -202,19 +202,19 @@ function Router() {
           ),
         },
         {
-          path: '/profit_view',
+          path: '/profit/:id',
           element: (
             <PrivateRoute
-              element={<ProfitView />}
+              element={<ProfitDetail />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
         },
         {
-          path: '/profit_edit',
+          path: '/profit/create',
           element: (
             <PrivateRoute
-              element={<ProfitEdit />}
+              element={<ProfitCreate />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),

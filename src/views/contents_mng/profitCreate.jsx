@@ -5,15 +5,15 @@ import { useMutation } from 'react-query'
 import Loading from '@/components/Loading'
 import request from '@/utils/request'
 
-function NoticeEdit() {
+function ProfitEdit() {
   const navigate = useNavigate()
   const { register, setValue, handleSubmit } = useForm()
 
-  const { mutate: createNotice, isLoading: isCreateNotice } = useMutation(
-    (data) => request.post('/admin/content-management/notice', data),
+  const { mutate: createProfit, isLoading: isCreateProfit } = useMutation(
+    (data) => request.post('/admin/content-management/benefit', data),
     {
       onSuccess: () => {
-        navigate('/notice')
+        navigate('/profit')
       },
     },
   )
@@ -26,13 +26,13 @@ function NoticeEdit() {
     newForm.append('title', data.title)
     newForm.append('topYN', data.topYN ? 'Y' : 'N')
     newForm.append('content', data.content)
-    createNotice(newForm)
+    createProfit(newForm)
   }
 
   return (
     <>
       <div className="intro-y box mt-5 relative">
-        {isCreateNotice && <Loading />}
+        {isCreateProfit && <Loading />}
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">공지사항</div>
         </div>
@@ -90,7 +90,7 @@ function NoticeEdit() {
             </div>
 
             <div className="flex gap-2 justify-center mt-3">
-              <Link to="/notice">
+              <Link to="/profit">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
               <button className="btn btn-sky w-24">확인</button>
@@ -102,4 +102,4 @@ function NoticeEdit() {
   )
 }
 
-export default NoticeEdit
+export default ProfitEdit
