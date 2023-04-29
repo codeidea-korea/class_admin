@@ -7,7 +7,7 @@ const Main = ({ limit, data, page, setPage, className }) => {
   }
   return (
     data &&
-    (data?.total > limit || data?.data.length > limit) && (
+    (data?.totalElements > limit || data?.content.length > limit) && (
       <div
         className={
           'intro-y col-span-12 flex items-center justify-center' +
@@ -19,7 +19,7 @@ const Main = ({ limit, data, page, setPage, className }) => {
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           forcePage={page - 1}
-          pageCount={data ? Math.ceil(data?.total / limit) : 1}
+          pageCount={data ? Math.ceil(data?.totalElements / limit) : 1}
           previousLabel={<Lucide icon="ChevronLeft" className="w-4 h-4" />}
           renderOnZeroPageCount={null}
           pageClassName="page-item"
@@ -31,7 +31,7 @@ const Main = ({ limit, data, page, setPage, className }) => {
           breakLabel="..."
           breakClassName="page-item"
           breakLinkClassName="page-link"
-          containerClassName="pagination"
+          containerClassName="pagination mx-auto mt-4"
           activeClassName="active"
         />
       </div>

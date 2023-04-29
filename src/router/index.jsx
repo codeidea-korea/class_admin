@@ -21,8 +21,8 @@ import FeedView from '../views/feed_mng/feed_view'
 import MentoMng from '../views/feed_mng/mentor_mng'
 
 import Notice from '../views/contents_mng/notice'
-import NoticeEdit from '../views/contents_mng/notice_edit'
-import NoticeView from '../views/contents_mng/notice_view'
+import NoticeCreate from '../views/contents_mng/noticeCreate'
+import NoticeView from '../views/contents_mng/noticeView'
 
 import Profit from '../views/contents_mng/profit'
 import ProfitView from '../views/contents_mng/profit_view'
@@ -178,16 +178,16 @@ function Router() {
           ),
         },
         {
-          path: '/notice_edit',
+          path: '/notice/create',
           element: (
             <PrivateRoute
-              element={<NoticeEdit />}
+              element={<NoticeCreate isCreate />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
         },
         {
-          path: '/notice_view',
+          path: '/notice/:id',
           element: (
             <PrivateRoute
               element={<NoticeView />}
@@ -195,7 +195,6 @@ function Router() {
             />
           ),
         },
-
         {
           path: '/profit', //혜택
           element: (
@@ -322,7 +321,10 @@ function Router() {
         {
           path: '/contents2', // 컨텐츠 URL 및 다운로드
           element: (
-            <PrivateRoute element={<Contents2 />} role={['ADMIN', 'DIRECTOR']} />
+            <PrivateRoute
+              element={<Contents2 />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
           ),
         },
       ],
