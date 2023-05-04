@@ -285,7 +285,7 @@ function Router() {
           ),
         },
         {
-          path: '/online_basic_class_form',
+          path: '/online_basic_class_form/:id',
           element: (
             <PrivateRoute
               element={<OnlineBasicClassForm />}
