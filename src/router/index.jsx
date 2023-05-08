@@ -29,8 +29,8 @@ import ProfitCreate from '../views/contents_mng/profitCreate'
 import ProfitDetail from '../views/contents_mng/profitDetail'
 
 import CurriCulum from '../views/contents_mng/curriculum'
-import CurriCulumView from '../views/contents_mng/curriculum_view'
-import CurriculumForm from '../views/contents_mng/curriculum_form'
+import CurriCulumView from '../views/contents_mng/curriculumView'
+import CurriculumForm from '../views/contents_mng/curriculumForm'
 
 import ClassVideo from '../views/contents_mng/classVideo'
 import ClassVideoControl from '../views/contents_mng/classVideoControl'
