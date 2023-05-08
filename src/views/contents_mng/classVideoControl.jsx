@@ -1,4 +1,4 @@
-import { Dropzone, Lucide } from '@/base-components'
+import { Lucide, Litepicker } from '@/base-components'
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -11,26 +11,28 @@ function ClassVideoForm({ isCreate }) {
   const navigate = useNavigate()
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { register, watch, getValues, setValue, handleSubmit } = useForm({
-    defaultValues: {
-      teacher_name: '',
-      field_name: '',
-      subject: searchParams.get('subject'),
-      profile: null,
-      profile_name: '',
-      classVideoScheduleRequests: [
-        {
-          key: 0,
-          order_number: 0,
-          gubun: '주중 B반',
-          cdate: '1월 3일(화)',
-          unit: '물질의 상태',
-          content: '물질, 물질의 상태, 물의 특이한 상태변화, 물의 가열 곡선',
-          link_url: 'https://www.youtube.com/watch?v=I-w6oYs-_yY',
-        },
-      ],
+  const { register, watch, getValues, setValue, reset, handleSubmit } = useForm(
+    {
+      defaultValues: {
+        teacher_name: '',
+        field_name: '',
+        subject: searchParams.get('subject'),
+        profile: null,
+        profile_name: '',
+        classVideoScheduleRequests: [
+          // {
+          //   key: 0,
+          //   order_number: 0,
+          //   gubun: '주중 B반',
+          //   cdate: '1월 3일(화)',
+          //   unit: '물질의 상태',
+          //   content: '물질, 물질의 상태, 물의 특이한 상태변화, 물의 가열 곡선',
+          //   link_url: 'https://www.youtube.com/watch?v=I-w6oYs-_yY',
+          // },
+        ],
+      },
     },
-  })
+  )
 
   const { data: videoDetail } = useQuery(
     'getVideoDetail',
@@ -54,7 +56,22 @@ function ClassVideoForm({ isCreate }) {
   )
 
   const onSubmit = (data) => {
-    createVideo(data)
+    console.log(data)
+    const formData = new FormData()
+    formData.append('field_name', '영재학교')
+    formData.append('subject', searchParams.get('subject'))
+    data.classVideoScheduleRequests.map((item) => {
+      formData.append('teacher_name', item.teacher_name)
+      formData.append('teacher_subject', item.teacher_subject)
+      formData.append('order_number', item.order_number)
+      formData.append('gubun', item.gubun)
+      formData.append('cdate', item.cdate)
+      formData.append('unit', item.unit)
+      formData.append('content', item.content)
+      formData.append('link_url', item.link_url)
+      formData.append('file', item.file)
+    })
+    // createVideo(data)
   }
 
   const handleAddSchedule = () => {
@@ -124,44 +141,10 @@ function ClassVideoForm({ isCreate }) {
                 <div className="input-group w-72">
                   <input
                     type="file"
-                    className="dp_none"
-                    id="file-upload"
-                    onChange={handleChangeFile}
+                    className="form-control"
+                    {...register('profile_name')}
                   />
-                  <label htmlFor="file-upload" className="flex items-center">
-                    <input
-                      type="text"
-                      className="form-control file_up bg-white"
-                      placeholder=""
-                      value={watch('profile_name')}
-                      readOnly
-                    />
-                    <div className="input-group-text whitespace-nowrap file_up_btn">
-                      파일찾기
-                    </div>
-                  </label>
                 </div>
-                {/* <Dropzone
-                  getRef={(el) => {
-                    dropzoneMultipleRef.current = el
-                  }}
-                  options={{
-                    url: 'https://httpbin.org/post',
-                    thumbnailWidth: 150,
-                    maxFilesize: 0.5,
-                    dictRemoveFile: '삭제',
-                    addRemoveLinks: true,
-                    headers: { 'My-Awesome-Header': 'header value' },
-                  }}
-                  className="dropzone"
-                >
-                  <div className="text-lg font-medium">
-                    파일 드래그 또는 클릭후 업로드 해주세요.
-                  </div>
-                  <div className="text-gray-600 text-sm">
-                    5MB 미만의 파일만 첨부가 가능합니다.(PNG, GIF, JPG만 가능)
-                  </div>
-                </Dropzone> */}
               </div>
             </div>
           </div>
@@ -183,7 +166,7 @@ function ClassVideoForm({ isCreate }) {
             </tr>
           </thead>
           <tbody>
-            {watch('classVideoScheduleRequests').map((item, index) => (
+            {watch('classVideoScheduleRequests')?.map((item, index) => (
               <tr className="text-center" key={item.key}>
                 <td>
                   <div className="input-group w-28">
@@ -210,10 +193,29 @@ function ClassVideoForm({ isCreate }) {
                   />
                 </td>
                 <td>
-                  <input
-                    type="text"
+                  <Litepicker
+                    value={item.cdate}
                     className="form-control"
-                    {...register(`classVideoScheduleRequests.${index}.cdate`)}
+                    onChange={(value) => {
+                      const newList = [
+                        ...getValues('classVideoScheduleRequests'),
+                      ]
+                      newList[index].cdate = value
+                      reset({
+                        classVideoScheduleRequests: newList,
+                      })
+                    }}
+                    options={{
+                      numberOfMonths: 1,
+                      format: 'YYYY-MM-DD',
+                      autoApply: true,
+                      dropdowns: {
+                        minYear: 1950,
+                        maxYear: null,
+                        months: true,
+                        years: true,
+                      },
+                    }}
                   />
                 </td>
                 <td>

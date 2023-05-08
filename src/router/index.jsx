@@ -300,6 +300,15 @@ function Router() {
           ),
         },
         {
+          path: '/mock_exam/:id', //회차별 모의고사
+          element: (
+            <PrivateRoute
+              element={<MockExamForm />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
           path: '/mock_exam_form',
           element: (
             <PrivateRoute

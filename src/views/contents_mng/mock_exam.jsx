@@ -1,13 +1,82 @@
-import { Lucide, Modal, ModalHeader,ModalBody,ModalFooter,  Dropdown,DropdownToggle,DropdownMenu,DropdownContent,DropdownItem, } from '@/base-components'
+import { useReducer } from 'react'
+import {
+  Lucide,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '@/base-components'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useQuery, useMutation } from 'react-query'
+import { useForm } from 'react-hook-form'
+import request from '@/utils/request'
+import Loading from '@/components/loading'
 
-function MockExam() {
+function OnlinebasicClass() {
   // 비디오 영상 모달
   const [video, videoDetail] = useState(false)
+  const { getValues, watch, reset, register } = useForm({
+    defaultValues: {
+      id: '',
+      field_name: '',
+      subject: '',
+      youtube: 'https://www.youtube.com/watch?v=IB5bcf_tMVE',
+    },
+  })
 
   // 과목추가하기 모달
-  const [SubjectsAdd, SubjectsAddDetail] = useState(false);
+  const [SubjectsAdd, SubjectsAddDetail] = useState(false)
+
+  const {
+    data: basicClassSubject,
+    isLoading: isBasicClassSubject,
+    refetch: refetchBasicClassSubject,
+  } = useQuery(
+    'getBasicClassSubject',
+    () =>
+      request.get(`/admin/content-management/mock-exam-gubun`, {
+        params: {
+          fieldName: '영재학교',
+        },
+      }),
+    {
+      onSuccess: (data) => {
+        reset({ id: data[0].id })
+      },
+    },
+  )
+  const {
+    data: basicClass,
+    isLoading: isBasicClassm,
+    refetch: refetchBasicClass,
+  } = useQuery(
+    ['getBasicClass', getValues('id')],
+    () => request.get(`/admin/content-management/mock-exam/${getValues('id')}`),
+    {
+      enabled: !!getValues('id'),
+    },
+  )
+
+  const { mutate: addClassSubject, isLoading: isAddClassSubject } = useMutation(
+    (data) => request.post(`/admin/content-management/mock-exam`, data),
+    {
+      onSuccess: () => {
+        refetchBasicClassSubject()
+      },
+    },
+  )
+
+  const { mutate: deleteClassSubject, isLoading: isDeleteClassSubject } =
+    useMutation(
+      (id) => request.delete(`/admin/content-management/mock-exam/${id}`),
+      {
+        onSuccess: () => {
+          refetchBasicClassSubject()
+          alert('삭제되였습니다.')
+        },
+      },
+    )
 
   return (
     <>
@@ -18,7 +87,7 @@ function MockExam() {
         >
           영재원
         </button>
-        <Link to="/mock_exam">
+        <Link to="/online_basic_class">
           <button className="btn btn-primary w-36">영재학교</button>
         </Link>
         <button
@@ -28,34 +97,23 @@ function MockExam() {
           과학고
         </button>
       </div>
-      <div className="intro-y box p-5 mt-5">
-        <div className="flex gap-3">
-          {/* <select name="" id="" className="form-select w-52">
-            <option value="">연도</option>
-            <option value="2023">2023년</option>
-            <option value="2022">2022년</option>
-          </select> */}
-
+      <div className="intro-y box mt-5 relative">
+        {(isBasicClassSubject || isBasicClassm) && <Loading />}
+        <div className="p-5">
           <div className="flex items-center gap-3">
-            <Dropdown>
-              <DropdownToggle>
-                <div className="input-group">
-                  <div
-                    id="input-group-email"
-                    className="input-group-text whitespace-nowrap"
-                  >
-                    구분
-                  </div>
-                  <input type="text" className="form-control" value={'2022년도 모의고사'} />
-                </div>
-              </DropdownToggle>
-              <DropdownMenu className="w-40">
-                <DropdownContent>
-                  <DropdownItem>2022년도 모의고사</DropdownItem>
-                  <DropdownItem>2023년도 모의고사</DropdownItem>
-                </DropdownContent>
-              </DropdownMenu>
-            </Dropdown>
+            <div>구분:</div>
+            <select
+              className="form-control w-40"
+              onChange={(e) => {
+                reset({ id: e.target.value })
+              }}
+            >
+              {basicClassSubject?.map((item) => (
+                <option value={item.id} key={item.id}>
+                  {item.gubun}
+                </option>
+              ))}
+            </select>
 
             <button
               className="btn btn-outline-primary border-dotted"
@@ -66,80 +124,71 @@ function MockExam() {
               <Lucide icon="Plus" className="w-4 h-4"></Lucide>
             </button>
 
+            <div className="flex ml-auto gap-2">
+              <button
+                className="btn btn-danger w-24"
+                onClick={() => {
+                  if (confirm('과목을 삭제하시겠습니까?')) {
+                    deleteClassSubject(getValues('id'))
+                  }
+                }}
+              >
+                과목삭제
+              </button>
+              <Link to={`/mock_exam/${getValues('id')}`}>
+                <button className="btn btn-sky w-24">수정</button>
+              </Link>
+            </div>
           </div>
 
-          <div className="flex ml-auto">
-            <button className="btn btn-danger w-24">과목삭제</button>
-            <Link to="/mock_exam_form">
-              <button className="btn btn-sky w-24">수정</button>
-            </Link>
-          </div>
+          <table className="table table-hover mt-5">
+            <thead>
+              <tr className="bg-slate-100 text-center">
+                <td className="">회차</td>
+                <td>과목</td>
+                <td>시험일자</td>
+                <td>모의고사 유형</td>
+                <td>풀이영상</td>
+                <td>학습자료</td>
+              </tr>
+            </thead>
+            <tbody>
+              {basicClass?.map((item, index) => (
+                <tr className="text-center" key={`basicClass-${item.row_id}`}>
+                  <td>{index + 1}</td>
+                  <td>{item.subject}</td>
+                  <td>{item.exam_date}</td>
+                  <td className="text-left">{item.exam_type}</td>
+                  <td>
+                    <div className="flex justify-center">
+                      <button
+                        className="btn btn-outline-primary flex items-center gap-2"
+                        onClick={() => {
+                          videoDetail(true)
+                        }}
+                      >
+                        <Lucide icon="Video" className="w-4 h-4"></Lucide>
+                        영상보기
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex justify-center">
+                      <Link
+                        to={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
+                      >
+                        <button className="btn btn-outline-pending flex items-center gap-2">
+                          <Lucide icon="File" className="w-4 h-4"></Lucide>
+                          학습자료
+                        </button>
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        <table className="table table-hover mt-5">
-          <tr className="bg-slate-100 text-center">
-            <td className="">회차</td>
-            <td>과목</td>
-            <td>시험일자</td>
-            <td>모의고사 유형</td>
-            <td>풀이영상</td>
-            <td>학습자료</td>
-          </tr>
-          <tr className="text-center">
-            <td>1</td>
-            <td>수학</td>
-            <td>1월 21일(토)</td>
-            <td className="text-left">CMS 전국 연합 종합 모의고사</td>
-            <td>
-              <div className="flex justify-center">
-                <button
-                  className="btn btn-outline-primary flex items-center gap-2"
-                  onClick={() => {
-                    videoDetail(true)
-                  }}
-                >
-                  <Lucide icon="Video" className="w-4 h-4"></Lucide>
-                  영상보기
-                </button>
-              </div>
-            </td>
-            <td>
-              <div className="flex justify-center">
-                <button className="btn btn-outline-pending flex items-center gap-2">
-                  <Lucide icon="File" className="w-4 h-4"></Lucide>
-                  학습자료
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr className="text-center">
-            <td>1</td>
-            <td>수학</td>
-            <td>1월 21일(토)</td>
-            <td className="text-left">CMS 전국 연합 종합 모의고사</td>
-            <td>
-              <div className="flex justify-center">
-                <button
-                  className="btn btn-outline-primary flex items-center gap-2"
-                  onClick={() => {
-                    videoDetail(true)
-                  }}
-                >
-                  <Lucide icon="Video" className="w-4 h-4"></Lucide>
-                  영상보기
-                </button>
-              </div>
-            </td>
-            <td>
-              <div className="flex justify-center">
-                <button className="btn btn-outline-pending flex items-center gap-2">
-                  <Lucide icon="File" className="w-4 h-4"></Lucide>
-                  학습자료
-                </button>
-              </div>
-            </td>
-          </tr>
-        </table>
       </div>
 
       {/* BEGIN: Modal 영상보기 */}
@@ -151,7 +200,8 @@ function MockExam() {
           videoDetail(false)
         }}
       >
-        <ModalBody className="video_frame">
+        <ModalBody className="video_frame relative">
+          {isDeleteClassSubject && <Loading />}
           <button
             className="video_x"
             onClick={() => {
@@ -163,27 +213,26 @@ function MockExam() {
           <iframe
             src="https://www.youtube.com/embed/IB5bcf_tMVE"
             title="YouTube video player"
-            frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
+            allowFullScreen
           ></iframe>
         </ModalBody>
       </Modal>
       {/* END: Modal 영상보기 */}
-      
+
       {/* BEGIN: Modal 과목추가하기 */}
       <Modal
         show={SubjectsAdd}
         onHidden={() => {
-          SubjectsAddDetail(false);
+          SubjectsAddDetail(false)
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">구분 추가하기</h2>
+          <h2 className="font-medium text-base mr-auto">과목 추가하기</h2>
           <button
             className="btn btn-rounded-secondary hidden sm:flex p-1"
             onClick={() => {
-              SubjectsAddDetail(false);
+              SubjectsAddDetail(false)
             }}
           >
             <Lucide icon="X" className="w-4 h-4" />
@@ -191,8 +240,12 @@ function MockExam() {
         </ModalHeader>
         <ModalBody>
           <div className="flex items-center">
-            <div className="w-16 shrink-0">구분</div>
-            <input type="text" className="form-control w-full" />
+            <div className="w-16 shrink-0">과목</div>
+            <input
+              type="text"
+              className="form-control w-full"
+              {...register('subject')}
+            />
           </div>
         </ModalBody>
         <ModalFooter>
@@ -200,12 +253,21 @@ function MockExam() {
             type="button"
             className="btn btn-ouline-secondary w-24 mr-2"
             onClick={() => {
-              SubjectsAddDetail(false);
+              SubjectsAddDetail(false)
             }}
           >
             취소
           </button>
-          <button type="button" className="btn btn-sky w-24">
+          <button
+            type="button"
+            className="btn btn-sky w-24"
+            onClick={() =>
+              addClassSubject({
+                field_name: '영재학교',
+                subject: getValues('subject'),
+              })
+            }
+          >
             확인
           </button>
         </ModalFooter>
@@ -215,4 +277,4 @@ function MockExam() {
   )
 }
 
-export default MockExam
+export default OnlinebasicClass
