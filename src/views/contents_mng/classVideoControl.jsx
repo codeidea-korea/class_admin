@@ -56,13 +56,13 @@ function ClassVideoForm({ isCreate }) {
   )
 
   const onSubmit = (data) => {
-    console.log(data)
     const formData = new FormData()
     formData.append('field_name', '영재학교')
     formData.append('subject', searchParams.get('subject'))
+    formData.append('teacher_name', data.teacher_name)
+    formData.append('teacher_subject', data.teacher_subject)
     data.classVideoScheduleRequests.map((item) => {
-      formData.append('teacher_name', item.teacher_name)
-      formData.append('teacher_subject', item.teacher_subject)
+      console.log(item)
       formData.append('order_number', item.order_number)
       formData.append('gubun', item.gubun)
       formData.append('cdate', item.cdate)
@@ -71,7 +71,7 @@ function ClassVideoForm({ isCreate }) {
       formData.append('link_url', item.link_url)
       formData.append('file', item.file)
     })
-    // createVideo(data)
+    createVideo(formData)
   }
 
   const handleAddSchedule = () => {

@@ -2,7 +2,7 @@ import { ClassicEditor } from '@/base-components'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'react-query'
-import Loading from '@/components/Loading'
+import Loading from '@/components/loading'
 import request from '@/utils/request'
 
 function ProfitEdit() {

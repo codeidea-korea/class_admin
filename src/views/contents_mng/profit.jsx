@@ -3,7 +3,7 @@ import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import request from '@/utils/request'
 import { useQuery, useMutation } from 'react-query'
-import Loading from '@/components/Loading'
+import Loading from '@/components/loading'
 import Pagenation from '@/components/pagenation'
 
 function Profit() {

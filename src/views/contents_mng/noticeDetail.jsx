@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
-import Loading from '@/components/Loading'
+import Loading from '@/components/loading'
 
 function NoticeView() {
   const { id } = useParams()
