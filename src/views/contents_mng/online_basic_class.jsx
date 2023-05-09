@@ -15,7 +15,13 @@ import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
   // 비디오 영상 모달
-  const [video, videoDetail] = useState(false)
+  const [video, videoDetail] = useReducer(
+    (prev, next) => ({ ...prev, ...next }),
+    {
+      modal: false,
+      url: '',
+    },
+  )
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
       id: '',
@@ -176,7 +182,10 @@ function OnlinebasicClass() {
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
                         onClick={() => {
-                          videoDetail(true)
+                          videoDetail({
+                            modal: true,
+                            url: item.link_url,
+                          })
                         }}
                       >
                         <Lucide icon="Video" className="w-4 h-4"></Lucide>
@@ -207,9 +216,11 @@ function OnlinebasicClass() {
       <Modal
         size="modal-xl"
         backdrop=""
-        show={video}
+        show={video.modal}
         onHidden={() => {
-          videoDetail(false)
+          videoDetail({
+            modal: false,
+          })
         }}
       >
         <ModalBody className="video_frame relative">
@@ -217,13 +228,15 @@ function OnlinebasicClass() {
           <button
             className="video_x"
             onClick={() => {
-              videoDetail(false)
+              videoDetail({
+                modal: false,
+              })
             }}
           >
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
           <iframe
-            src="https://www.youtube.com/embed/IB5bcf_tMVE"
+            src={video.url}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

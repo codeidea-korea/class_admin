@@ -20,7 +20,6 @@ function OnlineBasicClassForm() {
       list: [],
     },
   )
-  console.log(searchParams.get('subject'))
 
   //파일 업로드 시 플레이스 홀더 변경
   const [fileName, setFileName] = useState('')
@@ -90,11 +89,8 @@ function OnlineBasicClassForm() {
     })
     const newFileDelYN = []
 
-    console.log(getValues('list').length)
-
     getValues('list').map((item) => {
-      console.log(item.file)
-      if (item.file.length) {
+      if (item.file && item.file.length) {
         formData.append('file', item.file[0])
       } else {
         formData.append('file', null_file)
@@ -106,7 +102,6 @@ function OnlineBasicClassForm() {
         newFileDelYN.push('N')
       }
     })
-    console.log(newFileDelYN)
     formData.append('savedFileDelYN', newFileDelYN.join(','))
     saveBasicClass(formData)
   }
@@ -119,7 +114,7 @@ function OnlineBasicClassForm() {
       unit: null,
       content: null,
       link_url: null,
-      file: null,
+      file: [],
       fileId: null,
       savedFileDelYN: 'N',
     })
