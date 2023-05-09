@@ -1,13 +1,14 @@
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import React, { useState, useReducer } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const { id } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
       list: [],
@@ -19,6 +20,7 @@ function OnlineBasicClassForm() {
       list: [],
     },
   )
+  console.log(searchParams.get('subject'))
 
   //파일 업로드 시 플레이스 홀더 변경
   const [fileName, setFileName] = useState('')
@@ -132,7 +134,7 @@ function OnlineBasicClassForm() {
           <div className="text-lg font-medium flex items-center">
             영재학교
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            수학
+            {searchParams.get('subject')}
           </div>
         </div>
         <div className="intro-y p-5">

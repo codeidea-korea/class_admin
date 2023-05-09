@@ -42,7 +42,7 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
-        reset({ id: data[0].id })
+        reset({ id: data[0].id, subject: data[0].subject })
       },
     },
   )
@@ -108,7 +108,12 @@ function OnlinebasicClass() {
             <select
               className="form-control w-40"
               onChange={(e) => {
-                reset({ id: e.target.value })
+                reset({
+                  id: e.target.value,
+                  subject: basicClassSubject.find(
+                    (item) => item.id === Number(e.target.value),
+                  ).subject,
+                })
               }}
             >
               {basicClassSubject?.map((item) => (
@@ -138,7 +143,11 @@ function OnlinebasicClass() {
               >
                 과목삭제
               </button>
-              <Link to={`/online_basic_class_form/${getValues('id')}`}>
+              <Link
+                to={`/online_basic_class_form/${getValues(
+                  'id',
+                )}?subject=${getValues('subject')}`}
+              >
                 <button className="btn btn-sky w-24">수정</button>
               </Link>
             </div>
