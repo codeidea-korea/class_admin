@@ -7,7 +7,6 @@ import {
   ModalFooter,
 } from '@/base-components'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
 import { useQuery, useMutation } from 'react-query'
 import { useForm } from 'react-hook-form'
 import request from '@/utils/request'
@@ -15,7 +14,15 @@ import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
   // 비디오 영상 모달
-  const [video, videoDetail] = useState(false)
+  const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
+    id: '',
+    field_name: '',
+    gubun: '',
+    isVideo: false,
+    url: '',
+    isSubject: false,
+    subject: '',
+  })
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
       id: '',
@@ -24,9 +31,6 @@ function OnlinebasicClass() {
       youtube: 'https://www.youtube.com/watch?v=IB5bcf_tMVE',
     },
   })
-
-  // 과목추가하기 모달
-  const [SubjectsAdd, SubjectsAddDetail] = useState(false)
 
   const {
     data: basicClassSubject,
@@ -42,7 +46,10 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
-        reset({ id: data[0].id })
+        setState({
+          id: data[0].id,
+          gubun: data[0].gubun,
+        })
       },
     },
   )
@@ -51,25 +58,29 @@ function OnlinebasicClass() {
     isLoading: isBasicClassm,
     refetch: refetchBasicClass,
   } = useQuery(
-    ['getBasicClass', getValues('id')],
-    () => request.get(`/admin/content-management/mock-exam/${getValues('id')}`),
+    ['getBasicClass', state.id],
+    () => request.get(`/admin/content-management/mock-exam/${state.id}`),
     {
-      enabled: !!getValues('id'),
+      enabled: !!state.id,
     },
   )
 
   const { mutate: addClassSubject, isLoading: isAddClassSubject } = useMutation(
-    (data) => request.post(`/admin/content-management/mock-exam`, data),
+    (data) => request.post(`/admin/content-management/mock-exam-gubun`, data),
     {
       onSuccess: () => {
         refetchBasicClassSubject()
+        setState({
+          isSubject: false,
+        })
+        alert('추가되였습니다.')
       },
     },
   )
 
   const { mutate: deleteClassSubject, isLoading: isDeleteClassSubject } =
     useMutation(
-      (id) => request.delete(`/admin/content-management/mock-exam/${id}`),
+      (id) => request.delete(`/admin/content-management/mock-exam-gubun/${id}`),
       {
         onSuccess: () => {
           refetchBasicClassSubject()
@@ -105,7 +116,14 @@ function OnlinebasicClass() {
             <select
               className="form-control w-40"
               onChange={(e) => {
-                reset({ id: e.target.value })
+                setState({
+                  subject: basicClassSubject.find(
+                    (item) => item.id === Number(e.target.value),
+                  ).subject,
+                })
+                reset({
+                  id: e.target.value,
+                })
               }}
             >
               {basicClassSubject?.map((item) => (
@@ -118,7 +136,9 @@ function OnlinebasicClass() {
             <button
               className="btn btn-outline-primary border-dotted"
               onClick={() => {
-                SubjectsAddDetail(true)
+                setState({
+                  isSubject: true,
+                })
               }}
             >
               <Lucide icon="Plus" className="w-4 h-4"></Lucide>
@@ -135,7 +155,7 @@ function OnlinebasicClass() {
               >
                 과목삭제
               </button>
-              <Link to={`/mock_exam/${getValues('id')}`}>
+              <Link to={`/mock_exam/${state.id}?subject=${state.gubun}`}>
                 <button className="btn btn-sky w-24">수정</button>
               </Link>
             </div>
@@ -164,7 +184,7 @@ function OnlinebasicClass() {
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
                         onClick={() => {
-                          videoDetail(true)
+                          setVideo(true)
                         }}
                       >
                         <Lucide icon="Video" className="w-4 h-4"></Lucide>
@@ -195,9 +215,11 @@ function OnlinebasicClass() {
       <Modal
         size="modal-xl"
         backdrop=""
-        show={video}
+        show={state.isVideo}
         onHidden={() => {
-          videoDetail(false)
+          setState({
+            isVideo: false,
+          })
         }}
       >
         <ModalBody className="video_frame relative">
@@ -205,7 +227,9 @@ function OnlinebasicClass() {
           <button
             className="video_x"
             onClick={() => {
-              videoDetail(false)
+              setState({
+                isVideo: false,
+              })
             }}
           >
             <Lucide icon="X" className="w-8 h-8 text-white" />
@@ -222,9 +246,11 @@ function OnlinebasicClass() {
 
       {/* BEGIN: Modal 과목추가하기 */}
       <Modal
-        show={SubjectsAdd}
+        show={state.isSubject}
         onHidden={() => {
-          SubjectsAddDetail(false)
+          setState({
+            isSubject: false,
+          })
         }}
       >
         <ModalHeader>
@@ -232,7 +258,9 @@ function OnlinebasicClass() {
           <button
             className="btn btn-rounded-secondary hidden sm:flex p-1"
             onClick={() => {
-              SubjectsAddDetail(false)
+              setState({
+                isSubject: false,
+              })
             }}
           >
             <Lucide icon="X" className="w-4 h-4" />
@@ -253,7 +281,9 @@ function OnlinebasicClass() {
             type="button"
             className="btn btn-ouline-secondary w-24 mr-2"
             onClick={() => {
-              SubjectsAddDetail(false)
+              setState({
+                isSubject: false,
+              })
             }}
           >
             취소
@@ -261,12 +291,12 @@ function OnlinebasicClass() {
           <button
             type="button"
             className="btn btn-sky w-24"
-            onClick={() =>
+            onClick={() => {
               addClassSubject({
                 field_name: '영재학교',
-                subject: getValues('subject'),
+                gubun: getValues('subject'),
               })
-            }
+            }}
           >
             확인
           </button>

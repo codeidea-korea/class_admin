@@ -6,7 +6,7 @@ import {
   ModalBody,
   ModalFooter,
 } from '@/base-components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useQuery, useMutation } from 'react-query'
 import { useForm } from 'react-hook-form'
@@ -15,13 +15,10 @@ import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
   // 비디오 영상 모달
-  const [video, videoDetail] = useReducer(
-    (prev, next) => ({ ...prev, ...next }),
-    {
-      modal: false,
-      url: '',
-    },
-  )
+  const [video, setVideo] = useReducer((prev, next) => ({ ...prev, ...next }), {
+    modal: false,
+    url: '',
+  })
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
       id: '',
@@ -182,7 +179,7 @@ function OnlinebasicClass() {
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
                         onClick={() => {
-                          videoDetail({
+                          setVideo({
                             modal: true,
                             url: item.link_url,
                           })
@@ -218,7 +215,7 @@ function OnlinebasicClass() {
         backdrop=""
         show={video.modal}
         onHidden={() => {
-          videoDetail({
+          setVideo({
             modal: false,
           })
         }}
@@ -228,7 +225,7 @@ function OnlinebasicClass() {
           <button
             className="video_x"
             onClick={() => {
-              videoDetail({
+              setVideo({
                 modal: false,
               })
             }}

@@ -1,7 +1,7 @@
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import React, { useState, useReducer } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useQuery, useMutation } from 'react-query'
 import { Litepicker } from '@/base-components'
@@ -9,6 +9,8 @@ import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const { id } = useParams()
+  const { navigate } = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
       list: [],
@@ -46,7 +48,9 @@ function OnlineBasicClassForm() {
     (data) => request.put(`/admin/content-management/mock-exam/${id}`, data),
     {
       onSuccess: () => {
+        refetchBasicClass()
         alert('저장되었습니다.')
+        navigate('/mock-exam')
       },
     },
   )
@@ -95,11 +99,8 @@ function OnlineBasicClassForm() {
     })
     const newFileDelYN = []
 
-    console.log(getValues('list').length)
-
     getValues('list').map((item) => {
-      console.log(item.file)
-      if (item.file.length) {
+      if (item.file && item.file.length) {
         formData.append('file', item.file[0])
       } else {
         formData.append('file', null_file)
@@ -111,7 +112,6 @@ function OnlineBasicClassForm() {
         newFileDelYN.push('N')
       }
     })
-    console.log(newFileDelYN)
     formData.append('savedFileDelYN', newFileDelYN.join(','))
     saveBasicClass(formData)
   }
@@ -139,7 +139,7 @@ function OnlineBasicClassForm() {
           <div className="text-lg font-medium flex items-center">
             영재학교
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            수학
+            {searchParams.get('subject')}
           </div>
         </div>
         <div className="intro-y p-5">

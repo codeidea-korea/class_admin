@@ -1,13 +1,14 @@
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import React, { useState, useReducer } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
@@ -46,7 +47,9 @@ function OnlineBasicClassForm() {
     (data) => request.put(`/admin/content-management/basic-class/${id}`, data),
     {
       onSuccess: () => {
+        refetchBasicClass()
         alert('저장되었습니다.')
+        navigate('/online_basic_class')
       },
     },
   )
