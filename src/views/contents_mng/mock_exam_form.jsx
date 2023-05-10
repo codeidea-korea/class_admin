@@ -146,7 +146,7 @@ function OnlineBasicClassForm() {
           <table className="table table-hover">
             <thead>
               <tr className="bg-slate-100 text-center">
-                <td>회사</td>
+                <td>회차</td>
                 <td>과목</td>
                 <td>시험일자</td>
                 <td>모의고사유형</td>
