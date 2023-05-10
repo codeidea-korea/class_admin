@@ -9,7 +9,7 @@ import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const { id } = useParams()
-  const { navigate } = useNavigate()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
