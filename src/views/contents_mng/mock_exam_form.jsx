@@ -139,7 +139,7 @@ function OnlineBasicClassForm() {
           <div className="text-lg font-medium flex items-center">
             영재학교
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            {searchParams.get('subject')}
+            {searchParams.get('gubun')}
           </div>
         </div>
         <div className="intro-y p-5">
