@@ -15,9 +15,11 @@ import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
   // 비디오 영상 모달
-  const [video, setVideo] = useReducer((prev, next) => ({ ...prev, ...next }), {
+  const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
     modal: false,
     url: '',
+    isSubject: false,
+    subject: '',
   })
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
@@ -45,7 +47,7 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
-        reset({ id: data[0].id, subject: data[0].subject })
+        setState({ id: data[0].id, subject: data[0].subject })
       },
     },
   )
@@ -54,11 +56,10 @@ function OnlinebasicClass() {
     isLoading: isBasicClassm,
     refetch: refetchBasicClass,
   } = useQuery(
-    ['getBasicClass', getValues('id')],
-    () =>
-      request.get(`/admin/content-management/basic-class/${getValues('id')}`),
+    ['getBasicClass', state.id],
+    () => request.get(`/admin/content-management/basic-class/${state.id}`),
     {
-      enabled: !!getValues('id'),
+      enabled: !!state.id,
     },
   )
 
@@ -79,7 +80,7 @@ function OnlinebasicClass() {
       {
         onSuccess: () => {
           refetchBasicClassSubject()
-          alert('삭제되였습니다.')
+          alert('삭제되었습니다.')
         },
       },
     )
@@ -111,7 +112,7 @@ function OnlinebasicClass() {
             <select
               className="form-control w-40"
               onChange={(e) => {
-                reset({
+                setState({
                   id: e.target.value,
                   subject: basicClassSubject.find(
                     (item) => item.id === Number(e.target.value),
@@ -129,7 +130,9 @@ function OnlinebasicClass() {
             <button
               className="btn btn-outline-primary border-dotted"
               onClick={() => {
-                SubjectsAddDetail(true)
+                setState({
+                  isSubject: true,
+                })
               }}
             >
               <Lucide icon="Plus" className="w-4 h-4"></Lucide>
@@ -140,16 +143,14 @@ function OnlinebasicClass() {
                 className="btn btn-danger w-24"
                 onClick={() => {
                   if (confirm('과목을 삭제하시겠습니까?')) {
-                    deleteClassSubject(getValues('id'))
+                    deleteClassSubject(state.id)
                   }
                 }}
               >
                 과목삭제
               </button>
               <Link
-                to={`/online_basic_class_form/${getValues(
-                  'id',
-                )}?subject=${getValues('subject')}`}
+                to={`/online_basic_class_form/${state.id}?subject=${state.subject}`}
               >
                 <button className="btn btn-sky w-24">수정</button>
               </Link>
@@ -215,7 +216,7 @@ function OnlinebasicClass() {
         backdrop=""
         show={video.modal}
         onHidden={() => {
-          setVideo({
+          setState({
             modal: false,
           })
         }}
@@ -225,15 +226,16 @@ function OnlinebasicClass() {
           <button
             className="video_x"
             onClick={() => {
-              setVideo({
+              setState({
                 modal: false,
               })
             }}
           >
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
+          {state.url}
           <iframe
-            src={video.url}
+            src={state.url}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
@@ -246,7 +248,9 @@ function OnlinebasicClass() {
       <Modal
         show={SubjectsAdd}
         onHidden={() => {
-          SubjectsAddDetail(false)
+          setState({
+            isSubject: false,
+          })
         }}
       >
         <ModalHeader>
@@ -254,7 +258,9 @@ function OnlinebasicClass() {
           <button
             className="btn btn-rounded-secondary hidden sm:flex p-1"
             onClick={() => {
-              SubjectsAddDetail(false)
+              setState({
+                isSubject: false,
+              })
             }}
           >
             <Lucide icon="X" className="w-4 h-4" />
@@ -275,7 +281,9 @@ function OnlinebasicClass() {
             type="button"
             className="btn btn-ouline-secondary w-24 mr-2"
             onClick={() => {
-              SubjectsAddDetail(false)
+              setState({
+                isSubject: false,
+              })
             }}
           >
             취소
@@ -286,7 +294,7 @@ function OnlinebasicClass() {
             onClick={() =>
               addClassSubject({
                 field_name: '영재학교',
-                subject: getValues('subject'),
+                subject: state.subject,
               })
             }
           >

@@ -25,7 +25,6 @@ function OnlinebasicClass() {
   })
   const { getValues, watch, reset, register } = useForm({
     defaultValues: {
-      id: '',
       field_name: '',
       subject: '',
       youtube: 'https://www.youtube.com/watch?v=IB5bcf_tMVE',
@@ -84,7 +83,7 @@ function OnlinebasicClass() {
       {
         onSuccess: () => {
           refetchBasicClassSubject()
-          alert('삭제되였습니다.')
+          alert('삭제되었습니다.')
         },
       },
     )
@@ -117,12 +116,10 @@ function OnlinebasicClass() {
               className="form-control w-40"
               onChange={(e) => {
                 setState({
+                  id: e.target.value,
                   subject: basicClassSubject.find(
                     (item) => item.id === Number(e.target.value),
                   ).subject,
-                })
-                reset({
-                  id: e.target.value,
                 })
               }}
             >
@@ -184,7 +181,10 @@ function OnlinebasicClass() {
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
                         onClick={() => {
-                          setVideo(true)
+                          setState({
+                            isVideo: true,
+                            video: item.link_url,
+                          })
                         }}
                       >
                         <Lucide icon="Video" className="w-4 h-4"></Lucide>
@@ -235,7 +235,7 @@ function OnlinebasicClass() {
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
           <iframe
-            src="https://www.youtube.com/embed/IB5bcf_tMVE"
+            src={state.video}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
@@ -294,7 +294,7 @@ function OnlinebasicClass() {
             onClick={() => {
               addClassSubject({
                 field_name: '영재학교',
-                gubun: getValues('subject'),
+                gubun: state.gubun,
               })
             }}
           >
