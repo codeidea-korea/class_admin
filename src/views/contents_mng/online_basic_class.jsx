@@ -214,7 +214,7 @@ function OnlinebasicClass() {
       <Modal
         size="modal-xl"
         backdrop=""
-        show={video.modal}
+        show={state.modal}
         onHidden={() => {
           setState({
             modal: false,
