@@ -50,7 +50,7 @@ function OnlineBasicClassForm() {
       onSuccess: () => {
         refetchBasicClass()
         alert('저장되었습니다.')
-        navigate('/mock-exam')
+        navigate('/mock_exam')
       },
     },
   )

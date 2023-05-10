@@ -146,7 +146,7 @@ function OnlinebasicClass() {
                 className="btn btn-danger w-24"
                 onClick={() => {
                   if (confirm('과목을 삭제하시겠습니까?')) {
-                    deleteClassSubject(getValues('id'))
+                    deleteClassSubject(state.id)
                   }
                 }}
               >

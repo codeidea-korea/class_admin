@@ -20,8 +20,8 @@ function Contents() {
     subMenu: '',
     subMenuList: [],
     menuDetailList: [],
+    code: '',
   })
-  const subMenuCode = new Map()
 
   const { isLoading: isGetMenus } = useQuery(
     'getMenus',
@@ -34,19 +34,22 @@ function Contents() {
           mainMenuList: data,
           subMenu: data[0].subMenuResponseList[0].ca_code2_name,
           subMenuList: data[0].subMenuResponseList,
+          code: data[0].subMenuResponseList[0].ca_code2,
         })
       },
     },
   )
 
-  const { mutate: getMenuDetail, isLoading: isMutateMenuDetail } = useMutation(
-    () => {
-      console.log(subMenuCode.get('code'))
-      return request.get(
-        `/admin/content-management/detail/${subMenuCode.get('code')}`,
-      )
-    },
+  const {
+    data: getMenuDetail,
+    isLoading: isMutateMenuDetail,
+    refetch: refetchMenuDetail,
+    isRefetching: isRefetchingMenuDetail,
+  } = useQuery(
+    ['getMenuDetail', menu.code],
+    () => request.get(`/admin/content-management/detail/${menu.code}`),
     {
+      enabled: !!menu.code,
       onSuccess: (data) => {
         setMenu({
           menuDetailList: data,
@@ -61,7 +64,7 @@ function Contents() {
       {
         onSuccess: () => {
           alert('저장되었습니다.')
-          getMenuDetail()
+          refetchMenuDetail()
         },
       },
     )
@@ -123,18 +126,20 @@ function Contents() {
     updateMenuDetail(formData)
   }
 
-  useDidMountEffect(() => {
-    if (!menu.subMenuList) return
-    const code = menu.subMenuList?.find(
-      (item) => item.ca_code2_name === menu.subMenu,
-    ).ca_code2
-    subMenuCode.set('code', code)
-    getMenuDetail()
-  }, [menu.subMenu])
+  // useDidMountEffect(() => {
+  //   if (!menu.subMenuList) return
+  //   const code = menu.subMenuList?.find(
+  //     (item) => item.ca_code2_name === menu.subMenu,
+  //   ).ca_code2
+  //   refetchMenuDetail()
+  // }, [menu.subMenu])
 
   return (
     <div className="relative">
-      {(isGetMenus || isMutateMenuDetail || isUpdateMenuDetail) && <Loading />}
+      {(isGetMenus ||
+        isMutateMenuDetail ||
+        isRefetchingMenuDetail ||
+        isUpdateMenuDetail) && <Loading />}
       <div className="flex items-center gap-3">
         <Dropdown>
           <DropdownToggle className="btn bg-white">
@@ -149,7 +154,11 @@ function Contents() {
                   className={`${
                     menu.mainMenu === item.ca_code1_name && 'drop_active'
                   }`}
-                  onClick={() => setMenu({ mainMenu: item.ca_code1_name })}
+                  onClick={() => {
+                    setMenu({
+                      mainMenu: item.ca_code1_name,
+                    })
+                  }}
                 >
                   {item.ca_code1_name}
                 </DropdownItem>
@@ -177,6 +186,7 @@ function Contents() {
                         onClick={() => {
                           setMenu({
                             subMenu: item.ca_code2_name,
+                            code: item.ca_code2,
                           })
                           dismiss()
                         }}
