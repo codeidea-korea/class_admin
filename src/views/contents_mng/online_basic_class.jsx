@@ -180,7 +180,7 @@ function OnlinebasicClass() {
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
                         onClick={() => {
-                          setVideo({
+                          setState({
                             modal: true,
                             url: item.link_url,
                           })
