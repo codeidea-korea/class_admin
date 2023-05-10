@@ -62,6 +62,15 @@ function NoticeView() {
             <hr className="border-t border-dotted" />
           </div>
 
+          {noticeData?.fileId && (
+            <div className="p-5">
+              <img
+                src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
+                alt=""
+              />
+            </div>
+          )}
+
           <div
             className="p-5"
             dangerouslySetInnerHTML={{

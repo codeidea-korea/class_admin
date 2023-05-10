@@ -258,7 +258,7 @@ function OnlineBasicClassForm() {
           </table>
           <div className="flex mt-3 justify-center">
             <div className="flex gap-2">
-              <Link to="/online_basic_class">
+              <Link to="/mock_exam">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
               <button className="btn btn-sky w-24" onClick={() => handleSave()}>

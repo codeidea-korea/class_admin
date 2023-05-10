@@ -62,6 +62,15 @@ function ProfitView() {
             <hr className="border-t border-dotted" />
           </div>
 
+          {profitData?.fileId && (
+            <div className="p-5">
+              <img
+                src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}
+                alt=""
+              />
+            </div>
+          )}
+
           <div
             className="p-5"
             dangerouslySetInnerHTML={{

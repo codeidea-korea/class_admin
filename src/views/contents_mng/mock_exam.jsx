@@ -117,9 +117,9 @@ function OnlinebasicClass() {
               onChange={(e) => {
                 setState({
                   id: e.target.value,
-                  subject: basicClassSubject.find(
+                  gubun: basicClassSubject.find(
                     (item) => item.id === Number(e.target.value),
-                  ).subject,
+                  ).gubun,
                 })
               }}
             >
@@ -152,7 +152,7 @@ function OnlinebasicClass() {
               >
                 과목삭제
               </button>
-              <Link to={`/mock_exam/${state.id}?subject=${state.gubun}`}>
+              <Link to={`/mock_exam/${state.id}?gubun=${state.gubun}`}>
                 <button className="btn btn-sky w-24">수정</button>
               </Link>
             </div>
