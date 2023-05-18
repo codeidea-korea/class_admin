@@ -30,9 +30,6 @@ function OnlinebasicClass() {
     },
   })
 
-  // 과목추가하기 모달
-  const [SubjectsAdd, SubjectsAddDetail] = useState(false)
-
   const {
     data: basicClassSubject,
     isLoading: isBasicClassSubject,
@@ -47,7 +44,9 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
-        setState({ id: data[0].id, subject: data[0].subject })
+        if (data[0]) {
+          setState({ id: data[0].id, subject: data[0].subject })
+        }
       },
     },
   )
@@ -69,6 +68,10 @@ function OnlinebasicClass() {
     {
       onSuccess: () => {
         refetchBasicClassSubject()
+        setState({
+          isSubject: false,
+        })
+        alert('추가되였습니다.')
       },
     },
   )
@@ -246,7 +249,7 @@ function OnlinebasicClass() {
 
       {/* BEGIN: Modal 과목추가하기 */}
       <Modal
-        show={SubjectsAdd}
+        show={state.isSubject}
         onHidden={() => {
           setState({
             isSubject: false,
@@ -294,7 +297,7 @@ function OnlinebasicClass() {
             onClick={() =>
               addClassSubject({
                 field_name: '영재학교',
-                subject: state.subject,
+                subject: getValues('subject'),
               })
             }
           >
