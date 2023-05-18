@@ -230,7 +230,7 @@ function Router() {
           ),
         },
         {
-          path: '/curriculum_view',
+          path: '/curriculum_view/:id',
           element: (
             <PrivateRoute
               element={<CurriCulumView />}

@@ -1,8 +1,8 @@
 import { Lucide, Modal, ModalBody } from '@/base-components'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-
 import Default_img from '@/assets/images/default_image.jpg'
+import Loading from '@/components/loading'
 import Person from '@/assets/images/img02.png'
 import { useQuery } from 'react-query'
 import request from '@/utils/request'
@@ -11,7 +11,7 @@ function CurriCulum() {
   // 비디오 영상 모달
   const [video, videoDetail] = useState(false)
 
-  const { data: curriculumList } = useQuery(
+  const { data: curriculumList, isLoading: isGetCurriculumList } = useQuery(
     'getCurriculum',
     () => request.get('/admin/content-management/curriculum'),
     {
@@ -44,7 +44,8 @@ function CurriCulum() {
         </button>
       </div>
 
-      <div className="intro-y box mt-5">
+      <div className="intro-y box mt-5 relative">
+        {isGetCurriculumList && <Loading />}
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">수학(Mathmetic)</div>
         </div>
@@ -74,7 +75,10 @@ function CurriCulum() {
                           className="w-4 h-4"
                         ></Lucide>
                       </button>
-                      <Link to="/curriculum_view" className="w-full">
+                      <Link
+                        to={`/curriculum_view?subject=${item.subject}`}
+                        className="w-full"
+                      >
                         <button className="btn btn-secondary  w-full rounded-full">
                           상세 커리큘럼 보기
                           <Lucide
@@ -89,7 +93,7 @@ function CurriCulum() {
               ),
             )}
             <li className="add zoom-in">
-              <Link to="/curriculum_form" className="">
+              <Link to={'/curriculum_form?subject=수학'} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>
@@ -97,17 +101,19 @@ function CurriCulum() {
         </div>
       </div>
 
-      <div className="intro-y box mt-5">
+      <div className="intro-y box mt-5 relative">
+        {isGetCurriculumList && <Loading />}
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">과학(Science)</div>
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
             {curriculumList?.science?.subCurriculumResponseList.map((item) => (
-              <li>
+              <li key={item.id}>
                 <div className="inner">
                   <div className="subject">
-                    OOO 선생님<span className="sub">물리</span>
+                    {item.teacher_name} 선생님
+                    <span className="sub">{item.teacher_subject}</span>
                   </div>
                   <div className="thumb">
                     <img src={Person} />
@@ -122,7 +128,10 @@ function CurriCulum() {
                       학습 전략 영상 보기
                       <Lucide icon="ChevronRight" className="w-4 h-4"></Lucide>
                     </button>
-                    <Link to="/curriculum_view" className="w-full">
+                    <Link
+                      to={`/curriculum_view/${item.id}?subject=${item.subject}`}
+                      className="w-full"
+                    >
                       <button className="btn btn-secondary  w-full rounded-full">
                         상세 커리큘럼 보기
                         <Lucide
@@ -136,7 +145,7 @@ function CurriCulum() {
               </li>
             ))}
             <li className="add zoom-in">
-              <Link to="/curriculum_form" className="">
+              <Link to={'/curriculum_form?subject=과학'} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>

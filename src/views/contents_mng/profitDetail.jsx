@@ -37,7 +37,7 @@ function ProfitView() {
       <div className="intro-y box mt-5 relative">
         {(isProfitData || isDeleteProfit) && <Loading />}
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
-          <div className="text-lg font-medium">공지사항</div>
+          <div className="text-lg font-medium">혜택</div>
         </div>
         <div className="intro-y p-5">
           <div className="px-8">
