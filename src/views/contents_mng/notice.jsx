@@ -97,44 +97,91 @@ function Notice() {
                 </tr>
               </thead>
               <tbody>
-                {notice?.list?.map((item, index) => (
-                  <tr className="text-center" key={item.id}>
-                    <td>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={item.check}
-                        onChange={(e) => {
-                          const newList = notice.list.map((child, idx) => {
-                            if (idx === index) {
-                              return {
-                                ...child,
-                                check: e.target.checked,
+                {notice?.list
+                  ?.filter((item) => item.topYN === 'Y')
+                  .map((item, index) => (
+                    <tr className="text-center" key={item.id}>
+                      <td>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={item.check}
+                          onChange={(e) => {
+                            const newList = notice.list.map((child, idx) => {
+                              if (idx === index) {
+                                return {
+                                  ...child,
+                                  check: e.target.checked,
+                                }
                               }
-                            }
-                            return child
-                          })
-                          setNotice({
-                            list: newList,
-                          })
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <div className="flex justify-center">{index + 1}</div>
-                    </td>
-                    <td>
-                      <Link
-                        to={`/notice/${item.id}`}
-                        className="underline text-primary text-left"
-                      >
-                        <div className="w-550 truncate">{item.title}</div>
-                      </Link>
-                    </td>
-                    <td>{item.writerName}</td>
-                    <td>{item.creDate}</td>
-                  </tr>
-                ))}
+                              return child
+                            })
+                            setNotice({
+                              list: newList,
+                            })
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <div className="flex justify-center">
+                          <Lucide
+                            icon="BellRing"
+                            className="w-4 h-4 text-danger"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <Link
+                          to={`/notice/${item.id}`}
+                          className="underline text-left text-danger"
+                        >
+                          <div className="w-550 truncate">{item.title}</div>
+                        </Link>
+                      </td>
+                      <td className="text-danger">{item.writerName}</td>
+                      <td className="text-danger">{item.creDate}</td>
+                    </tr>
+                  ))}
+                {notice?.list
+                  ?.filter((item) => item.topYN === 'N')
+                  .map((item, index) => (
+                    <tr className="text-center" key={item.id}>
+                      <td>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={item.check}
+                          onChange={(e) => {
+                            const newList = notice.list.map((child, idx) => {
+                              if (idx === index) {
+                                return {
+                                  ...child,
+                                  check: e.target.checked,
+                                }
+                              }
+                              return child
+                            })
+                            setNotice({
+                              list: newList,
+                            })
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <div className="flex justify-center">{index + 1}</div>
+                      </td>
+                      <td>
+                        <Link
+                          to={`/notice/${item.id}`}
+                          className="underline text-primary text-left"
+                        >
+                          <div className="w-550 truncate">{item.title}</div>
+                        </Link>
+                      </td>
+                      <td>{item.writerName}</td>
+                      <td>{item.creDate}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
