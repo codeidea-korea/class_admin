@@ -185,7 +185,7 @@ function OnlinebasicClass() {
                         onClick={() => {
                           setState({
                             modal: true,
-                            url: item.link_url,
+                            url: item.link_url.replace('/watch?v=', '/embed/'),
                           })
                         }}
                       >
@@ -236,7 +236,6 @@ function OnlinebasicClass() {
           >
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
-          {state.url}
           <iframe
             src={state.url}
             title="YouTube video player"

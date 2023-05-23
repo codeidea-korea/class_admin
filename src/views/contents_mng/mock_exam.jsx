@@ -294,7 +294,7 @@ function OnlinebasicClass() {
             onClick={() => {
               addClassSubject({
                 field_name: '영재학교',
-                gubun: state.gubun,
+                gubun: getValues('subject'),
               })
             }}
           >
