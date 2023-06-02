@@ -170,9 +170,9 @@ function OnlinebasicClass() {
               </tr>
             </thead>
             <tbody>
-              {basicClass?.map((item, index) => (
+              {basicClass?.map((item) => (
                 <tr className="text-center" key={`basicClass-${item.row_id}`}>
-                  <td>{index + 1}</td>
+                  <td>{item.row_id}</td>
                   <td>{item.subject}</td>
                   <td>{item.exam_date}</td>
                   <td className="text-left">{item.exam_type}</td>
