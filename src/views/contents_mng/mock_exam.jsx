@@ -61,6 +61,10 @@ function OnlinebasicClass() {
     () => request.get(`/admin/content-management/mock-exam/${state.id}`),
     {
       enabled: !!state.id,
+      select: (data) =>
+        data.sort((a, b) => {
+          return new Date(b.exam_date) - new Date(a.exam_date)
+        }),
     },
   )
 
