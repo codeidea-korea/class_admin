@@ -1,19 +1,40 @@
-import { ClassicEditor } from '@/base-components'
-import { Link, useNavigate } from 'react-router-dom'
+import { ClassicEditor, Lucide } from '@/base-components'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { useMutation } from 'react-query'
+import { useQuery, useMutation } from 'react-query'
 import Loading from '@/components/loading'
 import request from '@/utils/request'
 
-function NoticeEdit() {
+function NoticeEdit({ isCreate }) {
+  const { id } = useParams()
   const navigate = useNavigate()
-  const { register, setValue, handleSubmit } = useForm()
+  const { watch, reset, register, setValue, handleSubmit } = useForm()
 
   const { mutate: createNotice, isLoading: isCreateNotice } = useMutation(
-    (data) => request.post('/admin/content-management/notice', data),
+    (data) => {
+      if (isCreate) {
+        request.post('/admin/content-management/notice', data)
+      } else {
+        request.put(`/admin/content-management/notice/${id}`, data)
+      }
+    },
     {
       onSuccess: () => {
         navigate('/notice')
+      },
+    },
+  )
+
+  const { data: noticeData, isLoading: isNoticeData } = useQuery(
+    'getNoticeData',
+    () => request.get(`/admin/content-management/notice/${id}`),
+    {
+      enabled: !isCreate,
+      onSuccess: (data) => {
+        reset((prev) => ({
+          ...prev,
+          ...data,
+        }))
       },
     },
   )
@@ -71,11 +92,33 @@ function NoticeEdit() {
                   첨부파일
                 </div>
                 <div className="dorp_w-full w-full">
-                  <input
-                    type="file"
-                    className="form-control"
-                    {...register('file')}
-                  />
+                  {watch('fileId') ? (
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
+                        className="underline text-blue"
+                      >
+                        {watch('fileName')}
+                      </a>
+                      <Lucide
+                        icon="X"
+                        className="w-4 h-4 text-danger cursor-pointer"
+                        onClick={() => {
+                          reset((prev) => ({
+                            ...prev,
+                            fileName: '',
+                            fileId: '',
+                          }))
+                        }}
+                      ></Lucide>
+                    </div>
+                  ) : (
+                    <input
+                      type="file"
+                      className="form-control"
+                      {...register('file')}
+                    />
+                  )}
                 </div>
               </div>
               <hr className="border-t border-dotted" />
@@ -84,6 +127,7 @@ function NoticeEdit() {
                   내용
                 </div>
                 <ClassicEditor
+                  value={watch('content')}
                   onChange={(value) => setValue('content', value)}
                 />
               </div>

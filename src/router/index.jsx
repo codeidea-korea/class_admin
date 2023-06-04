@@ -196,6 +196,15 @@ function Router() {
           ),
         },
         {
+          path: '/notice/edit/:id',
+          element: (
+            <PrivateRoute
+              element={<NoticeCreate />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
           path: '/profit', //혜택
           element: (
             <PrivateRoute element={<Profit />} role={['ADMIN', 'DIRECTOR']} />

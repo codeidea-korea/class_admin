@@ -89,7 +89,9 @@ function NoticeView() {
               <Link to="/notice">
                 <button className="btn bg-white w-24">목록</button>
               </Link>
-              <button className="btn btn-sky w-24">확인</button>
+              <Link to={`/notice/edit/${id}`}>
+                <button className="btn btn-sky w-24">수정</button>
+              </Link>
             </div>
           </div>
         </div>
