@@ -216,12 +216,15 @@ function OnlineBasicClassForm() {
                   </td>
                   <td>
                     {item.fileName ? (
-                      <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
-                        className="cursor-pointer text-blue underline"
-                      >
-                        {item.fileName}
-                      </a>
+                      <div className="flex items-center">
+                        <a
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
+                          className="cursor-pointer text-blue underline"
+                        >
+                          {item.fileName}
+                        </a>
+                        <Lucide icon="X" className="w-4 h-4 color-red"></Lucide>
+                      </div>
                     ) : (
                       <input
                         type="file"
