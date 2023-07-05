@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Lucide,
   Dropdown,
@@ -13,11 +13,15 @@ import {
 import { faker as $f } from '@/utils'
 import classnames from 'classnames'
 import { userState } from '@/states/userState'
-import { useRecoilState } from 'recoil'
+import { naviState } from '@/states/naviState'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import {configStore} from "@/stores/configStore";
 
 function Main(props) {
   const navigate = useNavigate()
   const [user, setUser] = useRecoilState(userState)
+  const [navi, setNavi] = useRecoilState(naviState)
+  const config = useRecoilValue(configStore)
   const [searchDropdown, setSearchDropdown] = useState(false)
   const showSearchDropdown = () => {
     setSearchDropdown(true)
@@ -31,6 +35,17 @@ function Main(props) {
     setUser()
     navigate('/login')
   }
+
+  useEffect(() => {
+    const text = config.menuType.pathToText[location.pathname.split('/')[1]];
+
+    setNavi(
+      {
+        menu01 : text ? text[0] : '',
+        menu02 : text ? text[1] : ''
+      },
+    );
+  }, [location.pathname]);
 
   return (
     <>
@@ -46,20 +61,25 @@ function Main(props) {
           className="-intro-x mr-auto hidden sm:flex"
         >
           <ol className="breadcrumb">
-            <li className="breadcrumb-item">
-              <a href="#" className="text-slate-400">
-                회원관리
+            <li className="breadcrumb-item text-white">
+              <a href="#" className={navi?.menu02 && 'text-slate-400'}>
+                {navi?.menu01}
               </a>
             </li>
-            <li className="">
-              <Lucide
-                icon="ChevronRight"
-                className="w-4 h-4 text-slate-400"
-              ></Lucide>
-            </li>
-            <li className=" text-white " aria-current="page">
-              회원관리
-            </li>
+            {
+              navi?.menu02 &&
+              <>
+                <li className="">
+                  <Lucide
+                    icon="ChevronRight"
+                    className="w-4 h-4 text-slate-400"
+                  ></Lucide>
+                </li>
+                <li className="text-white" aria-current="page">
+                  {navi?.menu02}
+                </li>
+              </>
+            }
           </ol>
         </nav>
         {/* END: Breadcrumb */}
