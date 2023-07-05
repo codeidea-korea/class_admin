@@ -8,21 +8,32 @@ import { useQuery } from 'react-query'
 import request from '@/utils/request'
 
 function CurriCulum() {
-  // 비디오 영상 모달
-  const [video, videoDetail] = useState(false)
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+  const [video, videoDetail] = useState(false);
+  const [videoSrc, setVideoSrc] = useState('');
 
   const { data: curriculumList, isLoading: isGetCurriculumList } = useQuery(
     'getCurriculum',
     () => request.get('/admin/content-management/curriculum'),
     {
       select: (data) => ({
-        mathematics: data.curriculumList.find(
-          (item) => item.subject === '수학',
-        ),
-        science: data.curriculumList.find((item) => item.subject === '과학'),
+        mathematics: data?.contentCurriculumTeacherList?.filter(item => item.subject === '수학'),
+        science: data?.contentCurriculumTeacherList?.filter(item => item.subject === '과학'),
       }),
     },
   )
+
+  // 학습 전략 영상 보기 버튼 클릭시 비디오 경로 설정 및 모달 노출
+  const setVideo = (src) => {
+    setVideoSrc(src);
+    videoDetail(true);
+  }
+
+  /*
+  *TODO
+  * 프로필 사진 : view에서 사용하는 profileId(파일 테이블 키값인듯?) 데이터 필요함
+  * 리스트 쿼리 확인(결과 리스트가 이상함)
+  */
 
   return (
     <>
@@ -51,23 +62,25 @@ function CurriCulum() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {curriculumList?.mathematics?.subCurriculumResponseList.map(
+            {curriculumList?.mathematics?.map(
               (item) => (
                 <li key={item.id}>
                   <div className="inner">
                     <div className="subject">
                       {item.teacher_name} 선생님
-                      <span className="sub">{item.subject}</span>
+                      <span className="sub">{item.teacher_subject}</span>
                     </div>
                     <div className="thumb">
-                      <img src={item.teacher_url} />
+                      {item?.profileId ? (
+                        <img src={`${baseUrl}/v1/contents-data/file-download/${item?.profileId}`} />
+                      ) : (
+                        <img src={Default_img} />
+                      )}
                     </div>
                     <div className="btnSet">
                       <button
                         className="btn btn-sky w-full rounded-full"
-                        onClick={() => {
-                          videoDetail(true)
-                        }}
+                        onClick={() => { setVideo(item.teacher_url) }}
                       >
                         학습 전략 영상 보기
                         <Lucide
@@ -76,7 +89,8 @@ function CurriCulum() {
                         ></Lucide>
                       </button>
                       <Link
-                        to={`/curriculum_view?subject=${item.subject}`}
+                        // to={`/curriculum_view?subject=${item.subject}`}
+                        to={`/curriculum/${item.id}?subject=${item.subject}`}
                         className="w-full"
                       >
                         <button className="btn btn-secondary  w-full rounded-full">
@@ -93,7 +107,7 @@ function CurriCulum() {
               ),
             )}
             <li className="add zoom-in">
-              <Link to={'/curriculum_form?subject=수학'} className="">
+              <Link to={'/curriculum/create?subject=수학'} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>
@@ -108,7 +122,7 @@ function CurriCulum() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {curriculumList?.science?.subCurriculumResponseList.map((item) => (
+            {curriculumList?.science?.map((item) => (
               <li key={item.id}>
                 <div className="inner">
                   <div className="subject">
@@ -116,20 +130,22 @@ function CurriCulum() {
                     <span className="sub">{item.teacher_subject}</span>
                   </div>
                   <div className="thumb">
-                    <img src={Person} />
+                    {item?.profileId ? (
+                      <img src={`${baseUrl}/v1/contents-data/file-download/${item?.profileId}`} />
+                    ) : (
+                      <img src={Default_img} />
+                    )}
                   </div>
                   <div className="btnSet">
                     <button
                       className="btn btn-sky w-full rounded-full"
-                      onClick={() => {
-                        videoDetail(true)
-                      }}
+                      onClick={() => { setVideo(item.teacher_url) }}
                     >
                       학습 전략 영상 보기
                       <Lucide icon="ChevronRight" className="w-4 h-4"></Lucide>
                     </button>
                     <Link
-                      to={`/curriculum_view/${item.id}?subject=${item.subject}`}
+                      to={`/curriculum/${item.id}?subject=${item.subject}`}
                       className="w-full"
                     >
                       <button className="btn btn-secondary  w-full rounded-full">
@@ -145,7 +161,7 @@ function CurriCulum() {
               </li>
             ))}
             <li className="add zoom-in">
-              <Link to={'/curriculum_form?subject=과학'} className="">
+              <Link to={'/curriculum/create?subject=과학'} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>
@@ -172,7 +188,7 @@ function CurriCulum() {
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
           <iframe
-            src="https://www.youtube.com/embed/IB5bcf_tMVE"
+            src={videoSrc}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

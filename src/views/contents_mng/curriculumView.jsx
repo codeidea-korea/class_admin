@@ -15,10 +15,10 @@ import Default_img from '@/assets/images/default_image.jpg'
 import request from '@/utils/request'
 
 function CurriCulumView() {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  // 영상보기 모달
-  const [video, videoDetail] = useState(false)
+  const [video, videoDetail] = useState(false);
 
   const { data: curriculumDetail } = useQuery('getCurriculum', () =>
     request.get(`/admin/content-management/curriculum/${id}`),
@@ -38,9 +38,9 @@ function CurriCulumView() {
           <div className="intro-y p-5">
             <div className="bg-slate-50 flex items-center p-5 gap-6 w-1/2">
               <div className="profile_img">
-                {curriculumDetail?.profileId ? (
+                {curriculumDetail?.teachers?.profileId ? (
                   <img
-                    src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${curriculumDetail?.profileId}`}
+                    src={`${baseUrl}/v1/contents-data/file-download/${curriculumDetail?.teachers?.profileId}`}
                     className="rounded-md"
                   />
                 ) : (
@@ -49,9 +49,9 @@ function CurriCulumView() {
               </div>
               <div className="w-full flex flex-col gap-6">
                 <div className="text-lg font-medium flex items-center">
-                  박진우 선생님
+                  {curriculumDetail?.teachers?.teacher_name} 선생님
                   <span className="bg-white border outline-secondary p-1 rounded-full text-sm w-16 text-center block ml-3">
-                    {searchParams.get('subject')}
+                    {curriculumDetail?.teachers?.teacher_subject}
                   </span>
                 </div>
                 <button
@@ -86,36 +86,36 @@ function CurriCulumView() {
             <div className="box p-5 ">
               <table className="table table-hover">
                 <thead>
-                  <tr className="bg-slate-100 text-center">
-                    <td className=" w-16">월</td>
-                    <td>차시</td>
-                    <td>교재</td>
-                    <td>학습목표</td>
-                    <td>학습 단원 및 내용</td>
-                  </tr>
+                <tr className="bg-slate-100 text-center">
+                  <td className=" w-16">월</td>
+                  <td>차시</td>
+                  <td>교재</td>
+                  <td>학습목표</td>
+                  <td>학습 단원 및 내용</td>
+                </tr>
                 </thead>
                 <tbody>
-                  {curriculumDetail?.scheduleWeeks?.map((item) => (
-                    <tr
-                      className="text-center"
-                      key={`scheduleWeeks-${item.id}`}
-                    >
-                      <td>{item.month}</td>
-                      <td>{item.order_number}차시</td>
-                      <td>{item.objective}</td>
-                      <td>{item.textbook}</td>
-                      <td>{item.content}</td>
-                    </tr>
-                  ))}
+                {curriculumDetail?.scheduleWeeks?.map((item) => (
+                  <tr
+                    className="text-center"
+                    key={`scheduleWeeks-${item.id}`}
+                  >
+                    <td>{item.month}월</td>
+                    <td>{item.order_number}차시</td>
+                    <td>{item.textbook}</td>
+                    <td>{item.objective}</td>
+                    <td>{item.content}</td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
               <div className="flex mt-3">
-                <button className="btn btn-outline-danger w-24">삭제</button>
+                {/*<button className="btn btn-outline-danger w-24">삭제</button>*/}
                 <div className="flex gap-2 ml-auto">
                   <Link to="/curriculum">
                     <button className="btn bg-white w-24">목록</button>
                   </Link>
-                  <Link to="/curriculum_form">
+                  <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
                     <button className="btn btn-sky w-24">수정하기</button>
                   </Link>
                 </div>
@@ -126,36 +126,36 @@ function CurriCulumView() {
             <div className="box p-5 ">
               <table className="table table-hover">
                 <thead>
-                  <tr className="bg-slate-100 text-center">
-                    <td className=" w-16">월</td>
-                    <td>차시</td>
-                    <td>교재</td>
-                    <td>학습목표</td>
-                    <td>학습 단원 및 내용</td>
-                  </tr>
+                <tr className="bg-slate-100 text-center">
+                  <td className=" w-16">월</td>
+                  <td>차시</td>
+                  <td>교재</td>
+                  <td>학습목표</td>
+                  <td>학습 단원 및 내용</td>
+                </tr>
                 </thead>
                 <tbody>
-                  {curriculumDetail?.scheduleWeekends?.map((item) => (
-                    <tr
-                      className="text-center"
-                      key={`scheduleWeeks-${item.id}`}
-                    >
-                      <td>{item.month}</td>
-                      <td>{item.order_number}차시</td>
-                      <td>{item.objective}</td>
-                      <td>{item.textbook}</td>
-                      <td>{item.content}</td>
-                    </tr>
-                  ))}
+                {curriculumDetail?.scheduleWeekends?.map((item) => (
+                  <tr
+                    className="text-center"
+                    key={`scheduleWeeks-${item.id}`}
+                  >
+                    <td>{item.month}월</td>
+                    <td>{item.order_number}차시</td>
+                    <td>{item.textbook}</td>
+                    <td>{item.objective}</td>
+                    <td>{item.content}</td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
               <div className="flex mt-3">
-                <button className="btn btn-outline-danger w-24">삭제</button>
+                {/*<button className="btn btn-outline-danger w-24">삭제</button>*/}
                 <div className="flex gap-2 ml-auto">
                   <Link to="/curriculum">
                     <button className="btn bg-white w-24">목록</button>
                   </Link>
-                  <Link to="/curriculum_form">
+                  <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
                     <button className="btn btn-sky w-24">수정하기</button>
                   </Link>
                 </div>
@@ -184,7 +184,7 @@ function CurriCulumView() {
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
           <iframe
-            src="https://www.youtube.com/embed/IB5bcf_tMVE"
+            src={curriculumDetail?.teachers?.teacher_url}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

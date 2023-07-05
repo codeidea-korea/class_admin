@@ -30,7 +30,7 @@ import ProfitDetail from '../views/contents_mng/profitDetail'
 
 import CurriCulum from '../views/contents_mng/curriculum'
 import CurriCulumView from '../views/contents_mng/curriculumView'
-import CurriculumForm from '../views/contents_mng/curriculumForm'
+import CurriculumCreate from '../views/contents_mng/curriculumCreate'
 
 import ClassVideo from '../views/contents_mng/classVideo'
 import ClassVideoControl from '../views/contents_mng/classVideoControl'
@@ -228,18 +228,17 @@ function Router() {
             />
           ),
         },
-
         {
           path: '/curriculum', //커리큘럼
           element: (
             <PrivateRoute
-              element={<CurriCulum />}
+              element={<CurriCulum/>}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
         },
         {
-          path: '/curriculum_view/:id',
+          path: '/curriculum/:id',
           element: (
             <PrivateRoute
               element={<CurriCulumView />}
@@ -248,10 +247,19 @@ function Router() {
           ),
         },
         {
-          path: '/curriculum_form',
+          path: '/curriculum/create',
           element: (
             <PrivateRoute
-              element={<CurriculumForm />}
+              element={<CurriculumCreate isCreate />}
+              role={['ADMIN', 'DIRECTOR', 'TEACHER']}
+            />
+          ),
+        },
+        {
+          path: '/curriculum/edit/:id',
+          element: (
+            <PrivateRoute
+              element={<CurriculumCreate/>}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),

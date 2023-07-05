@@ -110,9 +110,13 @@ function TabList(props) {
 	const tabListRef = createRef();
 	const tabGroupProps = useContext(tabGroupPropsContext);
 
-	useEffect(() => {
+  /*
+  * 커리큘럼 메뉴에서 useForm으로 데이터 관리할때 리렌더링 되면서 첫번째 탭으로 이동되는데 이를 막을 방법을 모르겠음
+  * 아래 내용 주석처리하니 해결되는데 혹시 다른 곳에서 문제가 발생하면 주석 풀고 커리큘럼쪽 수정해야됨
+  */
+	/*useEffect(() => {
 		init(dom(tabListRef.current).parent(), tabGroupProps);
-	}, [tabGroupProps]);
+	}, [tabGroupProps]);*/
 
 	return createElement(
 		"ul",
