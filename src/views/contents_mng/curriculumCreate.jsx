@@ -72,7 +72,9 @@ function CurriculumCreate({ isCreate }) {
     },
     {
       onSuccess: (data) => {
-        navigate('/curriculum')
+        setTimeout(function() {
+          navigate('/curriculum')
+        },500)
       },
     },
   )
