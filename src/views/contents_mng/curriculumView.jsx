@@ -19,9 +19,19 @@ function CurriCulumView() {
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const [video, videoDetail] = useState(false);
+  const [videoSrc, setVideoSrc] = useState('');
 
-  const { data: curriculumDetail } = useQuery('getCurriculum', () =>
-    request.get(`/admin/content-management/curriculum/${id}`),
+  const { data: curriculumDetail } = useQuery(
+    'getCurriculum',
+    () => request.get(`/admin/content-management/curriculum/${id}`),
+    {
+      onSuccess : (data) => {
+        // 학습 전략 영상 경로 설정
+        let src = data?.teachers?.teacher_url.split('watch?v=');
+        src = src.length < 2 ? '' : 'https://www.youtube.com/embed/'+src[1];
+        setVideoSrc(src);
+      }
+    }
   )
 
   return (
@@ -184,7 +194,7 @@ function CurriCulumView() {
             <Lucide icon="X" className="w-8 h-8 text-white" />
           </button>
           <iframe
-            src={curriculumDetail?.teachers?.teacher_url}
+            src={videoSrc}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

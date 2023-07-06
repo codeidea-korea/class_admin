@@ -25,7 +25,9 @@ function CurriCulum() {
 
   // 학습 전략 영상 보기 버튼 클릭시 비디오 경로 설정 및 모달 노출
   const setVideo = (src) => {
-    setVideoSrc(src);
+    let videoSrc = src.split('watch?v=');
+    videoSrc = videoSrc.length < 2 ? '' : 'https://www.youtube.com/embed/'+videoSrc[1];
+    setVideoSrc(videoSrc);
     videoDetail(true);
   }
 
