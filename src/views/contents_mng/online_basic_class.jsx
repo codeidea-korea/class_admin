@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import {useEffect, useReducer} from 'react'
 import {
   Lucide,
   Modal,
@@ -14,6 +14,8 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+
   // 비디오 영상 모달
   const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
     modal: false,
@@ -39,7 +41,7 @@ function OnlinebasicClass() {
     () =>
       request.get(`/admin/content-management/basic-class-subject`, {
         params: {
-          fieldName: '영재학교',
+          fieldName: curTab,
         },
       }),
     {
@@ -71,7 +73,7 @@ function OnlinebasicClass() {
         setState({
           isSubject: false,
         })
-        alert('추가되였습니다.')
+        alert('추가되었습니다.')
       },
     },
   )
@@ -88,24 +90,18 @@ function OnlinebasicClass() {
       },
     )
 
+  const [curTab, setCurTab] = useState('영재학교');
+
+  useEffect(() => {
+    refetchBasicClassSubject();
+  }, [curTab]);
+
   return (
     <>
       <div className="flex gap-2 mt-5">
-        <button
-          className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
-        >
-          영재원
-        </button>
-        <Link to="/online_basic_class">
-          <button className="btn btn-primary w-36">영재학교</button>
-        </Link>
-        <button
-          className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
-        >
-          과학고
-        </button>
+        <button className={"btn w-36" + (curTab === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => setCurTab('영재원')}>영재원</button>
+        <button className={"btn w-36" + (curTab === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => setCurTab('영재학교')}>영재학교</button>
+        <button className={"btn w-36" + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => { alert('준비중입니다.'); {/*setCurTab('과학고')*/}}}>과학고</button>
       </div>
       <div className="intro-y box mt-5 relative">
         {(isBasicClassSubject || isBasicClassm) && <Loading />}
@@ -182,12 +178,16 @@ function OnlinebasicClass() {
                     <div className="flex justify-center">
                       <button
                         className="btn btn-outline-primary flex items-center gap-2"
-                        onClick={() => {
-                          setState({
-                            modal: true,
-                            url: item.link_url.replace('/watch?v=', '/embed/'),
-                          })
-                        }}
+                        onClick={
+                          () => {
+                            (item.link_url && item.link_url.includes('/watch?v='))
+                            ? setState({
+                                modal: true,
+                                url: item.link_url.replace('/watch?v=', '/embed/'),
+                              })
+                            : alert('영상이 존재하지 않습니다.')
+                          }
+                        }
                       >
                         <Lucide icon="Video" className="w-4 h-4"></Lucide>
                         영상보기
@@ -196,14 +196,18 @@ function OnlinebasicClass() {
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      <Link
-                        to={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
-                      >
-                        <button className="btn btn-outline-pending flex items-center gap-2">
+                      <a href="#" onClick={
+                        () => {
+                          item.fileId
+                            ? (location.href = `${baseUrl}/v1/contents-data/file-download/${item.fileId}`)
+                            : (alert('학습자료가 존재하지 않습니다.'))
+                        }
+                      }>
+                        <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
                           <Lucide icon="File" className="w-4 h-4"></Lucide>
                           학습자료
                         </button>
-                      </Link>
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -295,7 +299,7 @@ function OnlinebasicClass() {
             className="btn btn-sky w-24"
             onClick={() =>
               addClassSubject({
-                field_name: '영재학교',
+                field_name: curTab,
                 subject: getValues('subject'),
               })
             }

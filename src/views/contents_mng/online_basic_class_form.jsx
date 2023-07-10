@@ -7,10 +7,11 @@ import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
+  let removeIndex = 0;
   const { id } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { getValues, watch, reset, register } = useForm({
+  const { getValues, setValue, watch, reset, register } = useForm({
     defaultValues: {
       list: [],
     },
@@ -43,50 +44,72 @@ function OnlineBasicClassForm() {
     },
   )
 
+  // 저장
   const { mutate: saveBasicClass } = useMutation(
     (data) => request.put(`/admin/content-management/basic-class/${id}`, data),
     {
       onSuccess: () => {
-        refetchBasicClass()
-        alert('저장되었습니다.')
-        navigate('/online_basic_class')
+        alert('저장되었습니다.');
+        location.reload()
       },
+      onError: () => {
+        alert('오류가 발생하였습니다.');
+      }
     },
   )
 
-  const handleSave = () => {
+  // 삭제
+  const { mutate: removeBasicClass } = useMutation(
+    (pk,idx) => request.delete(`/admin/content-management/basic-class/${pk}`),
+    {
+      onSuccess: () => {
+        alert('삭제되었습니다.');
+
+        reset({
+          list: getValues('list').filter((_, i) => i !== removeIndex),
+        });
+      },
+      onError: () => {
+        alert('오류가 발생하였습니다.');
+      }
+    },
+  )
+
+  // 저장하기 버튼 클릭
+  const handleSave = async () => {
     const formData = new FormData()
     formData.append(
       'row_id',
       getValues('list')
-        .map((item) => (item.row_id ? item.row_id : 0))
-        .join(','),
+      .map((item) => (item.row_id ? item.row_id : 0))
+      .join(','),
     )
     formData.append(
       'gubun',
       getValues('list')
-        .map((item) => (item.gubun ? item.gubun : 'null'))
-        .join(','),
+      .map((item) => (item.gubun ? item.gubun : 'null'))
+      .join(','),
     )
     formData.append(
       'unit',
       getValues('list')
-        .map((item) => (item.unit ? item.unit : 'null'))
-        .join(','),
+      .map((item) => (item.unit ? item.unit : 'null'))
+      .join(','),
     )
     formData.append(
       'content',
       getValues('list')
-        .map((item) => (item.content ? item.content : 'null'))
-        .join(','),
+      .map((item) => (item.content ? item.content : 'null'))
+      .join(','),
     )
     formData.append(
       'link_url',
       getValues('list')
-        .map((item) => (item.link_url ? item.link_url : 'null'))
-        .join(','),
+      .map((item) => (item.link_url ? item.link_url : 'null'))
+      .join(','),
     )
-    const null_blob = new Blob(['null'], { type: 'image/png' })
+
+    const null_blob = new Blob(['null'], {type: 'image/png'})
     const null_file = new File([null_blob], 'null.png', {
       type: 'image/png',
     })
@@ -95,23 +118,26 @@ function OnlineBasicClassForm() {
     getValues('list').map((item) => {
       if (item.file && item.file.length) {
         formData.append('file', item.file[0])
+
+        if (item.fileId) {
+          newFileDelYN.push('Y')
+        } else {
+          newFileDelYN.push('N')
+        }
+
       } else {
         formData.append('file', null_file)
-      }
-
-      if (item.fileId) {
-        newFileDelYN.push('Y')
-      } else {
         newFileDelYN.push('N')
       }
     })
+
     formData.append('savedFileDelYN', newFileDelYN.join(','))
     saveBasicClass(formData)
   }
 
+  // + 버튼 클릭
   const handleAddList = () => {
-    const newList = getValues('list')
-    newList.push({
+    const newSchedule = {
       row_id: 0,
       gubun: null,
       unit: null,
@@ -120,11 +146,28 @@ function OnlineBasicClassForm() {
       file: [],
       fileId: null,
       savedFileDelYN: 'N',
-    })
-    reset({
-      list: newList,
-    })
+    }
+    setValue('list', [
+      ...getValues('list'),
+      newSchedule
+    ])
   }
+
+  // 삭제 버튼 클릭
+  const handleRemove = (pk,idx) => {
+    if(pk && pk > 0) {
+      // 기존 데이터 삭제
+      if(confirm('삭제하시겠습니까?')) {
+        removeIndex = idx;
+        removeBasicClass(pk);
+      }
+    }else {
+      reset({
+        list: getValues('list').filter((_, i) => i !== idx),
+      });
+    }
+  }
+
   return (
     <>
       <div className="intro-y box mt-5">
@@ -148,7 +191,7 @@ function OnlineBasicClassForm() {
               </tr>
             </thead>
             <tbody>
-              {getValues('list').map((item, index) => (
+              {watch('list').map((item, index) => (
                 <tr className="text-center" key={`list-${index}`}>
                   <td>
                     <input
@@ -199,16 +242,14 @@ function OnlineBasicClassForm() {
                     )}
                   </td>
                   <td>
-                    <button
-                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                      onClick={() => {
-                        reset({
-                          list: getValues('list').filter((_, i) => i !== index),
-                        })
-                      }}
-                    >
-                      삭제
-                    </button>
+                    {index > 0 &&
+                      <button
+                        className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                        onClick={() => { handleRemove(item.row_id,index); }}
+                      >
+                        삭제
+                      </button>
+                    }
                   </td>
                 </tr>
               ))}
