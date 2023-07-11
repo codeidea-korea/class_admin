@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import {useReducer, useState} from 'react'
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import request from '@/utils/request'
@@ -7,11 +7,13 @@ import Loading from '@/components/loading'
 import Pagenation from '@/components/pagenation'
 
 function Notice() {
+  const [listLength,setListLength] = useState(0);
   const [notice, setNotice] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
       list: [],
       page: 1,
+      totalLength: 0
     },
   )
   const {
@@ -37,7 +39,11 @@ function Notice() {
         })
         setNotice({
           list: newData,
+          totalLength: Number(data?.totalElements)
         })
+
+        const topY = data?.content?.filter((item) => item.topYN === 'Y').length ?? 0;
+        setListLength(Number(data?.totalElements) - topY - ((notice.page-1) * 10));
       },
     },
   )
@@ -66,7 +72,7 @@ function Notice() {
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">
-            목록 <span className="color-blue">{notice?.list?.length}</span>건
+            목록 <span className="color-blue">{notice.totalLength}</span>건
           </div>
         </div>
         <div className="intro-y p-5">
@@ -168,7 +174,7 @@ function Notice() {
                         />
                       </td>
                       <td>
-                        <div className="flex justify-center">{index + 1}</div>
+                        <div className="flex justify-center">{listLength - index}</div>
                       </td>
                       <td>
                         <Link
