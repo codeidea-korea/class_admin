@@ -31,12 +31,6 @@ function CurriCulum() {
     videoDetail(true);
   }
 
-  /*
-  *TODO
-  * 프로필 사진 : view에서 사용하는 profileId(파일 테이블 키값인듯?) 데이터 필요함
-  * 리스트 쿼리 확인(결과 리스트가 이상함)
-  */
-
   return (
     <>
       <div className="flex gap-2 mt-5">
