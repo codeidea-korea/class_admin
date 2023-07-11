@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import {useReducer, useState} from 'react'
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import request from '@/utils/request'
@@ -7,11 +7,13 @@ import Loading from '@/components/loading'
 import Pagenation from '@/components/pagenation'
 
 function Profit() {
+  const [listLength,setListLength] = useState(0);
   const [profit, setProfit] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
       list: [],
       page: 1,
+      totalLength: 0
     },
   )
   const {
@@ -37,7 +39,11 @@ function Profit() {
         })
         setProfit({
           list: newData,
+          totalLength: Number(data?.totalElements)
         })
+
+        const topY = data?.content?.filter((item) => item.topYN === 'Y').length ?? 0;
+        setListLength(Number(data?.totalElements) - topY - ((profit.page-1) * 10));
       },
     },
   )
@@ -97,44 +103,87 @@ function Profit() {
                 </tr>
               </thead>
               <tbody>
-                {profit.list.map((item, index) => (
-                  <tr className="text-center" key={item.id}>
-                    <td>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={item.check}
-                        onChange={(e) => {
-                          const newList = profit.list.map((child, idx) => {
-                            if (idx === index) {
-                              return {
-                                ...child,
-                                check: e.target.checked,
-                              }
+              {profit?.list?.filter((item) => item.topYN === 'Y').map((item, index) => (
+                <tr className="text-center" key={item.id}>
+                  <td>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={item.check}
+                      onChange={(e) => {
+                        const newList = profit.list.map((child, idx) => {
+                          if (idx === index) {
+                            return {
+                              ...child,
+                              check: e.target.checked,
                             }
-                            return child
-                          })
-                          setProfit({
-                            list: newList,
-                          })
-                        }}
+                          }
+                          return child
+                        })
+                        setProfit({
+                          list: newList,
+                        })
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <div className="flex justify-center">
+                      <Lucide
+                        icon="BellRing"
+                        className="w-4 h-4 text-danger"
                       />
-                    </td>
-                    <td>
-                      <div className="flex justify-center">{item.id}</div>
-                    </td>
-                    <td>
-                      <Link
-                        to={`/profit/${item.id}`}
-                        className="underline text-primary text-left"
-                      >
-                        <div className="w-550 truncate">{item.title}</div>
-                      </Link>
-                    </td>
-                    <td>{item.writerName}</td>
-                    <td>{item.creDate}</td>
-                  </tr>
-                ))}
+                    </div>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/profit/${item.id}`}
+                      className="underline text-danger text-left"
+                    >
+                      <div className="w-550 truncate">{item.title}</div>
+                    </Link>
+                  </td>
+                  <td className="text-danger">{item.writerName}</td>
+                  <td className="text-danger">{item.creDate}</td>
+                </tr>
+              ))}
+              {profit?.list?.filter((item) => item.topYN === 'N').map((item, index) => (
+                <tr className="text-center" key={item.id}>
+                  <td>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={item.check}
+                      onChange={(e) => {
+                        const newList = profit.list.map((child, idx) => {
+                          if (idx === index) {
+                            return {
+                              ...child,
+                              check: e.target.checked,
+                            }
+                          }
+                          return child
+                        })
+                        setProfit({
+                          list: newList,
+                        })
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <div className="flex justify-center">{listLength - index}</div>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/profit/${item.id}`}
+                      className="underline text-primary text-left"
+                    >
+                      <div className="w-550 truncate">{item.title}</div>
+                    </Link>
+                  </td>
+                  <td>{item.writerName}</td>
+                  <td>{item.creDate}</td>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>
