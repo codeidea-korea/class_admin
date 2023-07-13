@@ -39,7 +39,7 @@ function ClType(props) {
 		})
 		.catch((err) => {
 			console.log('error', err);
-			if (err.response.status === 403){
+			if (err.response.status === 401){
 				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
 				navigate('/login');
 			}
