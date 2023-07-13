@@ -90,7 +90,7 @@ function OnlinebasicClass() {
       },
     )
 
-  const [curTab, setCurTab] = useState('영재학교');
+  const [curTab, setCurTab] = useState('영재원');
 
   useEffect(() => {
     refetchBasicClassSubject();
