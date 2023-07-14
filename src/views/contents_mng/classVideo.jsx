@@ -8,16 +8,19 @@ import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 
 function ClassVideo() {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+
   const { data: videoList } = useQuery(
     'getVideoList',
     () => request.get('/admin/content-management/class-video'),
     {
       select: (data) => ({
-        mathematics: data.classVideoList.find(
-          (item) => item.subject === '수학',
-        ),
-        science: data.classVideoList.find((item) => item.subject === '과학'),
+        mathematics: data?.classVideoList?.filter(item => item.subject === '수학'),
+        science: data?.classVideoList?.filter(item => item.subject === '과학')
       }),
+      onSuccess: (data) => {
+        console.log(data)
+      }
     },
   )
   return (
@@ -45,19 +48,26 @@ function ClassVideo() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {videoList?.mathematics?.subClassVideoResponseList.map(
+            {videoList?.mathematics?.map(
               (item, key) => (
                 <li key={`video-${key}`}>
                   <div className="inner">
                     <div className="subject">
                       {item.teacher_name} 선생님
-                      <span className="sub">수학</span>
+                      <span className="sub">{item.teacher_subject}</span>
                     </div>
                     <div className="thumb">
-                      <img src={Person} />
+                      {item?.fileId ? (
+                        <img
+                          src={`${baseUrl}/v1/contents-data/file-download/${item?.fileId}`}
+                          className="rounded-md"
+                        />
+                      ) : (
+                        <img src={Default_img} className="rounded-md" />
+                      )}
                     </div>
                     <div className="btnSet w-full">
-                      <Link to="/class_video_view" className="w-full">
+                      <Link to={`/classVideo/${item.id}?subject=${item.subject}`} className="w-full">
                         <button className="btn btn-sky w-full rounded-full">
                           영상 학습하기
                           <Lucide
@@ -86,17 +96,24 @@ function ClassVideo() {
         </div>
         <div className="intro-y p-5">
           <ul className="gall_ul curriculum">
-            {videoList?.science?.subClassVideoResponseList.map((item, key) => (
+            {videoList?.science?.map((item, key) => (
               <li key={`sub-${key}`}>
                 <div className="inner">
                   <div className="subject">
-                    {item.teacher_name} 선생님<span className="sub">수학</span>
+                    {item.teacher_name} 선생님<span className="sub">{item.teacher_subject}</span>
                   </div>
                   <div className="thumb">
-                    <img src={Person} />
+                    {item?.fileId ? (
+                      <img
+                        src={`${baseUrl}/v1/contents-data/file-download/${item?.fileId}`}
+                        className="rounded-md"
+                      />
+                    ) : (
+                      <img src={Default_img} className="rounded-md" />
+                    )}
                   </div>
                   <div className="btnSet">
-                    <Link to="/class_video_view" className="w-full">
+                    <Link to={`/classVideo/${item.id}?subject=${item.subject}`} className="w-full">
                       <button className="btn btn-sky w-full rounded-full">
                         영상 학습하기
                         <Lucide
@@ -110,7 +127,7 @@ function ClassVideo() {
               </li>
             ))}
             <li className="add zoom-in">
-              <Link to="/class_video_form" className="">
+              <Link to="/classVideo/create?subject=과학" className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>

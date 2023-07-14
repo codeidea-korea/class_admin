@@ -34,6 +34,7 @@ import CurriculumCreate from '../views/contents_mng/curriculumCreate'
 
 import ClassVideo from '../views/contents_mng/classVideo'
 import ClassVideoControl from '../views/contents_mng/classVideoControl'
+import ClassVideoView from '../views/contents_mng/classVideoView'
 
 import OnlinebasicClass from '../views/contents_mng/online_basic_class'
 import OnlineBasicClassForm from '../views/contents_mng/online_basic_class_form'
@@ -274,19 +275,28 @@ function Router() {
           ),
         },
         {
-          path: '/classVideo/:id',
+          path: '/classVideo/create',
           element: (
             <PrivateRoute
-              element={<ClassVideoControl />}
+              element={<ClassVideoControl isCreate />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
         },
         {
-          path: '/classVideo/create',
+          path: '/classVideo/edit/:id',
           element: (
             <PrivateRoute
-              element={<ClassVideoControl isCreate />}
+              element={<ClassVideoControl/>}
+              role={['ADMIN', 'DIRECTOR', 'TEACHER']}
+            />
+          ),
+        },
+        {
+          path: '/classVideo/:id',
+          element: (
+            <PrivateRoute
+              element={<ClassVideoView />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),

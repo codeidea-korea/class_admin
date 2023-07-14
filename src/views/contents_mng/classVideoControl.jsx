@@ -6,6 +6,7 @@ import { useQuery, useMutation } from 'react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import request from '@/utils/request'
+import $ from "jquery";
 
 function ClassVideoForm({ isCreate }) {
   const navigate = useNavigate()
@@ -49,11 +50,21 @@ function ClassVideoForm({ isCreate }) {
     (data) => request.post('/admin/content-management/class-video', data),
     {
       onSuccess: () => {
-        alert('등록 완료')
-        navigate('/classVideo')
+        setTimeout(function() {
+          alert('저장되었습니다.');
+          navigate('/classVideo');
+        },500)
       },
+      onError: () => {
+        alert('오류가 발생하였습니다.');
+      }
     },
   )
+
+  const null_blob = new Blob(['null'], {type: 'image/png'})
+  const null_file = new File([null_blob], 'null.png', {
+    type: 'image/png',
+  })
 
   const onSubmit = (data) => {
     const formData = new FormData()
@@ -61,35 +72,62 @@ function ClassVideoForm({ isCreate }) {
     formData.append('subject', searchParams.get('subject'))
     formData.append('teacher_name', data.teacher_name)
     formData.append('teacher_subject', data.teacher_subject)
+
+    if(isCreate) {
+      if (data?.profile?.length > 0 && data?.profile[0]) {
+        // 새로 추가된 파일이 있으면
+        formData.append('profile', data.profile[0]);
+      }
+    }
+
     data.classVideoScheduleRequests.map((item) => {
-      console.log(item)
       formData.append('order_number', item.order_number)
       formData.append('gubun', item.gubun)
       formData.append('cdate', item.cdate)
       formData.append('unit', item.unit)
       formData.append('content', item.content)
       formData.append('link_url', item.link_url)
-      formData.append('file', item.file)
+
+      if (item.file && item.file.length) {
+        formData.append('file', item.file[0])
+
+      }else {
+        formData.append('file', null_file)
+        // newFileDelYN.push('N')
+      }
     })
-    createVideo(formData)
+
+    // createVideo(formData)
   }
 
+  // + 버튼 클릭
   const handleAddSchedule = () => {
-    const newSchedule = {
-      key: getValues('classVideoScheduleRequests').length,
-      order_number: 0,
-      gubun: '',
-      cdate: '',
-      unit: '',
-      content: '',
-      link_url: '',
+    /*
+    * 기존에 하던 방식대로 하면 자꾸 이전 파일들이 사라짐
+    * 대충 원인은 알겠으나 해결 방법을 모르겠음
+    * 그냥 첫번째 객체 복사하고 초기화 하는 방법으로 대체했음..
+    */
+
+    let origin = getValues('classVideoScheduleRequests');
+    let copy = {};
+
+    for(let key in origin[0]) {
+      copy[key] = origin[0][key];
     }
-    setValue('classVideoScheduleRequests', [
-      ...getValues('classVideoScheduleRequests'),
-      newSchedule,
-    ])
+
+    copy['file'] = new DataTransfer().files;
+    copy['order_number'] = '';
+    copy['gubun'] = '';
+    copy['cdate'] = getToday();
+    copy['unit'] = '';
+    copy['content'] = '';
+    copy['link_url'] = '';
+
+    origin.push(copy);
+    setValue('classVideoScheduleRequests',origin);
   }
 
+  // 뭐지
   const handleChangeFile = (e) => {
     const file = e.target.files[0]
     const reader = new FileReader()
@@ -100,14 +138,23 @@ function ClassVideoForm({ isCreate }) {
     }
   }
 
+  // 삭제 버튼 클릭
   const handleDeleteVideo = (index) => {
     if (confirm('삭제하시겠습니까?')) {
-      const newVideoList = getValues('classVideoScheduleRequests').filter(
-        (item, i) => i !== index,
-      )
-      setValue('classVideoScheduleRequests', newVideoList)
+      let origin = getValues('classVideoScheduleRequests');
+      origin.splice(index,1);
+      setValue('classVideoScheduleRequests', origin);
     }
   }
+
+  function getToday(){
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = ("0" + (1 + date.getMonth())).slice(-2);
+    let day = ("0" + date.getDate()).slice(-2);
+    return year + "-" + month + "-" + day;
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="intro-y box mt-5">
@@ -134,6 +181,19 @@ function ClassVideoForm({ isCreate }) {
             </div>
             <hr className="border-t border-dotted" />
             <div className="flex items-center">
+              <div className="font-medium  w-36 text-left shrink-0">
+                과목 <span className="text-danger">*</span>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  className="form-control w-72"
+                  {...register('teacher_subject', { required: true })}
+                />
+              </div>
+            </div>
+            <hr className="border-t border-dotted" />
+            <div className="flex items-center">
               <div className="font-medium w-36 text-left shrink-0">
                 선생님 프로필
               </div>
@@ -142,7 +202,7 @@ function ClassVideoForm({ isCreate }) {
                   <input
                     type="file"
                     className="form-control"
-                    {...register('profile_name')}
+                    {...register('profile')}
                   />
                 </div>
               </div>
@@ -167,7 +227,7 @@ function ClassVideoForm({ isCreate }) {
           </thead>
           <tbody>
             {watch('classVideoScheduleRequests')?.map((item, index) => (
-              <tr className="text-center" key={item.key}>
+              <tr className="text-center" key={`list-${index}`}>
                 <td>
                   <div className="input-group w-28">
                     <input
@@ -201,14 +261,11 @@ function ClassVideoForm({ isCreate }) {
                         ...getValues('classVideoScheduleRequests'),
                       ]
                       newList[index].cdate = value
-                      reset({
-                        classVideoScheduleRequests: newList,
-                      })
+                      setValue('classVideoScheduleRequests',newList)
                     }}
                     options={{
                       numberOfMonths: 1,
                       format: 'YYYY-MM-DD',
-                      autoApply: true,
                       dropdowns: {
                         minYear: 1950,
                         maxYear: null,
@@ -247,16 +304,20 @@ function ClassVideoForm({ isCreate }) {
                       type="file"
                       className="dp_none"
                       id={`file-upload-${index}`}
+                      {...register(
+                        `classVideoScheduleRequests.${index}.file`,
+                      )}
                     />
-                    <label htmlFor="file-upload" className="flex items-center">
+                    <label htmlFor={`file-upload-${index}`} className="flex items-center">
                       <input
                         type="text"
                         className="form-control file_up bg-white"
                         placeholder=""
+                        value={item?.file.length > 0 ? item?.file[0]?.name : ''}
                         readOnly
                       />
                       <div className="input-group-text whitespace-nowrap file_up_btn">
-                        파일찾기
+                        찾기
                       </div>
                     </label>
                   </div>
