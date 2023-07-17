@@ -7,11 +7,18 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import request from '@/utils/request'
 import $ from "jquery";
+import useAxios from "@/hooks/useAxios";
+import {useRecoilValue} from "recoil";
+import {userState} from "@/states/userState";
 
 function ClassVideoForm({ isCreate }) {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+  const user = useRecoilValue(userState);
   const navigate = useNavigate()
+  const api = useAxios();
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [isOgFile, setIsOgFile] = useState(false);
   const { register, watch, getValues, setValue, reset, handleSubmit } = useForm(
     {
       defaultValues: {
@@ -19,7 +26,7 @@ function ClassVideoForm({ isCreate }) {
         field_name: '',
         subject: searchParams.get('subject'),
         profile: null,
-        profile_name: '',
+        profileId: 0,
         classVideoScheduleRequests: [
           // {
           //   key: 0,
@@ -35,19 +42,55 @@ function ClassVideoForm({ isCreate }) {
     },
   )
 
+  // 수정시 상세정보 불러오기
   const { data: videoDetail } = useQuery(
     'getVideoDetail',
     () => request.get(`/admin/content-management/class-video/${id}`),
     {
       enabled: !isCreate,
       onSuccess: (data) => {
-        console.log(data)
+        data = data[0];
+        let details = [];
+
+        data?.classVideoScheduleResponseList?.forEach(function(item) {
+          details.push({
+            row_id : item.id,
+            fileId : item.fileId,
+            fileName : item.fileName,
+            order_number : item.order_number,
+            gubun : item.gubun,
+            cdate : item.cdate,
+            unit : item.unit,
+            content : item.content,
+            link_url : item.link_url
+          })
+        });
+
+        reset(() => ({
+          subject : data.subject,
+          teacher_name : data.teacher_name,
+          teacher_subject : data.teacher_subject,
+          profileId : data.profileId,
+          profileName : data.profileName,
+          classVideoScheduleRequests : details
+        }))
+
+        data.profileId && setIsOgFile(true);
       },
     },
   )
 
+  // 저장 및 수정
   const { mutate: createVideo } = useMutation(
-    (data) => request.post('/admin/content-management/class-video', data),
+    (data) => {
+      if (isCreate) {
+        // 추가
+        request.post('/admin/content-management/class-video', data)
+      } else {
+        // 수정
+        request.put(`/admin/content-management/class-video/${id}`, data)
+      }
+    },
     {
       onSuccess: () => {
         setTimeout(function() {
@@ -58,7 +101,7 @@ function ClassVideoForm({ isCreate }) {
       onError: () => {
         alert('오류가 발생하였습니다.');
       }
-    },
+    }
   )
 
   const null_blob = new Blob(['null'], {type: 'image/png'})
@@ -67,45 +110,102 @@ function ClassVideoForm({ isCreate }) {
   })
 
   const onSubmit = (data) => {
-    const formData = new FormData()
-    formData.append('field_name', '영재학교')
-    formData.append('subject', searchParams.get('subject'))
-    formData.append('teacher_name', data.teacher_name)
-    formData.append('teacher_subject', data.teacher_subject)
+    const formData = new FormData();
 
+    // 선생님 기본 정보
+    formData.append('field_name', '영재학교');
+    formData.append('subject', searchParams.get('subject'));
+    formData.append('teacher_name', data.teacher_name);
+    formData.append('teacher_subject', data.teacher_subject);
+
+    // 선생님 프로필 사진 파일
     if(isCreate) {
-      if (data?.profile?.length > 0 && data?.profile[0]) {
+      // 등록이면
+      if (data?.profile?.length > 0) {
         // 새로 추가된 파일이 있으면
         formData.append('profile', data.profile[0]);
       }
-    }
+    }else {
+      // 수정이면
+      const tempLength = data?.profile?.length;
 
-    data.classVideoScheduleRequests.map((item) => {
-      formData.append('order_number', item.order_number)
-      formData.append('gubun', item.gubun)
-      formData.append('cdate', item.cdate)
-      formData.append('unit', item.unit)
-      formData.append('content', item.content)
-      formData.append('link_url', item.link_url)
+      if(tempLength === 1) {
+        // 새로 추가한 파일이 있는 경우
+        formData.append('profile', data.profile[0]);
+        // 기존에 등록된 파일이 있으면
+        isOgFile && formData.append('savedProfileDelYN', 'Y');
 
-      if (item.file && item.file.length) {
-        formData.append('file', item.file[0])
+      }else if(tempLength === 0) {
+        // 새로 추가한 파일은 없는데 등록된 파일을 제거한 경우
+        // formData.append('profile', null_file);
+        isOgFile && formData.append('savedProfileDelYN', 'Y');
 
       }else {
-        formData.append('file', null_file)
-        // newFileDelYN.push('N')
+        // 새로 추가한 파일도 없고 등록된 파일도 그대로일 경우
+        formData.append('savedProfileDelYN', 'N');
+      }
+    }
+
+    // 상세 정보
+    data.classVideoScheduleRequests.map((item) => {
+      formData.append('order_number', item.order_number);
+      formData.append('gubun', item.gubun);
+      formData.append('cdate', item.cdate);
+      formData.append('unit', item.unit);
+      formData.append('content', item.content);
+      formData.append('link_url', item.link_url);
+
+      // 수정이면
+      if(!isCreate) {
+        formData.append('row_id', item?.row_id > 0 ? item.row_id : 0);
+        formData.append('target_id', id);
+
+        if (item.file && item.file.length) {
+          // 파일 새로 등록하는 경우
+          formData.append('file', item.file[0]);
+
+          if(item.fileId > 0) {
+            // 기존에 등록된 파일이 있으면
+            formData.append('savedFileDelYN', 'Y');
+          }else {
+            // 기존에 등록된 파일이 없으면
+            formData.append('savedFileDelYN', 'N');
+          }
+
+
+        }else {
+          if(item.fileName) {
+            // 기존 파일 유지하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'N');
+
+          }else {
+            // 파일 삭제하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'Y');
+          }
+        }
+
+      // 등록이면
+      }else {
+        if (item.file && item.file.length) {
+          formData.append('file', item.file[0]);
+
+        }else {
+          formData.append('file', null_file);
+        }
       }
     })
 
-    // createVideo(formData)
+    createVideo(formData);
   }
 
   // + 버튼 클릭
   const handleAddSchedule = () => {
     /*
-    * 기존에 하던 방식대로 하면 자꾸 이전 파일들이 사라짐
+    * 기존에 하던 방식대로 setValue 하면 파일 객체들이 복사가 안되고 사라짐
     * 대충 원인은 알겠으나 해결 방법을 모르겠음
-    * 그냥 첫번째 객체 복사하고 초기화 하는 방법으로 대체했음..
+    * 그냥 첫번째 객체 복사하고 시켜서 추가하는 방법으로 대체했음..
     */
 
     let origin = getValues('classVideoScheduleRequests');
@@ -115,6 +215,9 @@ function ClassVideoForm({ isCreate }) {
       copy[key] = origin[0][key];
     }
 
+    copy['row_id'] = 0;
+    copy['fileId'] = 0;
+    copy['fileName'] = '';
     copy['file'] = new DataTransfer().files;
     copy['order_number'] = '';
     copy['gubun'] = '';
@@ -138,15 +241,40 @@ function ClassVideoForm({ isCreate }) {
     }
   }
 
+  // 실제 스케쥴 데이터 삭제
+  const removeSchedule = (idx, sId) => {
+    api.delete(`/admin/content-management/class-video-schedule/${sId}`,
+      {headers: {Authorization: `Bearer ${user.token}`}}
+    ).then((res) => {
+      if (res.status === 200) {
+        let origin = getValues('classVideoScheduleRequests');
+        origin.splice(idx,1);
+        setValue('classVideoScheduleRequests', origin);
+
+        alert('삭제되었습니다.');
+      }
+    }).catch((err) => {
+      alert('오류가 발생하였습니다.');
+    });
+  }
+
   // 삭제 버튼 클릭
-  const handleDeleteVideo = (index) => {
+  const handleDeleteVideo = (idx, sId) => {
     if (confirm('삭제하시겠습니까?')) {
-      let origin = getValues('classVideoScheduleRequests');
-      origin.splice(index,1);
-      setValue('classVideoScheduleRequests', origin);
+      if(sId > 0) {
+        // sId가 있는경우 === 기존에 등록된 데이터를 삭제하는 경우
+        removeSchedule(idx, sId);
+
+      }else {
+        // 기존에 등록된 데이터가 아닌 추가된 라인을 제거하는 경우
+        let origin = getValues('classVideoScheduleRequests');
+        origin.splice(idx,1);
+        setValue('classVideoScheduleRequests', origin);
+      }
     }
   }
 
+  // 오늘날짜 yyyy-mm-dd 구하기
   function getToday(){
     let date = new Date();
     let year = date.getFullYear();
@@ -199,11 +327,33 @@ function ClassVideoForm({ isCreate }) {
               </div>
               <div className="dorp_w-full w-full">
                 <div className="input-group w-72">
-                  <input
-                    type="file"
-                    className="form-control"
-                    {...register('profile')}
-                  />
+                  {watch('profileName') ? (
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`${baseUrl}/v1/contents-data/file-download/${watch('profileId')}`}
+                        className="underline text-blue"
+                      >
+                        {watch('profileName')}
+                      </a>
+                      <Lucide
+                        icon="X"
+                        className="w-4 h-4 text-danger cursor-pointer"
+                        onClick={() => {
+                          reset((prev) => ({
+                            ...prev,
+                            profileId: '',
+                            profileName: '',
+                          }))
+                        }}
+                      ></Lucide>
+                    </div>
+                  ) : (
+                    <input
+                      type="file"
+                      className="form-control"
+                      {...register('profile')}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -300,26 +450,49 @@ function ClassVideoForm({ isCreate }) {
                 </td>
                 <td>
                   <div className="input-group">
-                    <input
-                      type="file"
-                      className="dp_none"
-                      id={`file-upload-${index}`}
-                      {...register(
-                        `classVideoScheduleRequests.${index}.file`,
-                      )}
-                    />
-                    <label htmlFor={`file-upload-${index}`} className="flex items-center">
-                      <input
-                        type="text"
-                        className="form-control file_up bg-white"
-                        placeholder=""
-                        value={item?.file.length > 0 ? item?.file[0]?.name : ''}
-                        readOnly
-                      />
-                      <div className="input-group-text whitespace-nowrap file_up_btn">
-                        찾기
+                    {watch(`classVideoScheduleRequests.${index}.fileName`) ? (
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch('profileId')}`}
+                          className="underline text-blue"
+                        >
+                          {watch(`classVideoScheduleRequests.${index}.fileName`)}
+                        </a>
+                        <Lucide
+                          icon="X"
+                          className="w-4 h-4 text-danger cursor-pointer"
+                          onClick={() => {
+                            let classVideoScheduleRequests = getValues('classVideoScheduleRequests');
+                            classVideoScheduleRequests[index].fileName = '';
+
+                            setValue('classVideoScheduleRequests', classVideoScheduleRequests);
+                          }}
+                        ></Lucide>
                       </div>
-                    </label>
+                    ) : (
+                      <>
+                        <input
+                          type="file"
+                          className="dp_none"
+                          id={`file-upload-${index}`}
+                          {...register(
+                            `classVideoScheduleRequests.${index}.file`,
+                          )}
+                        />
+                        <label htmlFor={`file-upload-${index}`} className="flex items-center">
+                          <input
+                            type="text"
+                            className="form-control file_up bg-white"
+                            placeholder=""
+                            value={item?.file?.length > 0 ? item?.file[0]?.name : ''}
+                            readOnly
+                          />
+                          <div className="input-group-text whitespace-nowrap file_up_btn">
+                            찾기
+                          </div>
+                        </label>
+                      </>
+                    )}
                   </div>
                 </td>
                 {index !== 0 && (
@@ -327,7 +500,7 @@ function ClassVideoForm({ isCreate }) {
                     <button
                       type="button"
                       className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                      onClick={() => handleDeleteVideo(index)}
+                      onClick={() => handleDeleteVideo(index,item?.row_id)}
                     >
                       삭제
                     </button>

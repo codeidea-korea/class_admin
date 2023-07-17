@@ -115,7 +115,7 @@ function ClassVideoView() {
               <Link to="/classVideo">
                 <button className="btn bg-white w-24">목록</button>
               </Link>
-              <Link to="/classVideo">
+              <Link to={`/classVideo/edit/${id}?subject=${searchParams.get('subject')}`}>
                 <button className="btn btn-sky w-24">수정하기</button>
               </Link>
             </div>
