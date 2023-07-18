@@ -160,29 +160,28 @@ function ClassVideoForm({ isCreate }) {
         formData.append('row_id', item?.row_id > 0 ? item.row_id : 0);
         formData.append('target_id', id);
 
-        if (item.file && item.file.length) {
-          // 파일 새로 등록하는 경우
-          formData.append('file', item.file[0]);
-
-          if(item.fileId > 0) {
-            // 기존에 등록된 파일이 있으면
+        if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
             formData.append('savedFileDelYN', 'Y');
-          }else {
-            // 기존에 등록된 파일이 없으면
-            formData.append('savedFileDelYN', 'N');
+            formData.append('file', item.file[0]);
+
+          }else { // 새로 등록할 파일이 없으면
+            if(item.fileName) { // 기존 파일을 유지하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'N');
+            }else { // 기존 파일을 삭제하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'Y');
+            }
           }
 
+        }else { // 기존에 등록된 파일이 없으면
+          formData.append('savedFileDelYN', 'N');
 
-        }else {
-          if(item.fileName) {
-            // 기존 파일 유지하는 경우
-            formData.append('file', null_file);
-            formData.append('savedFileDelYN', 'N');
-
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+            formData.append('file', item.file[0]);
           }else {
-            // 파일 삭제하는 경우
             formData.append('file', null_file);
-            formData.append('savedFileDelYN', 'Y');
           }
         }
 
