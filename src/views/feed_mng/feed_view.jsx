@@ -96,12 +96,20 @@ function FeedView() {
               className={`leading-relaxed ${tab === 1 ? 'block' : 'hidden'}`}
             >
               {feedDetail && (
-                <FeedViewOutline
-                  feedId={feedId}
-                  feedDetail={feedDetail}
-                  refetchFeedDetail={refetchFeedDetail}
-                  setIsLoading={setIsLoading}
-                />
+                <>
+                  <FeedViewOutline
+                    feedId={feedId}
+                    feedDetail={feedDetail}
+                    refetchFeedDetail={refetchFeedDetail}
+                    setIsLoading={setIsLoading}
+                  />
+                  <button
+                    className="btn btn-primary w-20 mt-3"
+                    onClick={saveFeedback}
+                  >
+                    완료
+                  </button>
+                </>
               )}
             </div>
           </div>

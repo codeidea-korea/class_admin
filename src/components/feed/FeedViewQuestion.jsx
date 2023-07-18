@@ -1,4 +1,4 @@
-import { Fragment, useState, useReducer, useEffect } from 'react'
+import React, { Fragment, useState, useReducer, useEffect } from 'react'
 import {
   Lucide,
   Modal,
@@ -21,6 +21,7 @@ function FeedViewQuestion({
   setIsLoading,
 }) {
   const user = useRecoilValue(userState)
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const [content, setContent] = useRecoilState(QuestionContent)
   const [tab, setTab] = useState(0)
   const [feedbackParams, setFeedbackParams] = useState({
@@ -59,15 +60,25 @@ function FeedViewQuestion({
   }, [])
 
   /** 피드백 달기 버튼 */
-  const feedbackStart = async (id) => {
-    if (selection.sentence === '') {
-      alert('피드백할 영역을 선택해주세요.')
-      return
+  const feedbackStart = async (id, activity, content) => {
+    if (!activity) {
+      if (selection.sentence === '') {
+        alert('피드백할 영역을 선택해주세요.')
+        return
+      }
+      setSelection({
+        id,
+        fhId: feedId,
+      })
+    } else {
+      console.log(id)
+      setSelection({
+        id,
+        fhId: feedId,
+        sentence: '',
+        content: content,
+      })
     }
-    setSelection({
-      id,
-      fhId: feedId,
-    })
     setIsModal({ feedback: true })
   }
 
@@ -103,6 +114,36 @@ function FeedViewQuestion({
     createFeedback({
       ...selection,
       content: content[tab],
+    })
+  }
+
+  const { mutate: createFeedbackActive } = useMutation(
+    (data) =>
+      request.post(
+        '/admin/feedback-management/application/activity-feedback',
+        data,
+      ),
+    {
+      onSuccess: () => {
+        refetchFeedDetail()
+        setIsModal({ feedback: false })
+        setSelection({
+          id: 0,
+          fhId: 0,
+          teacherName: '',
+          sentence: '',
+          reply: '',
+          content: '',
+          color: '',
+        })
+      },
+    },
+  )
+
+  // 피드백 탐구활동 저장
+  const feedbackStoreActive = async () => {
+    createFeedbackActive({
+      ...selection,
     })
   }
 
@@ -147,6 +188,9 @@ function FeedViewQuestion({
       },
     },
   )
+
+  const [activeTab, setActiveTab] = useState(0)
+
   return (
     <Fragment>
       <button className="btn bg-white flex items-center w-44">
@@ -281,18 +325,26 @@ function FeedViewQuestion({
                 <div className="intro-y grid grid-cols-12 gap-6 mt-5">
                   <div className="col-span-8">
                     <div className="flex justify-end">
-                      <button className="btn btn-green btn-sm">피드백</button>
+                      <button
+                        className="btn btn-green btn-sm"
+                        onClick={() => {
+                          feedbackStart(item.id, true, item.content)
+                        }}
+                      >
+                        피드백
+                      </button>
                     </div>
                   </div>
                   <div className="col-span-4">
                     <div className="flex justify-end">
                       <button
                         className="btn btn-dark btn-sm"
-                        onClick={() =>
+                        onClick={() => {
                           setIsModal({
                             history: true,
                           })
-                        }
+                          setActiveTab(index)
+                        }}
                       >
                         히스토리 보기
                       </button>
@@ -322,11 +374,16 @@ function FeedViewQuestion({
                           <td colSpan={4}>
                             {item.fileName ? (
                               <div className="flex items-center">
-                                <div className="w-full">파일명: *.jpg</div>
+                                <div className="w-full">
+                                  파일명: {item.fileName}
+                                </div>
                                 <div className="ml-auto">
-                                  <button className="btn btn-primary w-20 btn-sm">
+                                  <a
+                                    href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
+                                    className="btn btn-primary w-20 btn-sm"
+                                  >
                                     다운로드
-                                  </button>
+                                  </a>
                                 </div>
                               </div>
                             ) : (
@@ -353,7 +410,7 @@ function FeedViewQuestion({
                             <div className="flex items-center">
                               <div className="btn mr-2">글자 수</div>
                               <div className="mr-10">
-                                ({item.content.length} / 200)
+                                ({item.content?.length} / 200)
                               </div>
                               <div className="btn mr-2">최종 수정일</div>
                               <div className="">
@@ -420,25 +477,58 @@ function FeedViewQuestion({
               <span className="font-medium mr-2 text-sm">OOO학생 자소서</span>{' '}
               <span className="text-slate-400 text-sm">2023년 1월20일</span>
             </div>
+          </div>
+          <div className="p-3 border rounded-md ml-12 bg-slate-100">
+            Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
+            gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
+            poskap.
+            <div className="flex justify-end mt-3">
+              <span className="font-medium mr-2 text-sm">
+                000 선생님 피드백
+              </span>{' '}
+              <span className="text-slate-400 text-sm">2023년 1월20일</span>
+            </div>
           </div> */}
           {(tab === feedDetail?.qnaList.length
-            ? Object.entries(feedDetail?.activityList[0].feedbackHistory)
+            ? Object.entries(
+                feedDetail?.activityList[activeTab].feedbackHistory,
+              )
             : Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)
           ).map(([key, value]) => (
-            <div
-              className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
-              key={key}
-            >
-              <div>{value[0].reply}</div>
-              <div className="flex justify-end mt-3">
-                <span className="font-medium mr-2 text-sm">
-                  {value[0].teacherName} 선생님 피드백
-                </span>{' '}
-                <span className="text-slate-400 text-sm">
-                  {value[0].creDate}
-                </span>
-              </div>
-            </div>
+            <Fragment key={value[0].id}>
+              {value.reverse().map((item, index) => (
+                <>
+                  {item.sentence.length !== 0 && (
+                    <div className="p-3 border rounded-md mr-12">
+                      {item.sentence}
+                      <div className="flex justify-end mt-3">
+                        <span className="font-medium mr-2 text-sm">
+                          학생 자소서
+                        </span>
+                        <span className="text-slate-400 text-sm">
+                          {item.creDate}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
+                    key={index}
+                  >
+                    <div>{item.reply}</div>
+                    <div className="flex justify-end mt-3">
+                      <span className="font-medium mr-2 text-sm">
+                        {item.teacherName} 선생님 피드백
+                      </span>
+                      <span className="text-slate-400 text-sm">
+                        {item.creDate}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ))}
+            </Fragment>
           ))}
         </ModalBody>
       </Modal>
@@ -503,7 +593,15 @@ function FeedViewQuestion({
           <button
             type="button"
             className="btn btn-primary w-24"
-            onClick={feedbackStore}
+            // onClick={feedbackStore}
+            onClick={() => {
+              if (tab == feedDetail?.qnaList.length) {
+                // 탐구활동
+                feedbackStoreActive()
+              } else {
+                feedbackStore()
+              }
+            }}
           >
             저장하기
           </button>

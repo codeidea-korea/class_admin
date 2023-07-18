@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from 'react'
+import React, { Fragment, useState, useReducer, useEffect, useRef } from 'react'
 import {
   Lucide,
   Modal,
@@ -324,20 +324,40 @@ function FeedViewQuestion({
             Object.entries(
               feedDetail?.outlineQnaList[selection.index]?.feedbackHistory,
             )?.map(([key, value]) => (
-              <div
-                className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
-                key={key}
-              >
-                <div>{value[0].reply}</div>
-                <div className="flex justify-end mt-3">
-                  <span className="font-medium mr-2 text-sm">
-                    {value[0].teacherName} 선생님 피드백
-                  </span>{' '}
-                  <span className="text-slate-400 text-sm">
-                    {value[0].creDate}
-                  </span>
-                </div>
-              </div>
+              <Fragment key={value[0].id}>
+                {value.reverse().map((item, index) => (
+                  <>
+                    {item.sentence.length !== 0 && (
+                      <div className="p-3 border rounded-md mr-12">
+                        {item.sentence}
+                        <div className="flex justify-end mt-3">
+                          <span className="font-medium mr-2 text-sm">
+                            학생 자소서
+                          </span>
+                          <span className="text-slate-400 text-sm">
+                            {item.creDate}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
+                      key={index}
+                    >
+                      <div className="break-all">{item.reply}</div>
+                      <div className="flex justify-end mt-3">
+                        <span className="font-medium mr-2 text-sm">
+                          {item.teacherName} 선생님 피드백
+                        </span>
+                        <span className="text-slate-400 text-sm">
+                          {item.creDate}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ))}
+              </Fragment>
             ))}
         </ModalBody>
       </Modal>
