@@ -25,9 +25,7 @@ function FeedViewQuestion({
     color: '',
     tab: 0,
   })
-  const [feedbackContent, setFeedbackContent] = useState({
-    content: '',
-  })
+  const [feedbackContent, setFeedbackContent] = useState('')
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -141,10 +139,16 @@ function FeedViewQuestion({
     (id) =>
       request.delete(
         `/admin/feedback-management/application/outline-feedback/${id}`,
-        feedbackContent,
+        {
+          withCredentials: true,
+          data: {
+            content: feedbackContent,
+          },
+        },
       ),
     {
       onSuccess: () => {
+        alert('피드백이 삭제되었습니다.')
         refetchFeedDetail()
         setIsLoading(false)
       },
@@ -246,14 +250,7 @@ function FeedViewQuestion({
                         className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
                         onClick={() => {
                           if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
-                            // setFeedbackParams({
-                            //   color: item.color,
-                            //   tab,
-                            // })
-                            setFeedbackContent({
-                              // content: JSON.stringify(content),
-                              content: content[index],
-                            })
+                            setFeedbackContent(content[index])
                             setTimeout(() => {
                               removeFeedback(item.id)
                             }, 100)
@@ -264,7 +261,7 @@ function FeedViewQuestion({
                       </button>
                     </div>
                     <div className="flex justify-between font-bold text-slate-500">
-                      <div>피드백</div>
+                      <div>피드백 {item.id}</div>
                       <div>{item.teacherName}</div>
                     </div>
                     <div

@@ -28,12 +28,7 @@ function FeedViewQuestion({
     color: '',
     tab: 0,
   })
-  const [feedbackContent, setFeedbackContent] = useState({})
-
-  useEffect(() => {
-    console.log(feedbackContent)
-    console.log(JSON.stringify(feedbackContent))
-  }, [feedbackContent])
+  const [feedbackContent, setFeedbackContent] = useState('')
 
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
@@ -207,7 +202,33 @@ function FeedViewQuestion({
     (id) =>
       request.delete(
         `/admin/feedback-management/application/answer-feedback/${id}`,
-        JSON.parse(JSON.stringify(feedbackContent)),
+        {
+          withCredentials: true,
+          data: {
+            content: feedbackContent,
+          },
+        },
+      ),
+    {
+      onSuccess: () => {
+        alert('피드백이 삭제되었습니다.')
+        refetchFeedDetail()
+        setIsLoading(false)
+      },
+    },
+  )
+
+  // 탐구활동 증빙자료 피드백 삭제
+  const { mutate: removeFeedback2 } = useMutation(
+    (id) =>
+      request.delete(
+        `/admin/feedback-management/application/activity-feedback/${id}`,
+        {
+          withCredentials: true,
+          data: {
+            content: feedbackContent,
+          },
+        },
       ),
     {
       onSuccess: () => {
@@ -434,7 +455,7 @@ function FeedViewQuestion({
                               증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여
                               200자 이내)
                             </p>
-                            {/* <div className="mt-3">{item.content}</div> */}
+                            <div className="mt-3">{item.content}</div>
                           </td>
                         </tr>
                         <tr>
@@ -455,16 +476,20 @@ function FeedViewQuestion({
                     </table>
                   </div>
                   <div className="col-span-4">
-                    {item.feedbackList?.map((item) => (
-                      <FeedbackList
-                        key={`feed-${item.id}`}
-                        item={item}
-                        setIsModal={setIsModal}
-                        setFeedbackParams={setFeedbackParams}
-                        setFeedbackModParams={setFeedbackModParams}
-                        removeFeedback={removeFeedback}
-                      />
-                    ))}
+                    {[...new Set(item.feedbackList.map(JSON.stringify))]
+                      .map(JSON.parse)
+                      .map((items) => (
+                        <FeedbackList
+                          key={`feed-${items.id}`}
+                          item={items}
+                          setIsModal={setIsModal}
+                          setFeedbackParams={setFeedbackParams}
+                          setFeedbackModParams={setFeedbackModParams}
+                          setFeedbackContent={setFeedbackContent}
+                          removeFeedback={removeFeedback2}
+                          content={item.content}
+                        />
+                      ))}
                     {/* <div className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative">
             <div className="font-bold text-slate-500">피드백</div>
             <div className="mt-3">피드백 내용 출력</div>
@@ -529,35 +554,39 @@ function FeedViewQuestion({
             : Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)
           ).map(([key, value]) => (
             <Fragment key={value[0].id}>
-              {value.reverse().map((item, index) => (
-                <Fragment key={index}>
-                  {item.sentence.length !== 0 && (
-                    <div className="p-3 border rounded-md mr-12">
-                      {item.sentence}
+              {[...new Set(value.map(JSON.stringify))]
+                .map(JSON.parse)
+                .reverse()
+                .sort((a, b) => a.id - b.id)
+                .map((item, index) => (
+                  <Fragment key={index}>
+                    {item.sentence.length !== 0 && (
+                      <div className="p-3 border rounded-md mr-12">
+                        {item.sentence}
+                        <div className="flex justify-end mt-3">
+                          <span className="font-medium mr-2 text-sm">
+                            학생 자소서
+                          </span>
+                          <span className="text-slate-400 text-sm">
+                            {item.creDate}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-3 border rounded-md ml-12 bg-slate-100 text-right">
+                      <div>{item.reply}</div>
                       <div className="flex justify-end mt-3">
                         <span className="font-medium mr-2 text-sm">
-                          학생 자소서
+                          {item.teacherName} 선생님 피드백
                         </span>
                         <span className="text-slate-400 text-sm">
                           {item.creDate}
                         </span>
                       </div>
                     </div>
-                  )}
-
-                  <div className="p-3 border rounded-md ml-12 bg-slate-100 text-right">
-                    <div>{item.reply}</div>
-                    <div className="flex justify-end mt-3">
-                      <span className="font-medium mr-2 text-sm">
-                        {item.teacherName} 선생님 피드백
-                      </span>
-                      <span className="text-slate-400 text-sm">
-                        {item.creDate}
-                      </span>
-                    </div>
-                  </div>
-                </Fragment>
-              ))}
+                  </Fragment>
+                ))}
             </Fragment>
           ))}
         </ModalBody>
@@ -728,15 +757,9 @@ const FeedbackList = ({
           className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
           onClick={() => {
             if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
-              // setFeedbackParams({
-              //   color: item.color,
-              //   // tab,
-              // })
-              setFeedbackContent({
-                // content: JSON.stringify(content),
-                content: content,
-              })
+              setFeedbackContent(content)
               setTimeout(() => {
+                console.log(content)
                 removeFeedback(item.id)
               }, 100)
             }
@@ -746,7 +769,7 @@ const FeedbackList = ({
         </button>
       </div>
       <div className="flex justify-between font-bold text-slate-500">
-        <div>피드백 {item.id}</div>
+        <div>피드백</div>
         <div>{item.teacherName}</div>
       </div>
       <div
