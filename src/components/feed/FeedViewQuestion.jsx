@@ -28,6 +28,13 @@ function FeedViewQuestion({
     color: '',
     tab: 0,
   })
+  const [feedbackContent, setFeedbackContent] = useState({})
+
+  useEffect(() => {
+    console.log(feedbackContent)
+    console.log(JSON.stringify(feedbackContent))
+  }, [feedbackContent])
+
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -167,6 +174,26 @@ function FeedViewQuestion({
     },
   )
 
+  // 탐구활동 증빙자료 수정
+  const { mutate: updateFeedback2 } = useMutation(
+    () =>
+      request.put(
+        `/admin/feedback-management/application/activity-feedback/${feedbackModParams.id}`,
+        feedbackModParams,
+      ),
+    {
+      onSuccess: () => {
+        alert('피드백이 수정되었습니다.')
+        refetchFeedDetail()
+        setIsModal({ editFeedback: false })
+        setFeedbackModParams({
+          id: '',
+          sentence: '',
+          reply: '',
+        })
+      },
+    },
+  )
   /** 피드백 자기소개서 수정 */
   const feedbackUpdate = () => {
     if (feedbackModParams.reply === '') {
@@ -180,9 +207,11 @@ function FeedViewQuestion({
     (id) =>
       request.delete(
         `/admin/feedback-management/application/answer-feedback/${id}`,
+        JSON.parse(JSON.stringify(feedbackContent)),
       ),
     {
       onSuccess: () => {
+        alert('피드백이 삭제되었습니다.')
         refetchFeedDetail()
         setIsLoading(false)
       },
@@ -301,13 +330,16 @@ function FeedViewQuestion({
                       히스토리 보기
                     </button>
                   </div>
-                  {item.feedbackList?.map((item) => (
+                  {item.feedbackList?.map((items) => (
                     <FeedbackList
-                      key={`feed-${item.id}`}
-                      item={item}
+                      key={`feed-${items.id}`}
+                      item={items}
+                      setIsModal={setIsModal}
                       setFeedbackParams={setFeedbackParams}
                       setFeedbackModParams={setFeedbackModParams}
                       removeFeedback={removeFeedback}
+                      setFeedbackContent={setFeedbackContent}
+                      content={content[index]}
                     />
                   ))}
                 </div>
@@ -402,7 +434,7 @@ function FeedViewQuestion({
                               증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여
                               200자 이내)
                             </p>
-                            <div className="mt-3">{item.content}</div>
+                            {/* <div className="mt-3">{item.content}</div> */}
                           </td>
                         </tr>
                         <tr>
@@ -427,6 +459,7 @@ function FeedViewQuestion({
                       <FeedbackList
                         key={`feed-${item.id}`}
                         item={item}
+                        setIsModal={setIsModal}
                         setFeedbackParams={setFeedbackParams}
                         setFeedbackModParams={setFeedbackModParams}
                         removeFeedback={removeFeedback}
@@ -497,7 +530,7 @@ function FeedViewQuestion({
           ).map(([key, value]) => (
             <Fragment key={value[0].id}>
               {value.reverse().map((item, index) => (
-                <>
+                <Fragment key={index}>
                   {item.sentence.length !== 0 && (
                     <div className="p-3 border rounded-md mr-12">
                       {item.sentence}
@@ -512,10 +545,7 @@ function FeedViewQuestion({
                     </div>
                   )}
 
-                  <div
-                    className="p-3 border rounded-md ml-12 bg-slate-100 text-right"
-                    key={index}
-                  >
+                  <div className="p-3 border rounded-md ml-12 bg-slate-100 text-right">
                     <div>{item.reply}</div>
                     <div className="flex justify-end mt-3">
                       <span className="font-medium mr-2 text-sm">
@@ -526,7 +556,7 @@ function FeedViewQuestion({
                       </span>
                     </div>
                   </div>
-                </>
+                </Fragment>
               ))}
             </Fragment>
           ))}
@@ -663,7 +693,11 @@ function FeedViewQuestion({
             type="button"
             className="btn btn-primary w-24"
             onClick={() => {
-              updateFeedback()
+              if (tab === feedDetail?.qnaList.length) {
+                updateFeedback2()
+              } else {
+                updateFeedback()
+              }
             }}
           >
             저장하기
@@ -679,7 +713,10 @@ const FeedbackList = ({
   setFeedbackParams,
   setFeedbackModParams,
   removeFeedback,
+  setIsModal,
   item,
+  setFeedbackContent,
+  content,
 }) => {
   return (
     <div
@@ -691,9 +728,13 @@ const FeedbackList = ({
           className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
           onClick={() => {
             if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
-              setFeedbackParams({
-                color: item.color,
-                tab,
+              // setFeedbackParams({
+              //   color: item.color,
+              //   // tab,
+              // })
+              setFeedbackContent({
+                // content: JSON.stringify(content),
+                content: content,
               })
               setTimeout(() => {
                 removeFeedback(item.id)
@@ -705,7 +746,7 @@ const FeedbackList = ({
         </button>
       </div>
       <div className="flex justify-between font-bold text-slate-500">
-        <div>피드백</div>
+        <div>피드백 {item.id}</div>
         <div>{item.teacherName}</div>
       </div>
       <div

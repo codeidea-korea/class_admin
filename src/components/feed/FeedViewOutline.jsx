@@ -25,6 +25,9 @@ function FeedViewQuestion({
     color: '',
     tab: 0,
   })
+  const [feedbackContent, setFeedbackContent] = useState({
+    content: '',
+  })
   const [isModal, setIsModal] = useReducer(
     (prev, next) => ({ ...prev, ...next }),
     {
@@ -58,6 +61,10 @@ function FeedViewQuestion({
 
   /** 피드백 달기 버튼 */
   const feedbackStart = (id, index) => {
+    if (selection.sentence === '') {
+      alert('피드백할 영역을 선택해주세요.')
+      return
+    }
     setSelection({
       id,
       index,
@@ -104,7 +111,7 @@ function FeedViewQuestion({
   const { mutate: updateFeedback } = useMutation(
     () =>
       request.put(
-        `/admin/feedback-management/application/answer-feedback/${feedbackModParams.id}`,
+        `/admin/feedback-management/application/outline-feedback/${feedbackModParams.id}`,
         feedbackModParams,
       ),
     {
@@ -133,7 +140,8 @@ function FeedViewQuestion({
   const { mutate: removeFeedback } = useMutation(
     (id) =>
       request.delete(
-        `/admin/feedback-management/application/answer-feedback/${id}`,
+        `/admin/feedback-management/application/outline-feedback/${id}`,
+        feedbackContent,
       ),
     {
       onSuccess: () => {
@@ -238,9 +246,13 @@ function FeedViewQuestion({
                         className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
                         onClick={() => {
                           if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
-                            setFeedbackParams({
-                              color: item.color,
-                              tab,
+                            // setFeedbackParams({
+                            //   color: item.color,
+                            //   tab,
+                            // })
+                            setFeedbackContent({
+                              // content: JSON.stringify(content),
+                              content: content[index],
                             })
                             setTimeout(() => {
                               removeFeedback(item.id)
