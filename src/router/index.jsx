@@ -54,6 +54,8 @@ import PwFindstep1 from '../views/login/pw_find_step1'
 import FindIdResult2 from '../views/login/id_find_result2'
 import PwFindstep2 from '../views/login/pw_find_step2'
 import PwFindResult from '../views/login/pw_find_reslut'
+import ReservationList from '../views/reservation/ReservationList'
+import ReservationView from '../views/reservation/ReservationView'
 
 function Router() {
   const routes = [
@@ -233,7 +235,7 @@ function Router() {
           path: '/curriculum', //커리큘럼
           element: (
             <PrivateRoute
-              element={<CurriCulum/>}
+              element={<CurriCulum />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
@@ -260,7 +262,7 @@ function Router() {
           path: '/curriculum/edit/:id',
           element: (
             <PrivateRoute
-              element={<CurriculumCreate/>}
+              element={<CurriculumCreate />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
@@ -287,7 +289,7 @@ function Router() {
           path: '/classVideo/edit/:id',
           element: (
             <PrivateRoute
-              element={<ClassVideoControl/>}
+              element={<ClassVideoControl />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
@@ -359,6 +361,26 @@ function Router() {
           element: (
             <PrivateRoute
               element={<Contents2 />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 상담예약확인
+        {
+          path: '/reservation', // 상담예약확인
+          element: (
+            <PrivateRoute
+              element={<ReservationList />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/reservation/view/:id', // 상담예약확인
+          element: (
+            <PrivateRoute
+              element={<ReservationView />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),

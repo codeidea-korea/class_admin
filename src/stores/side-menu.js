@@ -96,6 +96,11 @@ const sideMenu = atom({
         icon: 'Bell',
         title: '알림',
       },
+      {
+        icon: 'Laptop',
+        pathname: '/reservation',
+        title: '상담 예약 확인',
+      },
     ],
   },
 })
