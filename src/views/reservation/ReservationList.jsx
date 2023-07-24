@@ -1,19 +1,19 @@
-import {
-  Lucide,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@/base-components'
-import React, { useEffect } from 'react'
+import { Lucide } from '@/base-components'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
-import { userState } from "@/states/userState";
+import { userState } from '@/states/userState'
 
 const ReservationList = () => {
   const api = useAxios();
   const user = useRecoilValue(userState);
+  const [reservations, setReservation] = useState([]);
+
+  const leftPad = (value) => {
+    if (value >= 10) { return value; }
+    return `0${value}`;
+  }
 
   const getMyReservationList = () => {
     if(user.userId != null) {
@@ -21,63 +21,43 @@ const ReservationList = () => {
         {headers: {Authorization: `Bearer ${user.token}`}})
         .then((res) => {
           if (res.status === 200) {
-            const rootElement = document.getElementById('reservation-list');
-            for(let data of res.data) {
-              let tr = document.createElement("tr");
-              let td1 = document.createElement("td");
-              let td2 = document.createElement("td");
-              let td3 = document.createElement("td");
-              let td4 = document.createElement("td");
-              let td5 = document.createElement("td");
-              let td6 = document.createElement("td");
-              let td7 = document.createElement("td");
-              let td8 = document.createElement("td");
-              let td9 = document.createElement("td");
-
-              tr.classList.add('text-center');
-              td1.textContent = String(data.creDate[0] + "-" + data.creDate[1] + "-" + data.creDate[2]);
-              td2.innerHTML = `<Link to="/reservation/view/1" className="underline text-primary text-left">
-                                  <div className="truncate">
-                                    ${data.title}
-                                  </div>
-                                </Link>`;
-              td3.textContent = data.phone;
-              td4.textContent = data.date;
-              td5.textContent = data.time;
-              td6.textContent = data.consultingType;
-              td7.textContent = data.area;
-
-              switch (data.consultingStatus) {
-                case "WAIT": td8.textContent = "대기"; break;
-                case "SUCCESS": td8.textContent = "완료"; break;
-                case "HOLD": td8.textContent = "보류"; break;
-              }
-
-              tr.append(td1);
-              tr.append(td2);
-              tr.append(td3);
-              tr.append(td4);
-              tr.append(td5);
-              tr.append(td6);
-              tr.append(td7);
-              tr.append(td8);
-
-              if(rootElement != null) {
-                rootElement.append(tr);
-              }
-            }
+            setReservation(res.data);
           }
         })
         .catch((err) => {
           console.log(err);
         });
     }
-    return ['MON, TUE'];
   }
 
   useEffect(() => {
     getMyReservationList();
   }, [])
+
+  const renderDataAsElements = (dataArray) => {
+    return dataArray.map((item, index) => (
+      <React.Fragment key={index}>
+        <tr className="text-center">
+          <td>{item.creDate[0] + "-" + leftPad(item.creDate[1]) + "-" + leftPad(item.creDate[2])}</td>
+          <td>
+            <Link
+              to={`/reservation/view/${item.id}`}
+              className="underline text-primary text-left">
+              <div className="truncate">
+                {item.title}
+              </div>
+            </Link>
+          </td>
+          <td>{item.phone}</td>
+          <td>{item.date}</td>
+          <td>{item.time}</td>
+          <td>{item.consultingType}</td>
+          <td>{item.area}</td>
+          <td>{item.consultingStatus === 'WAIT' ? '대기' : item.consultingStatus === 'SUCCESS' ? '성공' : '보류'}</td>
+        </tr>
+      </React.Fragment>
+    ));
+  };
 
   return (
     <>
@@ -88,7 +68,7 @@ const ReservationList = () => {
         <div className="p-5">
           <div className="overflow-x-auto">
             <table className="table table-hover">
-              <tbody id={"reservation-list"}>
+              <tbody>
                 <tr className="text-center bg-slate-100">
                   <td>접수일</td>
                   <td>제목</td>
@@ -99,6 +79,7 @@ const ReservationList = () => {
                   <td>영역</td>
                   <td>대응여부</td>
                 </tr>
+                {renderDataAsElements(reservations)}
               </tbody>
             </table>
           </div>

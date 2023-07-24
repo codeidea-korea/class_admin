@@ -1,6 +1,45 @@
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useParams } from "react-router-dom";
+import useAxios from '@/hooks/useAxios'
+import { useRecoilValue } from 'recoil'
+import { userState } from "@/states/userState";
 
 const ReservationView = () => {
+  const api = useAxios();
+  const user = useRecoilValue(userState);
+  const params = useParams();
+  const [reservations, setReservation] = useState([]);
+
+  useEffect(() => {
+    getMyReservationDetail();
+  }, [])
+
+  const getMyReservationDetail = () => {
+    if(params.id != null) {
+      api.get('/admin/consulting/reservation-detail',
+        {params: {'id': params.id}, headers: {Authorization: `Bearer ${user.token}`}})
+        .then((res) => {
+          if (res.status === 200) {
+            setReservation(res.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  const renderStringWithLineBreaks = (str) => {
+    const lines = String(str).split("<br>");
+    return lines.map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        <br />
+      </React.Fragment>
+    ));
+  };
+
   return (
     <>
       <div className="intro-y box mt-5">
@@ -14,46 +53,44 @@ const ReservationView = () => {
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">연락처</span>
                 </td>
-                <td>010-1211-1111</td>
+                <td>{reservations.phone}</td>
               </tr>
               <tr>
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">상담일자</span>
                 </td>
-                <td>2022-11-15</td>
+                <td>{reservations.date}</td>
               </tr>
               <tr>
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">시간대</span>
                 </td>
-                <td>15:00 ~ 16:00</td>
+                <td>{reservations.time}</td>
               </tr>
               <tr>
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">상담유형</span>
                 </td>
-                <td>재원생상담</td>
+                <td>{reservations.consultingType}</td>
               </tr>
               <tr>
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">영역</span>
                 </td>
-                <td>영재학교</td>
+                <td>{reservations.area}</td>
               </tr>
               <tr>
                 <td className="w-48">
                   <span className="text-slate-400 font-bold">제목</span>
                 </td>
-                <td>등록관련 문의드립니다.</td>
+                <td>{reservations.title}</td>
               </tr>
               <tr>
                 <td className="w-48 align-top">
                   <span className="text-slate-400 font-bold">내용</span>
                 </td>
                 <td>
-                  등록 시 한달에 등록비가 얼마인가요?
-                  <br />
-                  장기 등록 시 금액적인 부분 협의가 가능할까요?
+                  {renderStringWithLineBreaks(reservations.content)}
                 </td>
               </tr>
               <tr>
@@ -61,9 +98,12 @@ const ReservationView = () => {
                   <span className="text-slate-400 font-bold"></span>
                 </td>
                 <td>
-                  <select name="" id="" className="form-select w-52">
-                    <option value="">미대응</option>
-                    <option value="">대응</option>
+                  <select name="" id="" className="form-select w-52"
+                          key={reservations.consultingStatus}
+                          defaultValue={reservations.consultingStatus}>
+                    <option value="WAIT">대기</option>
+                    <option value="SUCCESS">완료</option>
+                    <option value="HOLD">보류</option>
                   </select>
                 </td>
               </tr>
