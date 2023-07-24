@@ -494,8 +494,8 @@ function ClassVideoForm({ isCreate }) {
                     )}
                   </div>
                 </td>
-                {index !== 0 && (
                   <td>
+                    {index !== 0 && (
                     <button
                       type="button"
                       className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
@@ -503,8 +503,8 @@ function ClassVideoForm({ isCreate }) {
                     >
                       삭제
                     </button>
+                    )}
                   </td>
-                )}
               </tr>
             ))}
             <tr>

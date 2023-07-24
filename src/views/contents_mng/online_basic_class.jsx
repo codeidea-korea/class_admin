@@ -32,6 +32,7 @@ function OnlinebasicClass() {
     },
   })
 
+  // 과목 리스트 구하기
   const {
     data: basicClassSubject,
     isLoading: isBasicClassSubject,
@@ -46,12 +47,24 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
+        let id = '';
+        let subject = '';
+
         if (data[0]) {
-          setState({ id: data[0].id, subject: data[0].subject })
+          id = data[0].id;
+          subject = data[0].subject;
         }
+
+        setState({ id: id, subject: subject })
+
+        /*if (data[0]) {
+          setState({ id: data[0].id, subject: data[0].subject })
+        }*/
       },
     },
   )
+  
+  // 과목에 해당하는 본문 리스트 구하기
   const {
     data: basicClass,
     isLoading: isBasicClassm,
@@ -64,6 +77,7 @@ function OnlinebasicClass() {
     },
   )
 
+  // 추가
   const { mutate: addClassSubject, isLoading: isAddClassSubject } = useMutation(
     (data) =>
       request.post(`/admin/content-management/basic-class-subject`, data),
@@ -78,6 +92,7 @@ function OnlinebasicClass() {
     },
   )
 
+  // 삭제
   const { mutate: deleteClassSubject, isLoading: isDeleteClassSubject } =
     useMutation(
       (id) =>
@@ -168,7 +183,7 @@ function OnlinebasicClass() {
               </tr>
             </thead>
             <tbody>
-              {basicClass?.map((item, index) => (
+              {basicClass?.length > 0 ? basicClass?.map((item, index) => (
                 <tr className="text-center" key={`basicClass-${item.row_id}`}>
                   <td>{index + 1}</td>
                   <td>{item.gubun}</td>
@@ -211,7 +226,11 @@ function OnlinebasicClass() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) :
+                <tr className="text-center">
+                  <td colSpan={6}>데이터가 존재하지 않습니다.</td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
