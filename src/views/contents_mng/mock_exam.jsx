@@ -190,36 +190,34 @@ function OnlinebasicClass() {
                   <td className="text-left">{item.exam_type}</td>
                   <td>
                     <div className="flex justify-center">
-                      <button
-                        className="btn btn-outline-primary flex items-center gap-2"
-                        onClick={() => {
-                          (item.link_url && item.link_url.includes('/watch?v='))
-                            ? setState({
+                      {
+                        (item?.link_url && item?.link_url?.includes('/watch?v=')) &&
+                        <button
+                          className="btn btn-outline-primary flex items-center gap-2"
+                          onClick={() => {
+                            setState({
                               isVideo: true,
                               video: item.link_url.replace('/watch?v=', '/embed/'),
                             })
-                            : alert('영상이 존재하지 않습니다.')
-                        }}
-                      >
-                        <Lucide icon="Video" className="w-4 h-4"></Lucide>
-                        영상보기
-                      </button>
+                          }}
+                        >
+                          <Lucide icon="Video" className="w-4 h-4"></Lucide>
+                          영상보기
+                        </button>
+                      }
                     </div>
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      <a href="#" onClick={
-                        () => {
-                          item.fileId
-                            ? (location.href = `${baseUrl}/v1/contents-data/file-download/${item.fileId}`)
-                            : (alert('학습자료가 존재하지 않습니다.'))
-                        }
-                      }>
-                        <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
-                          <Lucide icon="File" className="w-4 h-4"></Lucide>
-                          학습자료
-                        </button>
-                      </a>
+                      {
+                        (item.fileId && item.fileId > 0) &&
+                        <a href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}>
+                          <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
+                            <Lucide icon="File" className="w-4 h-4"></Lucide>
+                            학습자료
+                          </button>
+                        </a>
+                      }
                     </div>
                   </td>
                 </tr>
