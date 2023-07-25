@@ -83,7 +83,7 @@ function CurriculumCreate({ isCreate }) {
     const formData = new FormData();
 
     // 선생님 기본 정보
-    formData.append('field_name', '영재학교')
+    formData.append('field_name', searchParams.get('fieldName'))
     formData.append('subject', searchParams.get('subject'))
     formData.append('teacher_subject', data.teacher_subject)
     formData.append('teacher_name', data.teacher_name)

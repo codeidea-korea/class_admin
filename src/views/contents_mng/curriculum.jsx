@@ -11,10 +11,11 @@ function CurriCulum() {
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const [video, videoDetail] = useState(false);
   const [videoSrc, setVideoSrc] = useState('');
+  const [fieldName, setFieldName] = useState('영재학교');
 
   const { data: curriculumList, isLoading: isGetCurriculumList } = useQuery(
-    'getCurriculum',
-    () => request.get('/admin/content-management/curriculum'),
+    ['getCurriculum',fieldName],
+    () => request.get(`/admin/content-management/curriculum?fieldName=${fieldName}`),
     {
       select: (data) => ({
         mathematics: data?.contentCurriculumTeacherList?.filter(item => item.subject === '수학'),
@@ -34,21 +35,9 @@ function CurriCulum() {
   return (
     <>
       <div className="flex gap-2 mt-5">
-        <button
-          className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
-        >
-          영재원
-        </button>
-        <Link to="/curriculum">
-          <button className="btn btn-primary w-36">영재학교</button>
-        </Link>
-        <button
-          className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
-        >
-          과학고
-        </button>
+        <button className={"btn w-36" + (fieldName === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => { alert('준비중입니다.'); {/*setFieldName('과학고')*/}}}>영재원</button>
+        <button className={"btn w-36" + (fieldName === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => setFieldName('영재학교')}>영재학교</button>
+        <button className={"btn w-36" + (fieldName === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => { {/*alert('준비중입니다.');*/} setFieldName('과학고')}}>과학고</button>
       </div>
 
       <div className="intro-y box mt-5 relative">
@@ -103,7 +92,7 @@ function CurriCulum() {
               ),
             )}
             <li className="add zoom-in">
-              <Link to={'/curriculum/create?subject=수학'} className="">
+              <Link to={`/curriculum/create?subject=수학&fieldName=${fieldName}`} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>
@@ -157,7 +146,7 @@ function CurriCulum() {
               </li>
             ))}
             <li className="add zoom-in">
-              <Link to={'/curriculum/create?subject=과학'} className="">
+              <Link to={`/curriculum/create?subject=과학&fieldName=${fieldName}`} className="">
                 <Lucide icon="Plus" className="w-10 h-10"></Lucide>
               </Link>
             </li>
