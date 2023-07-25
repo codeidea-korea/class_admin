@@ -30,6 +30,22 @@ const ReservationView = () => {
     }
   }
 
+  const udtConsultingStatus = (event) => {
+    const value = event.currentTarget.value;
+
+    if(params.id != null) {
+      api.post('/admin/consulting/udt-consulting-status', {id: params.id, ConsultingStatus: value},
+      {headers: {Authorization: `Bearer ${user.token}`}})
+        .then((res) => {
+          if (res.status === 200) {
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
   const renderStringWithLineBreaks = (str) => {
     const lines = String(str).split("<br>");
     return lines.map((line, index) => (
@@ -100,7 +116,8 @@ const ReservationView = () => {
                 <td>
                   <select name="" id="" className="form-select w-52"
                           key={reservations.consultingStatus}
-                          defaultValue={reservations.consultingStatus}>
+                          defaultValue={reservations.consultingStatus}
+                          onChange={udtConsultingStatus}>
                     <option value="WAIT">대기</option>
                     <option value="SUCCESS">완료</option>
                     <option value="HOLD">보류</option>
