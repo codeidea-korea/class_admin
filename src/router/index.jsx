@@ -56,6 +56,11 @@ import PwFindstep2 from '../views/login/pw_find_step2'
 import PwFindResult from '../views/login/pw_find_reslut'
 import ReservationList from '../views/reservation/ReservationList'
 import ReservationView from '../views/reservation/ReservationView'
+import GeOnlineMng from '../views/contents_mng/geOnlineMng'
+import GeOnlineMngEdit from '../views/contents_mng/geOnlineMngEdit'
+import ShOnlineMng from '../views/contents_mng/shOnlineMng'
+import ShOnlineMngEdit from '../views/contents_mng/shOnlineMngEdit'
+import ReadOnline from '../views/contents_mng/readOnline'
 
 function Router() {
   const routes = [
@@ -352,6 +357,57 @@ function Router() {
           element: (
             <PrivateRoute
               element={<Contents2 />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 영재원 영상학습 관리
+        {
+          path: '/ge_online_mng',
+          element: (
+            <PrivateRoute
+              element={<GeOnlineMng />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/ge_online_mng/edit',
+          element: (
+            <PrivateRoute
+              element={<GeOnlineMngEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 과학고 영상학습 관리
+        {
+          path: '/sh_online_mng',
+          element: (
+            <PrivateRoute
+              element={<ShOnlineMng />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/sh_online_mng/edit',
+          element: (
+            <PrivateRoute
+              element={<ShOnlineMngEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 읽기자료 & 학습영상 링크
+        {
+          path: '/read_online',
+          element: (
+            <PrivateRoute
+              element={<ReadOnline />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),

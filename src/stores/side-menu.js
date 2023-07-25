@@ -81,6 +81,21 @@ const sideMenu = atom({
           },
           {
             icon: '',
+            pathname: '/ge_online_mng',
+            title: '영재원 영상학습 관리',
+          },
+          {
+            icon: '',
+            pathname: '/sh_online_mng',
+            title: '과학고 영상학습 관리',
+          },
+          {
+            icon: '',
+            pathname: '/read_online',
+            title: '읽기자료 & 학습영상 링크',
+          },
+          {
+            icon: '',
             pathname: '/mock_exam',
             title: '회차별 모의고사',
           },
