@@ -17,30 +17,27 @@ function ClassVideo() {
       select: (data) => ({
         mathematics: data?.classVideoList?.filter(item => item.subject === '수학'),
         science: data?.classVideoList?.filter(item => item.subject === '과학')
-      }),
-      onSuccess: (data) => {
-        console.log(data)
-      }
+      })
     },
   )
   return (
     <>
       <div className="flex gap-2 mt-5">
-        <button
+        {/*<button
           className="btn bg-white w-36"
           onClick={() => alert('준비중입니다.')}
         >
           영재원
-        </button>
+        </button>*/}
         <Link to="/classVideo">
           <button className="btn btn-primary w-36">영재학교</button>
         </Link>
-        <button
+        {/*<button
           className="btn bg-white w-36"
           onClick={() => alert('준비중입니다.')}
         >
           과학고
-        </button>
+        </button>*/}
       </div>
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
