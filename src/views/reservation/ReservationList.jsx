@@ -37,7 +37,7 @@ const ReservationList = () => {
 
   useEffect(() => {
     getMyReservationList();
-  }, [])
+  }, [pageParams.currentPage])
 
   const renderDataAsElements = (dataArray) => {
     return dataArray.map((item, index) => (
