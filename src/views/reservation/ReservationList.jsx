@@ -4,24 +4,25 @@ import { Link } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
+import ReactPaginate from 'react-paginate'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const ReservationList = () => {
   const api = useAxios();
   const user = useRecoilValue(userState);
   const [reservations, setReservation] = useState([]);
-
-  const leftPad = (value) => {
-    if (value >= 10) { return value; }
-    return `0${value}`;
-  }
+  const [pageParams, setPageParams] = useState({
+    totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10
+  });
 
   const getMyReservationList = () => {
     if(user.userId != null) {
-      api.get('/admin/consulting/reservation-list',
+      api.get(`/admin/consulting/reservation-list?page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`,
         {headers: {Authorization: `Bearer ${user.token}`}})
         .then((res) => {
           if (res.status === 200) {
-            setReservation(res.data);
+            setReservation(res.data.content);
+            setPageParams({ ...pageParams, totalPages: res.data.totalPages, totalElements: res.data.totalElements })
           }
         })
         .catch((err) => {
@@ -29,6 +30,10 @@ const ReservationList = () => {
         });
     }
   }
+
+  const handlePageClick = (event) => {
+    setPageParams({ ...pageParams, currentPage: (event.selected + 1) })
+  };
 
   useEffect(() => {
     getMyReservationList();
@@ -38,7 +43,7 @@ const ReservationList = () => {
     return dataArray.map((item, index) => (
       <React.Fragment key={index}>
         <tr className="text-center">
-          <td>{item.creDate[0] + "-" + leftPad(item.creDate[1]) + "-" + leftPad(item.creDate[2])}</td>
+          <td>{item.creDate}</td>
           <td>
             <Link
               to={`/reservation/view/${item.id}`}
@@ -53,7 +58,7 @@ const ReservationList = () => {
           <td>{item.time}</td>
           <td>{item.consultingType}</td>
           <td>{item.area}</td>
-          <td>{item.consultingStatus === 'WAIT' ? '대기' : item.consultingStatus === 'SUCCESS' ? '성공' : '보류'}</td>
+          <td>{item.consultingStatus === 'WAIT' ? '대기' : item.consultingStatus === 'SUCCESS' ? '완료' : '보류'}</td>
         </tr>
       </React.Fragment>
     ));
@@ -88,33 +93,24 @@ const ReservationList = () => {
       <div className="mt-5 flex items-center justify-center">
         <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
           <nav className="w-full sm:w-auto sm:mr-auto">
-            <ul className="pagination">
-              <li className="page-item">
-                <Link className="page-link" to="">
-                  <Lucide icon="ChevronLeft" className="w-4 h-4" />
-                </Link>
-              </li>
-              <li className="page-item active">
-                <Link className="page-link" to="">
-                  1
-                </Link>
-              </li>
-              <li className="page-item">
-                <Link className="page-link" to="">
-                  2
-                </Link>
-              </li>
-              <li className="page-item">
-                <Link className="page-link" to="">
-                  3
-                </Link>
-              </li>
-              <li className="page-item">
-                <Link className="page-link" to="">
-                  <Lucide icon="ChevronRight" className="w-4 h-4" />
-                </Link>
-              </li>
-            </ul>
+            <ReactPaginate
+              className={'pagination justify-center'}
+              pageClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              breakLinkClassName={'page-item'}
+              breakLabel="..."
+              nextClassName={'page-item'}
+              nextLinkClassName={'page-link'}
+              nextLabel={<ChevronRight className="w-4 h-4"/>}
+              previousClassName={'page-item'}
+              previousLinkClassName={'page-link'}
+              onPageChange={handlePageClick}
+              previousLabel={<ChevronLeft className="w-4 h-4"/>}
+              activeClassName={'page-item active'}
+              pageRangeDisplayed={pageParams.pageRangeDisplayed}
+              pageCount={pageParams.totalPages}
+              renderOnZeroPageCount={props => null}
+            />
           </nav>
         </div>
       </div>
