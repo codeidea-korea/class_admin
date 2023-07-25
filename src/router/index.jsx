@@ -61,6 +61,7 @@ import GeOnlineMngEdit from '../views/contents_mng/geOnlineMngEdit'
 import ShOnlineMng from '../views/contents_mng/shOnlineMng'
 import ShOnlineMngEdit from '../views/contents_mng/shOnlineMngEdit'
 import ReadOnline from '../views/contents_mng/readOnline'
+import PwChange from '../views/login/pw_change'
 
 function Router() {
   const routes = [
@@ -430,6 +431,14 @@ function Router() {
               element={<ReservationView />}
               role={['ADMIN', 'DIRECTOR']}
             />
+          ),
+        },
+
+        // 비밀번호 변경
+        {
+          path: '/pw_change',
+          element: (
+            <PrivateRoute element={<PwChange />} role={['ADMIN', 'DIRECTOR']} />
           ),
         },
       ],

@@ -15,7 +15,7 @@ import classnames from 'classnames'
 import { userState } from '@/states/userState'
 import { naviState } from '@/states/naviState'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import {configStore} from "@/stores/configStore";
+import { configStore } from '@/stores/configStore'
 
 function Main(props) {
   const navigate = useNavigate()
@@ -37,15 +37,13 @@ function Main(props) {
   }
 
   useEffect(() => {
-    const text = config.menuType.pathToText[location.pathname.split('/')[1]];
+    const text = config.menuType.pathToText[location.pathname.split('/')[1]]
 
-    setNavi(
-      {
-        menu01 : text ? text[0] : '',
-        menu02 : text ? text[1] : ''
-      },
-    );
-  }, [location.pathname]);
+    setNavi({
+      menu01: text ? text[0] : '',
+      menu02: text ? text[1] : '',
+    })
+  }, [location.pathname])
 
   return (
     <>
@@ -66,8 +64,7 @@ function Main(props) {
                 {navi?.menu01}
               </a>
             </li>
-            {
-              navi?.menu02 &&
+            {navi?.menu02 && (
               <>
                 <li className="">
                   <Lucide
@@ -79,7 +76,7 @@ function Main(props) {
                   {navi?.menu02}
                 </li>
               </>
-            }
+            )}
           </ol>
         </nav>
         {/* END: Breadcrumb */}
@@ -201,9 +198,14 @@ function Main(props) {
                 </div>
               </DropdownHeader>
               <DropdownDivider className="border-white/[0.08]" />
-              <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="User" className="w-4 h-4 mr-2" /> 프로필 수정하기
-              </DropdownItem>
+              <li>
+                <Link
+                  className="dropdown-item cursor-pointer hover:bg-white/5"
+                  to="/pw_change"
+                >
+                  <Lucide icon="User" className="w-4 h-4 mr-2" /> 비밀번호 변경
+                </Link>
+              </li>
               <DropdownItem className="hover:bg-white/5" onClick={handleLogout}>
                 <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Logout
               </DropdownItem>
