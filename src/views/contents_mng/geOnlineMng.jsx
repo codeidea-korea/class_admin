@@ -1,81 +1,248 @@
-import {useEffect, useReducer, useState} from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import {
-    Lucide,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-  } from '@/base-components'
+  Lucide,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '@/base-components'
 import { Link } from 'react-router-dom'
+import { useQuery, useMutation } from 'react-query'
+import { useForm } from 'react-hook-form'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import request from '@/utils/request'
+import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
-    const [data,setData] = useState([
-      {rowId:1,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-      {rowId:2,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-      {rowId:3,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-      {rowId:4,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"}
-    ])
-    // 과목추가 모달
-    const [subject,setSubject] = useState(false)
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
+  const [data, setData] = useState([
+    {
+      rowId: 1,
+      subject: '융합',
+      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
+      link: 'https://youtu.be/hwCFXw35ctc',
+    },
+    {
+      rowId: 2,
+      subject: '융합',
+      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
+      link: 'https://youtu.be/hwCFXw35ctc',
+    },
+    {
+      rowId: 3,
+      subject: '융합',
+      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
+      link: 'https://youtu.be/hwCFXw35ctc',
+    },
+    {
+      rowId: 4,
+      subject: '융합',
+      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
+      link: 'https://youtu.be/hwCFXw35ctc',
+    },
+  ])
+  // 과목추가 모달
+  const [subject, setSubject] = useState(false)
 
-    // 탭 이동
-    const [curTab,setCurTab] = useState("수학")
+  // 탭 이동
+  const [curTab, setCurTab] = useState('MATH')
+  const [stuTab, setStuTab] = useState('ELEMENTARY')
 
-    // 페이지네이션 클릭
-    const handlePageClick = ()=>{}
+  const [subId, setSubId] = useState()
+  const [subName, setSubName] = useState()
+  const [pageParams, setPageParams] = useState({
+    totalPages: 0,
+    totalElements: 0,
+    currentPage: 1,
+    pageRangeDisplayed: 10,
+  })
 
-    return (<>
+  const { getValues, watch, reset, register } = useForm({
+    defaultValues: {
+      subjectUnit: '',
+    },
+  })
+
+  // 단원 리스트 가져오기
+  const {
+    data: basicClassSubject,
+    isLoading: isBasicClassSubject,
+    refetch: refetchBasicClassSubject,
+  } = useQuery(
+    'getBasicClassSubject',
+    () =>
+      request.get(`/admin/content-management/onlineSubjectUnit`, {
+        params: {
+          subjectType: curTab,
+          studentType: stuTab,
+        },
+      }),
+    {
+      onSuccess: (data) => {
+        if (data[0]) {
+          setSubId(data[0].row_id)
+          setSubName(data[0].title)
+        }
+      },
+    },
+  )
+
+  // 리스트 가져오기
+  const {
+    data: basicClass,
+    isLoading: isBasicClassm,
+    refetch: refetchBasicClass,
+  } = useQuery(
+    ['getBasicClass', subId],
+    () =>
+      request.get(`/admin/content-management/geniusOnlineClass`, {
+        params: {
+          subjectUnitId: subId,
+          page: pageParams.currentPage,
+          limit: pageParams.pageRangeDisplayed,
+        },
+      }),
+    {
+      enabled: !!subId,
+    },
+  )
+
+  // 단원 추가하기
+  const { mutate: addClassSubject, isLoading: isAddClassSubject } = useMutation(
+    (data) =>
+      request.post(`/admin/content-management/onlineSubjectUnit`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+    {
+      onSuccess: () => {
+        refetchBasicClassSubject()
+        alert('추가되었습니다.')
+        setSubject(false)
+        reset({ subjectUnit: '' })
+      },
+    },
+  )
+
+  // 단원 삭제하기
+  const { mutate: deleteClassSubject, isLoading: isDeleteClassSubject } =
+    useMutation(
+      (id) =>
+        request.delete(`/admin/content-management/onlineSubjectUnit/${id}`),
+      {
+        onSuccess: () => {
+          refetchBasicClassSubject()
+          alert('삭제되었습니다.')
+        },
+      },
+    )
+
+  useEffect(() => {
+    refetchBasicClassSubject()
+  }, [curTab, stuTab])
+
+  return (
+    <>
       <div className="flex gap-2 mt-5">
-          <button className={"btn w-32 " + (curTab === "수학"?"btn-primary":"bg-white")} onClick={()=>setCurTab("수학")}>수학</button>
-          <button className={"btn w-32 " + (curTab === "과학"?"btn-primary":"bg-white")}  onClick={()=>setCurTab("과학")}>과학</button>
+        <button
+          className={
+            'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')
+          }
+          onClick={() => setCurTab('MATH')}
+        >
+          수학
+        </button>
+        <button
+          className={
+            'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')
+          }
+          onClick={() => setCurTab('SCIENCE')}
+        >
+          과학
+        </button>
       </div>
       <div className="intro-y box mt-5 relative">
-          <div className="p-5">
-              <div className="flex items-center gap-3">
-                  <div>구분:</div>
-                  <select className="form-control w-40">
-                      <option value="초등학생">초등학생</option>
-                      <option value="중학생">중학생</option>
-                  </select>
-                  <select className="form-control w-28">
-                      <option value="융합">융합</option>
-                  </select>
-                  <button className="btn btn-outline-primary border-dotted" onClick={()=>setSubject(true)}>
-                      <Lucide icon="Plus" className="w-4 h-4"></Lucide>   
-                  </button>
+        {(isBasicClassSubject || isBasicClassm) && <Loading />}
+        <div className="p-5">
+          <div className="flex items-center gap-3">
+            <div>구분:</div>
+            <select
+              className="form-control w-40"
+              onChange={(e) => {
+                setStuTab(e.target.value)
+              }}
+            >
+              <option value="ELEMENTARY">초등학생</option>
+              <option value="MIDDLE">중학생</option>
+            </select>
+            <select
+              className="form-control w-28"
+              onChange={(e) => {
+                setSubId(e.target.value)
+              }}
+            >
+              {basicClassSubject?.map((item) => (
+                <option key={item.row_id} value={item.row_id}>
+                  {item.title}
+                </option>
+              ))}
+            </select>
+            <button
+              className="btn btn-outline-primary border-dotted"
+              onClick={() => setSubject(true)}
+            >
+              <Lucide icon="Plus" className="w-4 h-4"></Lucide>
+            </button>
 
-                  <div className="flex ml-auto gap-2">
-                      <button className="btn btn-danger w-24">
-                          과목삭제
-                      </button>
-                      <Link to="/ge_online_mng/edit">
-                          <button className="btn btn-sky w-24">수정</button>
-                      </Link>
-                  </div>
-              </div>
-              <table className='table table-hover mt-5'>
-                  <thead>
-                      <tr className="bg-slate-100 text-center">
-                          <td>번호</td>
-                          <td>과목</td>
-                          <td>제목</td>
-                          <td>링크</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((item,index)=>(
-                      <tr className="text-center" key={index}>
-                          <td>{item.rowId}</td>
-                          <td>{item.subject}</td>
-                          <td>{item.title}</td>
-                          <td><a href={item.link} target="_blank">{item.link}</a></td>
-                      </tr>
-                    ))}
-                  </tbody>
-              </table>
-              <div className="mt-5 flex items-center justify-center">
+            <div className="flex ml-auto gap-2">
+              <button
+                className="btn btn-danger w-24"
+                onClick={() => {
+                  if (confirm('과목을 삭제하시겠습니까?')) {
+                    deleteClassSubject(subId)
+                  }
+                }}
+              >
+                과목삭제
+              </button>
+              <Link
+                to={`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}`}
+              >
+                <button className="btn btn-sky w-24">수정</button>
+              </Link>
+            </div>
+          </div>
+          <table className="table table-hover mt-5">
+            <thead>
+              <tr className="bg-slate-100 text-center">
+                <td>번호</td>
+                <td>과목</td>
+                <td>제목</td>
+                <td>링크</td>
+              </tr>
+            </thead>
+            <tbody>
+              {basicClass?.content?.length > 0 ? (
+                basicClass?.content?.map((item, index) => (
+                  <tr className="text-center" key={index}>
+                    <td>{item.row_id}</td>
+                    <td>{item.subjectUnitTitle}</td>
+                    <td>{item.title}</td>
+                    <td>
+                      <a href={item.link_url} target="_blank">
+                        {item.link_url}
+                      </a>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="text-center">
+                  <td colSpan={4}>데이터가 존재하지 않습니다.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          {/* <div className="mt-5 flex items-center justify-center">
               <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
                 <nav className="w-full sm:w-auto sm:mr-auto">
                   <ReactPaginate
@@ -100,14 +267,11 @@ const GeOnlineMng = () => {
                   />
                 </nav>
               </div>
-            </div>
-          </div>
+            </div> */}
+        </div>
       </div>
       {/* BEGIN: Modal 과목추가하기 */}
-      <Modal
-        show={subject}
-        onHidden={() => setSubject(false)}
-      >
+      <Modal show={subject} onHidden={() => setSubject(false)}>
         <ModalHeader>
           <h2 className="font-medium text-base mr-auto">과목 추가하기</h2>
           <button
@@ -123,6 +287,7 @@ const GeOnlineMng = () => {
             <input
               type="text"
               className="form-control w-full"
+              {...register('subjectUnit')}
             />
           </div>
         </ModalBody>
@@ -137,12 +302,20 @@ const GeOnlineMng = () => {
           <button
             type="button"
             className="btn btn-sky w-24"
+            onClick={() => {
+              addClassSubject({
+                title: getValues('subjectUnit'),
+                subjectType: curTab,
+                studentType: stuTab,
+              })
+            }}
           >
             확인
           </button>
         </ModalFooter>
       </Modal>
       {/* END: Modal 과목추가하기 */}
-  </>)
+    </>
+  )
 }
 export default GeOnlineMng

@@ -31,12 +31,14 @@ const ReadOnlineEdit = () => {
       // + 버튼 클릭
     const handleAddList = () => {
         const addData = {rowId:data.length+1,subject:"",title:"",link_url:"",fileId:"",fileName:""}
+        setData([...data, addData])
         setValue('list',[...data,addData])
     }
     // 삭제
     const deleteHandle = (rowId)=>{
         const result = data.filter((item)=>item.rowId !== rowId)
         setData(result)
+        setValue('list', result)
     }
 
   return (

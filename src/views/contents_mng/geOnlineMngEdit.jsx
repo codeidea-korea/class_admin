@@ -1,35 +1,78 @@
 import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import React, { useState, useReducer } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { useQuery, useMutation } from 'react-query'
+import { useForm } from 'react-hook-form'
+import request from '@/utils/request'
+import Loading from '@/components/loading'
 
 const GeOnlineMngEdit = () => {
-    const [data,setData] = useState([
-        {rowId:1,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-        {rowId:2,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-        {rowId:3,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"},
-        {rowId:4,subject:"융합",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link:"https://youtu.be/hwCFXw35ctc"}
-    ])
-    console.log(data)
-    // + 버튼 클릭
-    const handleAddList = () => {
-        const addData = {rowId:data.length+1,subject:"융합",title:"",link:""}
-        setData([...data,addData])
+  const [searchParams, setSearchParams] = useSearchParams()
+  const id = searchParams.get('id')
+
+  const { getValues, setValue, watch, reset, register } = useForm({
+    defaultValues: {
+      list: [],
+    },
+  })
+
+  const [data, setData] = useState([])
+
+  // + 버튼 클릭
+  const handleAddList = () => {
+    let origin = getValues('list')
+    let copy = {}
+
+    console.log(origin)
+    const addData = {
+      rowId: 0,
+      subjectUnitId: '융합',
+      title: '',
+      link: '',
     }
-    // 삭제
-    const deleteHandle = (rowId)=>{
-        const result = data.filter((item)=>item.rowId !== rowId)
-        setData(result)
-    }
-    
-    return (<>
-    <div className="intro-y box mt-5">
+    setData([...data, addData])
+  }
+  // 삭제
+  const deleteHandle = (rowId) => {
+    const result = data.filter((item) => item.rowId !== rowId)
+    setData(result)
+  }
+
+  // 리스트 가져오기
+  const {
+    data: basicClass,
+    isLoading: isBasicClassm,
+    refetch: refetchBasicClass,
+  } = useQuery(
+    ['getBasicClass', id],
+    () =>
+      request.get(`/admin/content-management/geniusOnlineClass`, {
+        params: {
+          subjectUnitId: id,
+          page: 1,
+          limit: 10000,
+        },
+      }),
+    {
+      enabled: !!id,
+      onSuccess: (data) => {
+        reset({ list: data.content })
+      },
+    },
+  )
+  console.log(basicClass)
+
+  return (
+    <>
+      <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium flex items-center">
             영재원 영상 학습 관리
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            초등학생
+            {searchParams.get('student') == 'MIDDLE' ? '중학생' : '초등학생'}
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
-            융합
+            {searchParams.get('subject')}
           </div>
         </div>
         <div className="intro-y p-5">
@@ -44,39 +87,54 @@ const GeOnlineMngEdit = () => {
               </tr>
             </thead>
             <tbody>
-                {data.map((item,index)=>(
-                    <tr className="text-center" key={index}>
-                        <td>{index+1}</td>
-                        <td>{item.subject}</td>
-                        <td>
-                            <input
-                            type="text"
-                            className="form-control"
-                            defaultValue={item.title}
-                            key={item.title}
-                            />
-                        </td>
-                        <td>
-                            <input
-                            type="text"
-                            className="form-control"
-                            defaultValue={item.link}
-                            key={item.link}
-                            />
-                        </td>
-                        <td>
-                            {index > 0 && 
-                                <button 
-                                    className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                                    onClick={()=>deleteHandle(item.rowId)}
-                                >
-                                    삭제 
-                                </button>
-                            }
-                            
-                        </td>
-                    </tr>
-                ))}
+              {watch('list')?.map((item, index) => (
+                <tr className="text-center" key={index}>
+                  <td>
+                    {index + 1}{' '}
+                    <input
+                      type="text"
+                      className="form-control hidden"
+                      defaultValue={item.row_id}
+                      {...register(`list[${index}].row_id`)}
+                    />
+                  </td>
+                  <td>
+                    {searchParams.get('subject')}
+                    <input
+                      type="text"
+                      className="form-control hidden"
+                      defaultValue={id}
+                      {...register(`list[${index}].subjectUnitId`)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control"
+                      defaultValue={item.title}
+                      key={item.title}
+                      {...register(`list[${index}].title`)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control"
+                      defaultValue={item.link_url}
+                      key={item.link_url}
+                      {...register(`list[${index}].link_url`)}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                      onClick={() => deleteHandle(item.rowId)}
+                    >
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              ))}
               <tr>
                 <td colSpan={5} className="text-center">
                   <button
@@ -94,13 +152,12 @@ const GeOnlineMngEdit = () => {
               <Link to="/ge_online_mng">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
-              <button className="btn btn-sky w-24" >
-                저장하기
-              </button>
+              <button className="btn btn-sky w-24">저장하기</button>
             </div>
           </div>
         </div>
       </div>
-    </>)
+    </>
+  )
 }
-export default GeOnlineMngEdit;
+export default GeOnlineMngEdit
