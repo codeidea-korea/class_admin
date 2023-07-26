@@ -62,6 +62,7 @@ import ShOnlineMng from '../views/contents_mng/shOnlineMng'
 import ShOnlineMngEdit from '../views/contents_mng/shOnlineMngEdit'
 import ReadOnline from '../views/contents_mng/readOnline'
 import PwChange from '../views/login/pw_change'
+import ReadOnlineEdit from '../views/contents_mng/readOnlineEdit'
 
 function Router() {
   const routes = [
@@ -409,6 +410,15 @@ function Router() {
           element: (
             <PrivateRoute
               element={<ReadOnline />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/read_online/edit',
+          element: (
+            <PrivateRoute
+              element={<ReadOnlineEdit />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
