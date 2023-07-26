@@ -7,7 +7,7 @@ import {
     ModalFooter,
   } from '@/base-components'
 import { Link } from 'react-router-dom'
-import ReactPaginate from 'react-paginate'
+import { useForm } from 'react-hook-form'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const ReadOnlineEdit = () => {
@@ -18,10 +18,20 @@ const ReadOnlineEdit = () => {
         {rowId:4,subject:"과학",title:"초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학",link_url:"",fileId:"478",fileName:"파일이름"}
       ])
 
+      const { getValues, setValue, watch, reset, register } = useForm({
+        defaultValues: {
+          list: [],
+        },
+      })
+
+      useEffect(()=>{
+        reset({ list: data })
+      },[])
+
       // + 버튼 클릭
     const handleAddList = () => {
         const addData = {rowId:data.length+1,subject:"",title:"",link_url:"",fileId:"",fileName:""}
-        setData([...data,addData])
+        setValue('list',[...data,addData])
     }
     // 삭제
     const deleteHandle = (rowId)=>{
@@ -50,7 +60,7 @@ const ReadOnlineEdit = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((item,index)=>(
+                        {watch('list')?.map((item,index)=>(
                             <tr className="text-center" key={index}>
                                 <td>{index+1}</td>
                                 <td>
@@ -98,6 +108,9 @@ const ReadOnlineEdit = () => {
                                             type="file"
                                             className="dp_none"
                                             id={`file-upload-${index}`}
+                                            {...register(
+                                                `list.${index}.file`,
+                                              )}
                                         />
                                         <label htmlFor={`file-upload-${index}`} className="flex items-center">
                                             <input
