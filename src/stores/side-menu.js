@@ -96,6 +96,11 @@ const sideMenu = atom({
           },
           {
             icon: '',
+            pathname: '/prior_question',
+            title: '방문 면접 대비 기출 문제',
+          },
+          {
+            icon: '',
             pathname: '/mock_exam',
             title: '회차별 모의고사',
           },
