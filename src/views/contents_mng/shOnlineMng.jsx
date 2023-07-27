@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
+import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
 
 const ShOnlineMng = () => {
   // 과목추가 모달
@@ -75,9 +76,38 @@ const ShOnlineMng = () => {
       enabled: !!subId,
       onSuccess: (data) => {
         setPageParams({ ...pageParams, totalPages: data.totalPages, totalElements: data.totalElements })
-      }
+      },
     },
   )
+
+  // 단원 추가하기
+  const { mutate: addClassSubject, isLoading: isAddClassSubject } = useMutation(
+    (data) =>
+      request.post(`/admin/content-management/onlineSubjectUnit`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+    {
+      onSuccess: () => {
+        refetchBasicClassSubject()
+        alert('추가되었습니다.')
+        setSubject(false)
+        reset({ subjectUnit: '' })
+      },
+    },
+  )
+
+  // 단원 삭제하기
+  const { mutate: deleteClassSubject, isLoading: isDeleteClassSubject } =
+    useMutation(
+      (id) =>
+        request.delete(`/admin/content-management/onlineSubjectUnit/${id}`),
+      {
+        onSuccess: () => {
+          refetchBasicClassSubject()
+          alert('삭제되었습니다.')
+        },
+      },
+    )
 
   useEffect(() => {
     refetchBasicClassSubject()
@@ -113,7 +143,23 @@ const ShOnlineMng = () => {
               </option>
             ))}
           </select>
+          <button
+            className='btn btn-outline-primary border-dotted'
+            onClick={() => setSubject(true)}
+          >
+            <Lucide icon='Plus' className='w-4 h-4'></Lucide>
+          </button>
           <div className='flex ml-auto gap-2'>
+            <button
+              className='btn btn-danger w-24'
+              onClick={() => {
+                if (confirm('과목을 삭제하시겠습니까?')) {
+                  deleteClassSubject(subId)
+                }
+              }}
+            >
+              과목삭제
+            </button>
             <Link to={`/sh_online_mng/edit?curTab=${curTab}&subject=${subName}&id=${subId}`}>
               <button className='btn btn-sky w-24'>수정</button>
             </Link>
@@ -169,6 +215,51 @@ const ShOnlineMng = () => {
         </div>
       </div>
     </div>
+    {/* BEGIN: Modal 과목추가하기 */}
+    <Modal show={subject} onHidden={() => setSubject(false)}>
+      <ModalHeader>
+        <h2 className='font-medium text-base mr-auto'>과목 추가하기</h2>
+        <button
+          className='btn btn-rounded-secondary hidden sm:flex p-1'
+          onClick={() => setSubject(false)}
+        >
+          <Lucide icon='X' className='w-4 h-4' />
+        </button>
+      </ModalHeader>
+      <ModalBody>
+        <div className='flex items-center'>
+          <div className='w-16 shrink-0'>과목</div>
+          <input
+            type='text'
+            className='form-control w-full'
+            {...register('subjectUnit')}
+          />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button
+          type='button'
+          className='btn btn-ouline-secondary w-24 mr-2'
+          onClick={() => setSubject(false)}
+        >
+          취소
+        </button>
+        <button
+          type='button'
+          className='btn btn-sky w-24'
+          onClick={() => {
+            addClassSubject({
+              title: getValues('subjectUnit'),
+              subjectType: curTab,
+              studentType: 'HIGHSCHOOL',
+            })
+          }}
+        >
+          확인
+        </button>
+      </ModalFooter>
+    </Modal>
+    {/* END: Modal 과목추가하기 */}
   </>)
 }
 export default ShOnlineMng

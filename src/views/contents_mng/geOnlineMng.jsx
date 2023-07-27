@@ -81,7 +81,7 @@ const GeOnlineMng = () => {
       enabled: !!subId,
       onSuccess: (data) => {
         setPageParams({ ...pageParams, totalPages: data.totalPages, totalElements: data.totalElements })
-      }
+      },
     },
   )
 
