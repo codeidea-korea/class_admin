@@ -111,7 +111,7 @@ const ShOnlineMng = () => {
 
   useEffect(() => {
     refetchBasicClassSubject()
-  }, [curTab])
+  }, [curTab, pageParams])
 
   return (<>
     <div className='flex gap-2 mt-5'>
