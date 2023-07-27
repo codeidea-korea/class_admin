@@ -203,7 +203,7 @@ const GeOnlineMng = () => {
               {basicClass?.content?.length > 0 ? (
                 basicClass?.content?.map((item, index) => (
                   <tr className="text-center" key={index}>
-                    <td>{item.row_id}</td>
+                    <td>{index + 1}</td>
                     <td>{item.subjectUnitTitle}</td>
                     <td>{item.title}</td>
                     <td>
