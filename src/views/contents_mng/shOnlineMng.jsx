@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useRecoilValue } from 'recoil'
-import { userState } from '@/states/userState'
-import useAxios from '@/hooks/useAxios'
 import { useQuery } from 'react-query'
 import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
@@ -31,8 +28,8 @@ const ShOnlineMng = () => {
     },
   })
 
-  const handlePageClick = () => {
-
+  const handlePageClick = (event) => {
+    setPageParams({ ...pageParams, currentPage: (event.selected + 1) })
   }
 
   // 단원 리스트 가져오기
@@ -76,6 +73,9 @@ const ShOnlineMng = () => {
       }),
     {
       enabled: !!subId,
+      onSuccess: (data) => {
+        setPageParams({ ...pageParams, totalPages: data.totalPages, totalElements: data.totalElements })
+      }
     },
   )
 
@@ -101,7 +101,7 @@ const ShOnlineMng = () => {
         <div className='flex items-center gap-3'>
           <div>구분:</div>
           <select
-            className="form-control w-28"
+            className='form-control w-28'
             onChange={(e) => {
               setSubId(e.target.value)
               setSubName(e.target.selectedOptions[0].innerText)

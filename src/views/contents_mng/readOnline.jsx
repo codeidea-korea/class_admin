@@ -12,24 +12,6 @@ const ReadOnline = () => {
   const api = useAxios()
   const user = useRecoilValue(userState)
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
-  // const [data, setData] = useState([
-  //   {
-  //     rowId: 1,
-  //     subject: '기타',
-  //     title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-  //     link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-  //     fileId: '',
-  //   },
-  //   { rowId: 2, subject: '융합', title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link_url: '', fileId: '478' },
-  //   {
-  //     rowId: 3,
-  //     subject: '기술',
-  //     title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-  //     link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-  //     fileId: '',
-  //   },
-  //   { rowId: 4, subject: '과학', title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link_url: '', fileId: '478' },
-  // ])
 
   const [data, setData] = useState([])
   const [pageParams, setPageParams] = useState({
@@ -46,7 +28,8 @@ const ReadOnline = () => {
   const [curTab, setCurTab] = useState('EDU_GIFTED')
 
   // 페이지네이션 클릭
-  const handlePageClick = () => {
+  const handlePageClick = (event) => {
+    setPageParams({ ...pageParams, currentPage: (event.selected + 1) })
   }
 
   const getDataList = () => {
@@ -66,7 +49,7 @@ const ReadOnline = () => {
 
   useEffect(() => {
     getDataList()
-  }, [curTab])
+  }, [curTab, pageParams.currentPage])
 
   return (<>
     <div className='flex gap-2 mt-5'>
