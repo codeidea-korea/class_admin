@@ -16,32 +16,7 @@ import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
-  const [data, setData] = useState([
-    {
-      rowId: 1,
-      subject: '융합',
-      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-      link: 'https://youtu.be/hwCFXw35ctc',
-    },
-    {
-      rowId: 2,
-      subject: '융합',
-      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-      link: 'https://youtu.be/hwCFXw35ctc',
-    },
-    {
-      rowId: 3,
-      subject: '융합',
-      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-      link: 'https://youtu.be/hwCFXw35ctc',
-    },
-    {
-      rowId: 4,
-      subject: '융합',
-      title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학',
-      link: 'https://youtu.be/hwCFXw35ctc',
-    },
-  ])
+
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
@@ -141,6 +116,8 @@ const GeOnlineMng = () => {
     refetchBasicClassSubject()
   }, [curTab, stuTab])
 
+  // console.log(subName)
+
   return (
     <>
       <div className="flex gap-2 mt-5">
@@ -179,6 +156,7 @@ const GeOnlineMng = () => {
               className="form-control w-28"
               onChange={(e) => {
                 setSubId(e.target.value)
+                setSubName(e.target.selectedOptions[0].innerText)
               }}
             >
               {basicClassSubject?.map((item) => (
@@ -206,7 +184,7 @@ const GeOnlineMng = () => {
                 과목삭제
               </button>
               <Link
-                to={`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}`}
+                to={`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}&curTab=${curTab}`}
               >
                 <button className="btn btn-sky w-24">수정</button>
               </Link>
@@ -243,31 +221,29 @@ const GeOnlineMng = () => {
             </tbody>
           </table>
           {/* <div className="mt-5 flex items-center justify-center">
-              <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
-                <nav className="w-full sm:w-auto sm:mr-auto">
-                  <ReactPaginate
-                    className={'pagination justify-center'}
-                    pageClassName={'page-item'}
-                    pageLinkClassName={'page-link'}
-                    breakLinkClassName={'page-item'}
-                    breakLabel="..."
-                    nextClassName={'page-item'}
-                    nextLinkClassName={'page-link'}
-                    nextLabel={<ChevronRight className="w-4 h-4"/>}
-                    previousClassName={'page-item'}
-                    previousLinkClassName={'page-link'}
-                    onPageChange={handlePageClick}
-                    previousLabel={<ChevronLeft className="w-4 h-4"/>}
-                    activeClassName={'page-item active'}
-                    // pageRangeDisplayed={pageParams.pageRangeDisplayed}
-                    pageRangeDisplayed = {"10"}
-                    // pageCount={pageParams.totalPages}
-                    pageCount={"3"}
-                    renderOnZeroPageCount={props => null}
-                  />
-                </nav>
-              </div>
-            </div> */}
+            <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
+              <nav className="w-full sm:w-auto sm:mr-auto">
+                <ReactPaginate
+                  className={'pagination justify-center'}
+                  pageClassName={'page-item'}
+                  pageLinkClassName={'page-link'}
+                  breakLinkClassName={'page-item'}
+                  breakLabel="..."
+                  nextClassName={'page-item'}
+                  nextLinkClassName={'page-link'}
+                  nextLabel={<ChevronRight className="w-4 h-4" />}
+                  previousClassName={'page-item'}
+                  previousLinkClassName={'page-link'}
+                  onPageChange={handlePageClick}
+                  previousLabel={<ChevronLeft className="w-4 h-4" />}
+                  activeClassName={'page-item active'}
+                  pageRangeDisplayed={pageParams.pageRangeDisplayed}
+                  pageCount={pageParams.totalPages}
+                  renderOnZeroPageCount={(props) => null}
+                />
+              </nav>
+            </div>
+          </div> */}
         </div>
       </div>
       {/* BEGIN: Modal 과목추가하기 */}

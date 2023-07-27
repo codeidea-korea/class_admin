@@ -17,26 +17,26 @@ const GeOnlineMngEdit = () => {
     },
   })
 
-  const [data, setData] = useState([])
-
   // + 버튼 클릭
   const handleAddList = () => {
-    let origin = getValues('list')
-    let copy = {}
-
-    console.log(origin)
     const addData = {
-      rowId: 0,
-      subjectUnitId: '융합',
+      row_id: 0,
+      subjectUnitId: Number(id),
       title: '',
-      link: '',
+      link_url: '',
+      delYn: 'N',
     }
-    setData([...data, addData])
+    setValue('list', [...getValues('list'), addData])
   }
+
   // 삭제
-  const deleteHandle = (rowId) => {
-    const result = data.filter((item) => item.rowId !== rowId)
-    setData(result)
+  const [delDataList, setDelDataList] = useState([])
+  const deleteHandle = (data, index) => {
+    if (data.row_id > 0) {
+      setDelDataList([...delDataList, data])
+    }
+
+    reset({ list: getValues('list').filter((i, n) => n !== index) })
   }
 
   // 리스트 가져오기
@@ -51,17 +51,74 @@ const GeOnlineMngEdit = () => {
         params: {
           subjectUnitId: id,
           page: 1,
-          limit: 10000,
+          limit: 9999,
         },
       }),
     {
-      enabled: !!id,
       onSuccess: (data) => {
         reset({ list: data.content })
       },
     },
   )
-  console.log(basicClass)
+
+  // 저장
+  const { mutate: saveData } = useMutation(
+    (data) =>
+      request.put(`/admin/content-management/geniusOnlineClass`, data),
+    {
+      onSuccess: () => {
+        alert('저장되었습니다.')
+        location.reload()
+      },
+      onError: (e) => {
+        console.log(e)
+      },
+    },
+  )
+
+  // 저장버튼
+  const handleSave = () => {
+    let rowIdList = getValues('list').map((item) =>
+      item.row_id ? item.row_id : 0,
+    )
+    let subjectUnitId = getValues('list').map((item) =>
+      item.subjectUnitId ? item.subjectUnitId : id,
+    )
+    let titleList = getValues('list').map((item) =>
+      item.title ? item.title : '',
+    )
+    let linkUrlList = getValues('list').map((item) =>
+      item.link_url ? item.link_url : '',
+    )
+    let delYnList = getValues('list').map((item) =>
+      item.delYN ? item.delYN : 'N',
+    )
+
+    delDataList.forEach((item) => {
+      rowIdList.push(item.row_id)
+      subjectUnitId.push(item.subjectUnitId)
+      titleList.push(item.title)
+      linkUrlList.push(item.link_url)
+      delYnList.push('Y')
+    })
+
+    // console.log(rowIdList)
+
+    const formData = new FormData()
+    formData.append('row_id', rowIdList.join(','))
+    formData.append('subjectUnitId', subjectUnitId.join(','))
+    formData.append('title', titleList.join(','))
+    formData.append('link_url', linkUrlList.join(','))
+    formData.append('delYN', delYnList.join(','))
+
+    formData.append(
+      'totalCount',
+      Number(getValues('list').length) + Number(delDataList.length),
+    )
+    formData.append('subjectType', searchParams.get('curTab'))
+
+    saveData(formData);
+  }
 
   return (
     <>
@@ -89,24 +146,8 @@ const GeOnlineMngEdit = () => {
             <tbody>
               {watch('list')?.map((item, index) => (
                 <tr className="text-center" key={index}>
-                  <td>
-                    {index + 1}{' '}
-                    <input
-                      type="text"
-                      className="form-control hidden"
-                      defaultValue={item.row_id}
-                      {...register(`list[${index}].row_id`)}
-                    />
-                  </td>
-                  <td>
-                    {searchParams.get('subject')}
-                    <input
-                      type="text"
-                      className="form-control hidden"
-                      defaultValue={id}
-                      {...register(`list[${index}].subjectUnitId`)}
-                    />
-                  </td>
+                  <td>{index + 1}</td>
+                  <td>{searchParams.get('subject')}</td>
                   <td>
                     <input
                       type="text"
@@ -128,7 +169,7 @@ const GeOnlineMngEdit = () => {
                   <td>
                     <button
                       className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                      onClick={() => deleteHandle(item.rowId)}
+                      onClick={() => deleteHandle(item, index)}
                     >
                       삭제
                     </button>
@@ -152,7 +193,9 @@ const GeOnlineMngEdit = () => {
               <Link to="/ge_online_mng">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
-              <button className="btn btn-sky w-24">저장하기</button>
+              <button className="btn btn-sky w-24" onClick={() => handleSave()}>
+                저장하기
+              </button>
             </div>
           </div>
         </div>
