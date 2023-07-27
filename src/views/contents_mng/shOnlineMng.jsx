@@ -37,7 +37,7 @@ const ShOnlineMng = () => {
         if (res.status === 200) {
           setData(res.data.content)
           setPageParams({ ...pageParams, totalPages: res.data.totalPages, totalElements: res.data.totalElements })
-          setListLength(Number(pageParams.totalElements) - ((pageParams.currentPage - 1) * 10))
+          setListLength(Number(res.data.totalElements) - ((pageParams.currentPage - 1) * 10))
         }
       })
       .catch((err) => {
