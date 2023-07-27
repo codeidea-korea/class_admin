@@ -12,6 +12,8 @@ const ShOnlineMngEdit = () => {
   const userLocation = useLocation()
   const queryParams = new URLSearchParams(userLocation.search)
   const curTab = queryParams.get('curTab')
+  const subName = queryParams.get('subject')
+  const subId = queryParams.get('id')
   // const [idx, setIdx] = useState(1)
   const [delDataList, setDelDataList] = useState([])
   const { getValues, setValue, watch, reset, register } = useForm({
@@ -32,9 +34,11 @@ const ShOnlineMngEdit = () => {
     refetch: refetchBasicClass,
   } = useQuery(
     'getBasicClass',
-    () => request.get(`/admin/content-management/scienceOnlineClass?subjectType=${curTab}&page=1&limit=9999`, {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
+    () => request.get(`/admin/content-management/scienceOnlineClass`, {
+      params: {
+        subjectUnitId: subId,
+        page: 1,
+        limit: 9999,
       },
     }),
     {
@@ -72,14 +76,14 @@ const ShOnlineMngEdit = () => {
   // 저장하기 버튼 클릭
   const handleSave = async () => {
     let rowIdList = getValues('list').map((item) => (item.row_id ? item.row_id : 0))
+    let subjectUnitIdList = getValues('list').map((item) => (item.subjectUnitId ? item.subjectUnitId : subId))
     let titleList = getValues('list').map((item) => (item.title ? item.title : ''))
     let linkUrlList = getValues('list').map((item) => (item.link_url ? item.link_url : ''))
     let delYnList = getValues('list').map((item) => (item.delYN ? item.delYN : 'N'))
 
-    console.log(rowIdList)
-
     delDataList.forEach((item) => {
       rowIdList.push(item.row_id)
+      subjectUnitIdList.push(item.subjectUnitId)
       titleList.push(item.title)
       linkUrlList.push(item.link_url)
       delYnList.push('Y')
@@ -87,6 +91,7 @@ const ShOnlineMngEdit = () => {
 
     const formData = new FormData()
     formData.append('row_id', rowIdList.join(','));
+    formData.append('subjectUnitId', subjectUnitIdList.join(','))
     formData.append('title', titleList.join(','));
     formData.append('link_url', linkUrlList.join(','));
     formData.append('delYN', delYnList.join(','));
@@ -101,6 +106,7 @@ const ShOnlineMngEdit = () => {
   const handleAddList = () => {
     const newSchedule = {
       row_id: 0,
+      subjectUnitId: 0,
       title: null,
       link_url: null,
       delYN: 'N',
@@ -163,6 +169,8 @@ const ShOnlineMngEdit = () => {
           과학고 영상 학습 관리
           <Lucide icon='ChevronRight' className='w-6 h-6 mx-3'></Lucide>
           {curTab === 'MATH' ? '수학' : '과학'}
+          <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
+          {subName}
         </div>
       </div>
       <div className='intro-y p-5'>

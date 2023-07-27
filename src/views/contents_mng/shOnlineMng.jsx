@@ -5,48 +5,82 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
 import useAxios from '@/hooks/useAxios'
+import { useQuery } from 'react-query'
+import request from '@/utils/request'
+import { useForm } from 'react-hook-form'
 
 const ShOnlineMng = () => {
-  const [listLength, setListLength] = useState(0)
-  const api = useAxios()
-  const user = useRecoilValue(userState)
-  // const [data, setData] = useState([
-  //   { rowId: 1, title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link: 'https://youtu.be/hwCFXw35ctc' },
-  //   { rowId: 2, title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link: 'https://youtu.be/hwCFXw35ctc' },
-  //   { rowId: 3, title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link: 'https://youtu.be/hwCFXw35ctc' },
-  //   { rowId: 4, title: '초등 수학 딱 대. 한번에 끝나는 초등 고학년 수학', link: 'https://youtu.be/hwCFXw35ctc' },
-  // ])
-  const [data, setData] = useState([])
-  const [pageParams, setPageParams] = useState({
-    totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10,
-  })
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
   // 탭 이동
   const [curTab, setCurTab] = useState('MATH')
 
-  // 페이지네이션 클릭
+  const [subId, setSubId] = useState()
+  const [subName, setSubName] = useState()
+  const [pageParams, setPageParams] = useState({
+    totalPages: 0,
+    totalElements: 0,
+    currentPage: 1,
+    pageRangeDisplayed: 10,
+  })
+
+  const { getValues, watch, reset, register } = useForm({
+    defaultValues: {
+      subjectUnit: '',
+    },
+  })
+
   const handlePageClick = () => {
+
   }
 
-  const getDataList = () => {
-    api.get(`/admin/content-management/scienceOnlineClass?subjectType=${curTab}&page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`,
-      { headers: { Authorization: `Bearer ${user.token}` } })
-      .then((res) => {
-        if (res.status === 200) {
-          setData(res.data.content)
-          setPageParams({ ...pageParams, totalPages: res.data.totalPages, totalElements: res.data.totalElements })
-          setListLength(Number(res.data.totalElements) - ((pageParams.currentPage - 1) * 10))
+  // 단원 리스트 가져오기
+  const {
+    data: basicClassSubject,
+    isLoading: isBasicClassSubject,
+    refetch: refetchBasicClassSubject,
+  } = useQuery(
+    'getBasicClassSubject',
+    () =>
+      request.get(`/admin/content-management/onlineSubjectUnit`, {
+        params: {
+          subjectType: curTab,
+          studentType: 'HIGHSCHOOL',
+        },
+      }),
+    {
+      onSuccess: (data) => {
+        if (data[0]) {
+          setSubId(data[0].row_id)
+          setSubName(data[0].title)
         }
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }
+      },
+    },
+  )
+
+  // 리스트 가져오기
+  const {
+    data: basicClass,
+    isLoading: isBasicClassm,
+    refetch: refetchBasicClass,
+  } = useQuery(
+    ['getBasicClass', subId],
+    () =>
+      request.get(`/admin/content-management/scienceOnlineClass`, {
+        params: {
+          subjectUnitId: subId,
+          page: pageParams.currentPage,
+          limit: pageParams.pageRangeDisplayed,
+        },
+      }),
+    {
+      enabled: !!subId,
+    },
+  )
 
   useEffect(() => {
-    getDataList()
+    refetchBasicClassSubject()
   }, [curTab])
 
   return (<>
@@ -65,8 +99,22 @@ const ShOnlineMng = () => {
     <div className='intro-y box mt-5 relative'>
       <div className='p-5'>
         <div className='flex items-center gap-3'>
+          <div>구분:</div>
+          <select
+            className="form-control w-28"
+            onChange={(e) => {
+              setSubId(e.target.value)
+              setSubName(e.target.selectedOptions[0].innerText)
+            }}
+          >
+            {basicClassSubject?.map((item) => (
+              <option key={item.row_id} value={item.row_id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
           <div className='flex ml-auto gap-2'>
-            <Link to={`/sh_online_mng/edit?curTab=${curTab}`}>
+            <Link to={`/sh_online_mng/edit?curTab=${curTab}&subject=${subName}&id=${subId}`}>
               <button className='btn btn-sky w-24'>수정</button>
             </Link>
           </div>
@@ -80,17 +128,19 @@ const ShOnlineMng = () => {
           </tr>
           </thead>
           <tbody>
-          {data?.length > 0 ? data?.map((item, index) => (
+          {basicClass?.content?.length > 0 ? (
+            basicClass?.content?.map((item, index) => (
               <tr className='text-center' key={index}>
-                <td>{listLength - index}</td>
+                <td>{index + 1}</td>
                 <td>{item.title}</td>
                 <td><a href={item.link_url} target='_blank'>{item.link_url}</a></td>
               </tr>
-            )) :
+            ))
+          ) : (
             <tr className='text-center'>
               <td colSpan={3}>데이터가 존재하지 않습니다.</td>
             </tr>
-          }
+          )}
           </tbody>
         </table>
         <div className='mt-5 flex items-center justify-center'>
