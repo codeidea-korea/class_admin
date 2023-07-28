@@ -1,28 +1,64 @@
-import { ClassicEditor } from '@/base-components'
-import { Link, useNavigate } from 'react-router-dom'
+import {ClassicEditor, Lucide} from '@/base-components'
+import {Link, useNavigate, useParams} from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { useMutation } from 'react-query'
+import {useMutation, useQuery} from 'react-query'
 import Loading from '@/components/loading'
 import request from '@/utils/request'
 
-function ProfitEdit() {
+function ProfitEdit({ isCreate }) {
+  const { id } = useParams()
   const navigate = useNavigate()
-  const { register, setValue, handleSubmit } = useForm()
+  const { watch, reset, register, setValue, getValues, handleSubmit } = useForm()
 
   const { mutate: createProfit, isLoading: isCreateProfit } = useMutation(
-    (data) => request.post('/admin/content-management/benefit', data),
+    (data) => {
+      if (isCreate) {
+        request.post('/admin/content-management/benefit', data)
+      } else {
+        request.put(`/admin/content-management/benefit/${id}`, data)
+      }
+    },
     {
       onSuccess: () => {
+        alert(isCreate ? '등록되었습니다.' : '수정되었습니다.');
         navigate('/profit')
       },
     },
   )
 
+  const { data: profitData, isLoading: isProfitData } = useQuery(
+    'getProfitData',
+    () => request.get(`/admin/content-management/benefit/${id}`),
+    {
+      enabled: !isCreate,
+      onSuccess: (data) => {
+        data.topYN = data.topYN === 'Y'
+        reset((prev) => ({
+          ...prev,
+          ...data,
+        }))
+      },
+    },
+  )
+
   const onSubmit = (data) => {
-    const newForm = new FormData()
+    const newForm = new FormData();
+
+    if(!isCreate) {
+      if(data.fileId > 0 && (data.fileName === '' || !data.fileName)) {
+        // 기존 파일이 있었는데 제거한 경우
+        newForm.append('savedProfileDelYN', 'Y')
+
+      }else {
+        newForm.append('savedProfileDelYN', 'N')
+      }
+    }
+
     if (data.file[0]) {
+      //신규 등록 파일이 있는 경우
       newForm.append('file', data.file[0])
     }
+
     newForm.append('title', data.title)
     newForm.append('topYN', data.topYN ? 'Y' : 'N')
     newForm.append('content', data.content)
@@ -71,11 +107,32 @@ function ProfitEdit() {
                   첨부파일
                 </div>
                 <div className="dorp_w-full w-full">
-                  <input
-                    type="file"
-                    className="form-control"
-                    {...register('file')}
-                  />
+                  {watch('fileName') ? (
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}
+                        className="underline text-blue"
+                      >
+                        {watch('fileName')}
+                      </a>
+                      <Lucide
+                        icon="X"
+                        className="w-4 h-4 text-danger cursor-pointer"
+                        onClick={() => {
+                          reset((prev) => ({
+                            ...prev,
+                            fileName: '',
+                          }))
+                        }}
+                      ></Lucide>
+                    </div>
+                  ) : (
+                    <input
+                      type="file"
+                      className="form-control"
+                      {...register('file')}
+                    />
+                  )}
                 </div>
               </div>
               <hr className="border-t border-dotted" />
@@ -84,6 +141,7 @@ function ProfitEdit() {
                   내용
                 </div>
                 <ClassicEditor
+                  value={watch('content')}
                   onChange={(value) => setValue('content', value)}
                 />
               </div>

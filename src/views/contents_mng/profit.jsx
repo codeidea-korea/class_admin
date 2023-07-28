@@ -13,6 +13,7 @@ function Profit() {
     {
       list: [],
       page: 1,
+      limit: 10,
       totalLength: 0
     },
   )
@@ -26,7 +27,7 @@ function Profit() {
       request.get('/admin/content-management/benefit', {
         params: {
           page: profit.page,
-          limit: 10,
+          limit: profit.limit
         },
       }),
     {
@@ -56,16 +57,27 @@ function Profit() {
       }),
     {
       onSuccess: () => {
-        refetchProfit()
+        alert('삭제되었습니다.');
+
+        if(profit.page > 1) {
+          setProfit({
+            page: 1
+          })
+
+        }else {
+          refetchProfit();
+        }
       },
     },
   )
 
   const handleDelete = () => {
-    const ids = profit.list.filter((item) => item.check).map((item) => item.id)
-    const formData = new FormData()
-    formData.append('ids', ids)
-    deleTeProfit(formData.get('ids'))
+    if(confirm('삭제하시겠습니까?')) {
+      const ids = profit.list.filter((item) => item.check).map((item) => item.id)
+      const formData = new FormData()
+      formData.append('ids', ids)
+      deleTeProfit(formData.get('ids'))
+    }
   }
   return (
     <>
@@ -103,7 +115,8 @@ function Profit() {
                 </tr>
               </thead>
               <tbody>
-              {profit?.list?.filter((item) => item.topYN === 'Y').map((item, index) => (
+              {profit?.list
+              .map((item, index) => (
                 <tr className="text-center" key={item.id}>
                   <td>
                     <input
@@ -128,60 +141,28 @@ function Profit() {
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      <Lucide
-                        icon="BellRing"
-                        className="w-4 h-4 text-danger"
-                      />
+                      {
+                        item.topYN === 'Y'
+                          ?
+                          <Lucide
+                            icon="BellRing"
+                            className="w-4 h-4 text-danger"
+                          />
+                          :
+                          <>{profit.totalLength - ((profit.page-1) * profit.limit) -index}</>
+                      }
                     </div>
                   </td>
                   <td>
                     <Link
                       to={`/profit/${item.id}`}
-                      className="underline text-danger text-left"
+                      className={`underline text-left ${item.topYN === 'Y' ? 'text-danger' : ''}`}
                     >
                       <div className="w-550 truncate">{item.title}</div>
                     </Link>
                   </td>
-                  <td className="text-danger">{item.writerName}</td>
-                  <td className="text-danger">{item.creDate}</td>
-                </tr>
-              ))}
-              {profit?.list?.filter((item) => item.topYN === 'N').map((item, index) => (
-                <tr className="text-center" key={item.id}>
-                  <td>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      checked={item.check}
-                      onChange={(e) => {
-                        const newList = profit.list.map((child, idx) => {
-                          if (idx === index) {
-                            return {
-                              ...child,
-                              check: e.target.checked,
-                            }
-                          }
-                          return child
-                        })
-                        setProfit({
-                          list: newList,
-                        })
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <div className="flex justify-center">{listLength - index}</div>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/profit/${item.id}`}
-                      className="underline text-primary text-left"
-                    >
-                      <div className="w-550 truncate">{item.title}</div>
-                    </Link>
-                  </td>
-                  <td>{item.writerName}</td>
-                  <td>{item.creDate}</td>
+                  <td className={item.topYN === 'Y' && 'text-danger' ? 'text-danger' : ''}>{item.writerName}</td>
+                  <td className={item.topYN === 'Y' && 'text-danger' ? 'text-danger' : ''}>{item.creDate}</td>
                 </tr>
               ))}
               </tbody>

@@ -21,6 +21,7 @@ function ProfitView() {
       }),
     {
       onSuccess: () => {
+        alert('삭제되었습니다.');
         navigate('/profit')
       },
     },
@@ -41,7 +42,11 @@ function ProfitView() {
         </div>
         <div className="intro-y p-5">
           <div className="px-8">
-            <div className="flex gap-48">
+            <div className="flex">
+              <div className="text-slate-400 font-medium w-24">제목</div>
+              <div>{profitData?.title}</div>
+            </div>
+            <div className="flex mt-5 gap-48">
               <div className="flex">
                 <div className="text-slate-400 font-medium w-24">작성자</div>
                 <div>{profitData?.writerName}</div>
@@ -50,11 +55,16 @@ function ProfitView() {
                 <div className="text-slate-400 font-medium w-24">등록일</div>
                 <div>{profitData?.creDate}</div>
               </div>
-            </div>
-
-            <div className="flex mt-5">
-              <div className="text-slate-400 font-medium w-24">제목</div>
-              <div>{profitData?.title}</div>
+              <div className="flex">
+                <div className="text-slate-400 font-medium w-24">첨부파일</div>
+                <div>
+                  {profitData?.fileId && (
+                    <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}>
+                      {profitData?.fileName}
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -62,14 +72,15 @@ function ProfitView() {
             <hr className="border-t border-dotted" />
           </div>
 
-          {profitData?.fileId && (
+          {/* 첨부파일을 등록했는데 그걸 이미지로 확정짓고 개발하는건 아닌것같음, 위에 첨부파일 항목 추가했음 */}
+          {/*{profitData?.fileId && (
             <div className="p-5">
               <img
                 src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}
                 alt=""
               />
             </div>
-          )}
+          )}*/}
 
           <div
             className="p-5"
@@ -89,7 +100,9 @@ function ProfitView() {
               <Link to="/profit">
                 <button className="btn bg-white w-24">목록</button>
               </Link>
-              <button className="btn btn-sky w-24">확인</button>
+              <Link to={`/profit/edit/${id}`}>
+                <button className="btn btn-sky w-24">수정</button>
+              </Link>
             </div>
           </div>
         </div>
