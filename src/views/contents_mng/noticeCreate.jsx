@@ -51,12 +51,12 @@ function NoticeEdit({ isCreate }) {
 
       }else {
         newForm.append('savedProfileDelYN', 'N')
-
-        if (data.file[0]) {
-          //신규 등록 파일이 있는 경우
-          newForm.append('file', data.file[0])
-        }
       }
+    }
+
+    if (data.file[0]) {
+      //신규 등록 파일이 있는 경우
+      newForm.append('file', data.file[0])
     }
 
     newForm.append('title', data.title)

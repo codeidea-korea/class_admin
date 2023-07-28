@@ -257,6 +257,15 @@ function Router() {
           path: '/profit/create',
           element: (
             <PrivateRoute
+              element={<ProfitCreate isCreate />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/profit/edit/:id',
+          element: (
+            <PrivateRoute
               element={<ProfitCreate />}
               role={['ADMIN', 'DIRECTOR']}
             />
