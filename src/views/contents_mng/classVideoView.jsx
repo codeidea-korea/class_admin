@@ -1,11 +1,12 @@
 import { Lucide, Modal, ModalBody } from '@/base-components'
-import {Link, useParams, useSearchParams} from 'react-router-dom'
+import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom'
 import {useEffect, useState} from 'react'
 import Default_img from '@/assets/images/default_image.jpg'
-import {useQuery} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import request from "@/utils/request";
 
 function ClassVideoView() {
+  const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -21,6 +22,24 @@ function ClassVideoView() {
       },
     },
   )
+
+  // 선생님 삭제
+  const { mutate: deleteTeacher, isLoading: isDeleteTeacher } = useMutation(
+    () =>
+      request.delete(`/admin/content-management/class-video-teacher/${id}`),
+    {
+      onSuccess: () => {
+        alert('삭제되었습니다.');
+        navigate('/classVideo');
+      },
+    },
+  )
+
+  const handleDeleteTeacher = () => {
+    if(confirm('선생님을 삭제하시겠습니까?')) {
+      deleteTeacher();
+    }
+  }
 
   return (
     <>
@@ -110,7 +129,7 @@ function ClassVideoView() {
             </tbody>
           </table>
           <div className="flex mt-3">
-            <button className="btn btn-outline-danger w-24">삭제</button>
+            <button onClick={handleDeleteTeacher} className="btn btn-outline-danger w-24">삭제</button>
             <div className="flex gap-2 ml-auto">
               <Link to="/classVideo">
                 <button className="btn bg-white w-24">목록</button>

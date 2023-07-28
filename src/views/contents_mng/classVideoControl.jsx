@@ -260,7 +260,12 @@ function ClassVideoForm({ isCreate }) {
   // 삭제 버튼 클릭
   const handleDeleteVideo = (idx, sId) => {
     if (confirm('삭제하시겠습니까?')) {
-      if(sId > 0) {
+      let origin = getValues('classVideoScheduleRequests');
+      origin.splice(idx,1);
+      setValue('classVideoScheduleRequests', origin);
+
+      /* 삭제 버튼 눌렀을 때 바로 API 통신하는 로직 */
+      /*if(sId > 0) {
         // sId가 있는경우 === 기존에 등록된 데이터를 삭제하는 경우
         removeSchedule(idx, sId);
 
@@ -269,7 +274,7 @@ function ClassVideoForm({ isCreate }) {
         let origin = getValues('classVideoScheduleRequests');
         origin.splice(idx,1);
         setValue('classVideoScheduleRequests', origin);
-      }
+      }*/
     }
   }
 
