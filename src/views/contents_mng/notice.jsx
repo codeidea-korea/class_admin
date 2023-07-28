@@ -13,6 +13,7 @@ function Notice() {
     {
       list: [],
       page: 1,
+      limit: 10,
       totalLength: 0
     },
   )
@@ -26,7 +27,7 @@ function Notice() {
       request.get('/admin/content-management/notice', {
         params: {
           page: notice.page,
-          limit: 10,
+          limit: notice.limit
         },
       }),
     {
@@ -56,17 +57,29 @@ function Notice() {
       }),
     {
       onSuccess: () => {
-        refetchNotice()
+        alert('삭제되었습니다.');
+
+        if(notice.page > 1) {
+          setNotice({
+            page: 1
+          })
+
+        }else {
+          refetchNotice();
+        }
       },
     },
   )
 
   const handleDelete = () => {
-    const ids = notice.list.filter((item) => item.check).map((item) => item.id)
-    const formData = new FormData()
-    formData.append('ids', ids)
-    deleteNotice(formData.get('ids'))
+    if(confirm('삭제하시겠습니까?')) {
+      const ids = notice.list.filter((item) => item.check).map((item) => item.id)
+      const formData = new FormData()
+      formData.append('ids', ids)
+      deleteNotice(formData.get('ids'))
+    }
   }
+
   return (
     <>
       <div className="intro-y box mt-5">
@@ -78,8 +91,9 @@ function Notice() {
         <div className="intro-y p-5">
           <div className="overflow-x-auto">
             {(isNoticeData || isDeleteNocie) && <Loading />}
-            <table className="table table-hover">
-              <thead>
+            { notice &&
+              <table className="table table-hover">
+                <thead>
                 <tr className="text-center bg-slate-100">
                   <td className="w-10">
                     <input
@@ -101,95 +115,61 @@ function Notice() {
                   <td>작성자</td>
                   <td>작성일</td>
                 </tr>
-              </thead>
-              <tbody>
+                </thead>
+                <tbody>
                 {notice?.list
-                  ?.filter((item) => item.topYN === 'Y')
-                  .map((item, index) => (
-                    <tr className="text-center" key={item.id}>
-                      <td>
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={item.check}
-                          onChange={(e) => {
-                            const newList = notice.list.map((child, idx) => {
-                              if (idx === index) {
-                                return {
-                                  ...child,
-                                  check: e.target.checked,
-                                }
+                .map((item, index) => (
+                  <tr className="text-center" key={item.id}>
+                    <td>
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={item.check}
+                        onChange={(e) => {
+                          const newList = notice.list.map((child, idx) => {
+                            if (idx === index) {
+                              return {
+                                ...child,
+                                check: e.target.checked,
                               }
-                              return child
-                            })
-                            setNotice({
-                              list: newList,
-                            })
-                          }}
-                        />
-                      </td>
-                      <td>
-                        <div className="flex justify-center">
-                          <Lucide
-                            icon="BellRing"
-                            className="w-4 h-4 text-danger"
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <Link
-                          to={`/notice/${item.id}`}
-                          className="underline text-left text-danger"
-                        >
-                          <div className="w-550 truncate">{item.title}</div>
-                        </Link>
-                      </td>
-                      <td className="text-danger">{item.writerName}</td>
-                      <td className="text-danger">{item.creDate}</td>
-                    </tr>
-                  ))}
-                {notice?.list
-                  ?.filter((item) => item.topYN === 'N')
-                  .map((item, index) => (
-                    <tr className="text-center" key={item.id}>
-                      <td>
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={item.check}
-                          onChange={(e) => {
-                            const newList = notice.list.map((child, idx) => {
-                              if (idx === index) {
-                                return {
-                                  ...child,
-                                  check: e.target.checked,
-                                }
-                              }
-                              return child
-                            })
-                            setNotice({
-                              list: newList,
-                            })
-                          }}
-                        />
-                      </td>
-                      <td>
-                        <div className="flex justify-center">{listLength - index}</div>
-                      </td>
-                      <td>
-                        <Link
-                          to={`/notice/${item.id}`}
-                          className="underline text-primary text-left"
-                        >
-                          <div className="w-550 truncate">{item.title}</div>
-                        </Link>
-                      </td>
-                      <td>{item.writerName}</td>
-                      <td>{item.creDate}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                            }
+                            return child
+                          })
+                          setNotice({
+                            list: newList,
+                          })
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <div className="flex justify-center">
+                        {
+                          item.topYN === 'Y'
+                            ?
+                            <Lucide
+                              icon="BellRing"
+                              className="w-4 h-4 text-danger"
+                            />
+                            :
+                            <>{notice.totalLength - ((notice.page-1) * notice.limit) -index}</>
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/notice/${item.id}`}
+                        className={`underline text-left ${item.topYN === 'Y' ? 'text-danger' : ''}`}
+                      >
+                        <div className="w-550 truncate">{item.title}</div>
+                      </Link>
+                    </td>
+                    <td className={item.topYN === 'Y' && 'text-danger' ? 'text-danger' : ''}>{item.writerName}</td>
+                    <td className={item.topYN === 'Y' && 'text-danger' ? 'text-danger' : ''}>{item.creDate}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
+            }
           </div>
           <div className="flex mt-3">
             <button

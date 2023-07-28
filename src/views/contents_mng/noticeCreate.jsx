@@ -8,7 +8,7 @@ import request from '@/utils/request'
 function NoticeEdit({ isCreate }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { watch, reset, register, setValue, handleSubmit } = useForm()
+  const { watch, reset, register, setValue, getValues, handleSubmit } = useForm()
 
   const { mutate: createNotice, isLoading: isCreateNotice } = useMutation(
     (data) => {
@@ -20,6 +20,7 @@ function NoticeEdit({ isCreate }) {
     },
     {
       onSuccess: () => {
+        alert(isCreate ? '등록되었습니다.' : '수정되었습니다.');
         navigate('/notice')
       },
     },
@@ -31,6 +32,7 @@ function NoticeEdit({ isCreate }) {
     {
       enabled: !isCreate,
       onSuccess: (data) => {
+        data.topYN = data.topYN === 'Y'
         reset((prev) => ({
           ...prev,
           ...data,
@@ -40,10 +42,24 @@ function NoticeEdit({ isCreate }) {
   )
 
   const onSubmit = (data) => {
-    const newForm = new FormData()
-    if (data.file[0]) {
-      newForm.append('file', data.file[0])
+    const newForm = new FormData();
+
+    if(!isCreate) {
+      if(data.fileId > 0 && (data.fileName === '' || !data.fileName)) {
+        // 기존 파일이 있었는데 제거한 경우
+        newForm.append('savedProfileDelYN', 'Y')
+
+      }else {
+        // 기존 파일이 있었는데 제거한 경우
+        newForm.append('savedProfileDelYN', 'N')
+
+        if (data.file[0]) {
+          //신규 등록 파일이 있는 경우
+          newForm.append('file', data.file[0])
+        }
+      }
     }
+
     newForm.append('title', data.title)
     newForm.append('topYN', data.topYN ? 'Y' : 'N')
     newForm.append('content', data.content)
@@ -92,7 +108,7 @@ function NoticeEdit({ isCreate }) {
                   첨부파일
                 </div>
                 <div className="dorp_w-full w-full">
-                  {watch('fileId') ? (
+                  {watch('fileName') ? (
                     <div className="flex items-center gap-2">
                       <a
                         href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
@@ -107,7 +123,6 @@ function NoticeEdit({ isCreate }) {
                           reset((prev) => ({
                             ...prev,
                             fileName: '',
-                            fileId: '',
                           }))
                         }}
                       ></Lucide>

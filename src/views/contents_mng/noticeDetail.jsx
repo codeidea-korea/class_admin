@@ -21,6 +21,7 @@ function NoticeView() {
       }),
     {
       onSuccess: () => {
+        alert('삭제되었습니다.');
         navigate('/notice')
       },
     },
@@ -35,13 +36,20 @@ function NoticeView() {
   return (
     <>
       <div className="intro-y box mt-5 relative">
+
         {(isNoticeData || isDeleteNotice) && <Loading />}
+
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">공지사항</div>
         </div>
+
         <div className="intro-y p-5">
           <div className="px-8">
-            <div className="flex gap-48">
+            <div className="flex">
+              <div className="text-slate-400 font-medium w-24">제목</div>
+              <div>{noticeData?.title}</div>
+            </div>
+            <div className="flex mt-5 gap-48">
               <div className="flex">
                 <div className="text-slate-400 font-medium w-24">작성자</div>
                 <div>{noticeData?.writerName}</div>
@@ -50,11 +58,16 @@ function NoticeView() {
                 <div className="text-slate-400 font-medium w-24">등록일</div>
                 <div>{noticeData?.creDate}</div>
               </div>
-            </div>
-
-            <div className="flex mt-5">
-              <div className="text-slate-400 font-medium w-24">제목</div>
-              <div>{noticeData?.title}</div>
+              <div className="flex">
+                <div className="text-slate-400 font-medium w-24">첨부파일</div>
+                <div>
+                  {noticeData?.fileId && (
+                    <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}>
+                      {noticeData?.fileName}
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -62,14 +75,15 @@ function NoticeView() {
             <hr className="border-t border-dotted" />
           </div>
 
-          {noticeData?.fileId && (
+          {/* 첨부파일을 등록했는데 그걸 이미지로 확정짓고 개발하는건 아닌것같음, 위에 첨부파일 항목 추가했음 */}
+          {/*{noticeData?.fileId && (
             <div className="p-5">
               <img
                 src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
                 alt=""
               />
             </div>
-          )}
+          )}*/}
 
           <div
             className="p-5"
