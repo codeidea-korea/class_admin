@@ -217,12 +217,12 @@ function MentoMng() {
         <Link to="/mento_mng">
           <button className="btn btn-primary w-36">자기소개서</button>
         </Link>
-        <button
+        {/* <button
           className="btn bg-white w-36"
           onClick={() => alert('준비중입니다.')}
         >
           문제은행
-        </button>
+        </button> */}
       </div>
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">

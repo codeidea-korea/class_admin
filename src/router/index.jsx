@@ -65,6 +65,10 @@ import PwChange from '../views/login/pw_change'
 import ReadOnlineEdit from '../views/contents_mng/readOnlineEdit'
 import PriorQuestion from '../views/contents_mng/PriorQuestion'
 import PriorQuestionEdit from '../views/contents_mng/PriorQuestionEdit'
+import ReviewTest from '../views/feed_mng/review_test'
+import MentoTabMng from '../views/feed_mng/mentoTabMng'
+import ReviewTestView from '../views/feed_mng/review_test_view'
+import ReviewTestEdit from '../views/feed_mng/review_test_edit'
 
 function Router() {
   const routes = [
@@ -179,6 +183,24 @@ function Router() {
           path: '/mento_mng',
           element: (
             <PrivateRoute element={<MentoMng />} role={['ADMIN', 'DIRECTOR']} />
+          ),
+        },
+        {
+          path: '/mento_mng/view/:id',
+          element: (
+            <PrivateRoute
+              element={<ReviewTestView />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/mento_mng/edit/:id',
+          element: (
+            <PrivateRoute
+              element={<ReviewTestEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
           ),
         },
 
