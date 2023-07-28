@@ -62,6 +62,9 @@ import ShOnlineMng from '../views/contents_mng/shOnlineMng'
 import ShOnlineMngEdit from '../views/contents_mng/shOnlineMngEdit'
 import ReadOnline from '../views/contents_mng/readOnline'
 import PwChange from '../views/login/pw_change'
+import ReadOnlineEdit from '../views/contents_mng/readOnlineEdit'
+import PriorQuestion from '../views/contents_mng/PriorQuestion'
+import PriorQuestionEdit from '../views/contents_mng/PriorQuestionEdit'
 
 function Router() {
   const routes = [
@@ -409,6 +412,35 @@ function Router() {
           element: (
             <PrivateRoute
               element={<ReadOnline />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/read_online/edit',
+          element: (
+            <PrivateRoute
+              element={<ReadOnlineEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 방문 면접 대비 기출 문제
+        {
+          path: '/prior_question',
+          element: (
+            <PrivateRoute
+              element={<PriorQuestion />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/prior_question/edit',
+          element: (
+            <PrivateRoute
+              element={<PriorQuestionEdit />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
