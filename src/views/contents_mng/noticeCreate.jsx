@@ -50,7 +50,6 @@ function NoticeEdit({ isCreate }) {
         newForm.append('savedProfileDelYN', 'Y')
 
       }else {
-        // 기존 파일이 있었는데 제거한 경우
         newForm.append('savedProfileDelYN', 'N')
 
         if (data.file[0]) {
