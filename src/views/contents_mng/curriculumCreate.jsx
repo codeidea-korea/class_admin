@@ -230,6 +230,7 @@ function CurriculumCreate({ isCreate }) {
                       <input
                         type="file"
                         className="form-control"
+                        accept="image/gif, image/jpeg, image/png"
                         {...register('profileId', { required: false })}
                       />
                     )}

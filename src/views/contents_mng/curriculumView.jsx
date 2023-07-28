@@ -8,20 +8,21 @@ import {
   TabPanels,
   TabPanel,
 } from '@/base-components'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom'
 import { useState } from 'react'
-import { useQuery } from 'react-query'
+import {useMutation, useQuery} from 'react-query'
 import Default_img from '@/assets/images/default_image.jpg'
 import request from '@/utils/request'
 
 function CurriCulumView() {
+  const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const [video, videoDetail] = useState(false);
   const [videoSrc, setVideoSrc] = useState('');
 
-  const { data: curriculumDetail } = useQuery(
+  const { data: curriculumDetail, refetch: curriculumRefetch } = useQuery(
     'getCurriculum',
     () => request.get(`/admin/content-management/curriculum/${id}`),
     {
@@ -33,6 +34,42 @@ function CurriCulumView() {
       }
     }
   )
+
+  // 주중 or 주말 커리큘럼 삭제
+  const { mutate: deleteCurriculum, isLoading: isDeleteCurriculum } = useMutation(
+    (type) =>
+      request.delete(`/admin/content-management/curriculum-schedule/${type}/${id}`),
+    {
+      onSuccess: () => {
+        alert('삭제되었습니다.');
+        curriculumRefetch();
+      },
+    },
+  )
+
+  // 선생님 삭제
+  const { mutate: deleteTeacher, isLoading: isDeleteTeacher } = useMutation(
+    () =>
+      request.delete(`/admin/content-management/curriculum-schedule/${id}`),
+    {
+      onSuccess: () => {
+        alert('삭제되었습니다.');
+        navigate('/curriculum');
+      },
+    },
+  )
+
+  const handleDeleteCurriculum = (type) => {
+    if(confirm((type === 'N' ? '주증' : '주말') + ' 커리큘럼을 삭제하시겠습니까?')) {
+      deleteCurriculum(type);
+    }
+  }
+
+  const handleDeleteTeacher = () => {
+    if(confirm('선생님을 삭제하시겠습니까?')) {
+      deleteTeacher();
+    }
+  }
 
   return (
     <>
@@ -93,6 +130,8 @@ function CurriCulumView() {
         </div>
         <TabPanels className="intro-y mt-5">
           <TabPanel className="leading-relaxed">
+
+
             <div className="box p-5 ">
               <table className="table table-hover">
                 <thead>
@@ -105,32 +144,39 @@ function CurriCulumView() {
                 </tr>
                 </thead>
                 <tbody>
-                {curriculumDetail?.scheduleWeeks?.map((item) => (
-                  <tr
-                    className="text-center"
-                    key={`scheduleWeeks-${item.id}`}
-                  >
-                    <td>{item.month}월</td>
-                    <td>{item.order_number}차시</td>
-                    <td>{item.textbook}</td>
-                    <td>{item.objective}</td>
-                    <td>{item.content}</td>
-                  </tr>
-                ))}
+                {
+                  curriculumDetail?.scheduleWeeks?.length > 0 ?
+                    <>
+                      {curriculumDetail?.scheduleWeeks?.map((item) => (
+                        <tr
+                          className="text-center"
+                          key={`scheduleWeeks-${item.id}`}
+                        >
+                          <td>{item.month}월</td>
+                          <td>{item.order_number}차시</td>
+                          <td>{item.textbook}</td>
+                          <td>{item.objective}</td>
+                          <td>{item.content}</td>
+                        </tr>
+                      ))}
+                    </>
+                    :
+                    <tr className="text-center">
+                      <td colSpan={5}>데이터가 존재하지 않습니다.</td>
+                    </tr>
+                }
+
                 </tbody>
               </table>
-              <div className="flex mt-3">
-                {/*<button className="btn btn-outline-danger w-24">삭제</button>*/}
-                <div className="flex gap-2 ml-auto">
-                  <Link to="/curriculum">
-                    <button className="btn bg-white w-24">목록</button>
-                  </Link>
-                  <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
-                    <button className="btn btn-sky w-24">수정하기</button>
-                  </Link>
+              {
+                curriculumDetail?.scheduleWeeks?.length > 0 &&
+                <div className="flex mt-3">
+                  <button className="btn btn-outline-danger w-48" onClick={() => handleDeleteCurriculum('N')}>주중 커리큘럼 삭제</button>
                 </div>
-              </div>
+              }
             </div>
+            
+
           </TabPanel>
           <TabPanel className="leading-relaxed">
             <div className="box p-5 ">
@@ -145,35 +191,54 @@ function CurriCulumView() {
                 </tr>
                 </thead>
                 <tbody>
-                {curriculumDetail?.scheduleWeekends?.map((item) => (
-                  <tr
-                    className="text-center"
-                    key={`scheduleWeeks-${item.id}`}
-                  >
-                    <td>{item.month}월</td>
-                    <td>{item.order_number}차시</td>
-                    <td>{item.textbook}</td>
-                    <td>{item.objective}</td>
-                    <td>{item.content}</td>
-                  </tr>
-                ))}
+                {
+                  curriculumDetail?.scheduleWeekends?.length > 0 ?
+                    <>
+                      {curriculumDetail?.scheduleWeekends?.map((item) => (
+                        <tr
+                          className="text-center"
+                          key={`scheduleWeeks-${item.id}`}
+                        >
+                          <td>{item.month}월</td>
+                          <td>{item.order_number}차시</td>
+                          <td>{item.textbook}</td>
+                          <td>{item.objective}</td>
+                          <td>{item.content}</td>
+                        </tr>
+                      ))}
+                    </>
+                    :
+                    <tr className="text-center">
+                      <td colSpan={5}>데이터가 존재하지 않습니다.</td>
+                    </tr>
+                }
+
                 </tbody>
               </table>
-              <div className="flex mt-3">
-                {/*<button className="btn btn-outline-danger w-24">삭제</button>*/}
-                <div className="flex gap-2 ml-auto">
-                  <Link to="/curriculum">
-                    <button className="btn bg-white w-24">목록</button>
-                  </Link>
-                  <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
-                    <button className="btn btn-sky w-24">수정하기</button>
-                  </Link>
+              {
+                curriculumDetail?.scheduleWeekends?.length > 0 &&
+                <div className="flex mt-3">
+                  <button className="btn btn-outline-danger w-48" onClick={() => handleDeleteCurriculum('Y')}>주말 커리큘럼 삭제</button>
                 </div>
-              </div>
+              }
             </div>
           </TabPanel>
         </TabPanels>
       </TabGroup>
+
+      <div class="box p-5 mt-5">
+        <div class="flex">
+          <div class="flex gap-2 ml-auto">
+            <Link to="/curriculum">
+              <button className="btn bg-white w-24">목록</button>
+            </Link>
+            <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
+              <button className="btn btn-sky w-24">수정하기</button>
+            </Link>
+            <button onClick={handleDeleteTeacher} className="btn btn-danger w-32">선생님 삭제</button>
+          </div>
+        </div>
+      </div>
 
       {/* BEGIN: Modal 영상보기 */}
       <Modal
