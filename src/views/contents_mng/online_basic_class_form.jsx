@@ -7,34 +7,17 @@ import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
-  let removeIndex = 0;
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const { id } = useParams()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { getValues, setValue, watch, reset, register } = useForm({
+  const [searchParams] = useSearchParams()
+  const { getValues, setValue, watch, reset, register, handleSubmit } = useForm({
     defaultValues: {
       list: [],
     },
   })
-  const [state, setState] = useReducer(
-    (state, newState) => ({ ...state, ...newState }),
-    {
-      list: [],
-    },
-  )
 
-  //파일 업로드 시 플레이스 홀더 변경
-  const [fileName, setFileName] = useState('')
-
-  const handleChange = (event) => {
-    setFileName(event.target.files[0].name)
-  }
-
-  const {
-    data: basicClass,
-    isLoading: isBasicClassm,
-    refetch: refetchBasicClass,
-  } = useQuery(
+  useQuery(
     'getBasicClass',
     () => request.get(`/admin/content-management/basic-class/${id}`),
     {
@@ -50,13 +33,100 @@ function OnlineBasicClassForm() {
     {
       onSuccess: () => {
         alert('저장되었습니다.');
-        location.reload()
+        location.reload();
+        /* 같은 페이지라서 navigate가 안먹힘 */
+        // navigate(`/online_basic_class_form/${id}?subject=${searchParams.get('subject')}`);
       },
       onError: () => {
         alert('오류가 발생하였습니다.');
       }
     },
   )
+
+  // 저장하기 버튼 클릭
+  const handleSave = async (data) => {
+    const formData = new FormData();
+
+    const null_blob = new Blob(['null'], {type: 'image/png'});
+    const null_file = new File([null_blob], 'null.png', {
+      type: 'image/png',
+    });
+
+    data.list.map((item) => {
+      formData.append('row_id', item?.row_id ?? 0);
+      formData.append('gubun', item?.gubun ?? '');
+      formData.append('unit', item?.unit ?? '');
+      formData.append('content', item?.content ?? '');
+      formData.append('link_url', item?.link_url ?? '');
+
+        if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+            formData.append('savedFileDelYN', 'Y');
+            formData.append('file', item.file[0]);
+
+          }else { // 새로 등록할 파일이 없으면
+            if(item.fileName) { // 기존 파일을 유지하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'N');
+            }else { // 기존 파일을 삭제하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'Y');
+            }
+          }
+
+        }else { // 기존에 등록된 파일이 없으면
+          formData.append('savedFileDelYN', 'N');
+
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+            formData.append('file', item.file[0]);
+          }else {
+            formData.append('file', null_file);
+          }
+        }
+    })
+
+    saveBasicClass(formData)
+  }
+
+  // + 버튼 클릭
+  const handleAdd = () => {
+    /*
+    * 기존에 하던 방식대로 setValue 하면 파일 객체들이 복사가 안되고 사라짐
+    * 대충 원인은 알겠으나 해결 방법을 모르겠음
+    * 그냥 첫번째 객체 복사하고 시켜서 추가하는 방법으로 대체했음..
+    */
+
+    let origin = getValues('list');
+    let copy = {};
+
+    for(let key in origin[0]) {
+      copy[key] = origin[0][key];
+    }
+
+    copy['row_id'] = 0;
+    copy['fileId'] = 0;
+    copy['fileName'] = '';
+    copy['file'] = new DataTransfer().files;
+    copy['gubun'] = '';
+    copy['unit'] = '';
+    copy['content'] = '';
+    copy['link_url'] = '';
+
+    origin.push(copy);
+    setValue('list',origin);
+  }
+
+  // 삭제 버튼 클릭
+  const handleRemove = (idx, pk) => {
+    if (confirm('삭제하시겠습니까?')) {
+      let origin = getValues('list');
+      origin.splice(idx, 1);
+      setValue('list', origin);
+    }
+  }
+
+  /* 삭제 기존 소스 */
+  /*let removeIndex = 0;
 
   // 삭제
   const { mutate: removeBasicClass } = useMutation(
@@ -75,86 +145,8 @@ function OnlineBasicClassForm() {
     },
   )
 
-  // 저장하기 버튼 클릭
-  const handleSave = async () => {
-    const formData = new FormData()
-    formData.append(
-      'row_id',
-      getValues('list')
-      .map((item) => (item.row_id ? item.row_id : 0))
-      .join(','),
-    )
-    formData.append(
-      'gubun',
-      getValues('list')
-      .map((item) => (item.gubun ? item.gubun : 'null'))
-      .join(','),
-    )
-    formData.append(
-      'unit',
-      getValues('list')
-      .map((item) => (item.unit ? item.unit : 'null'))
-      .join(','),
-    )
-    formData.append(
-      'content',
-      getValues('list')
-      .map((item) => (item.content ? item.content : 'null'))
-      .join(','),
-    )
-    formData.append(
-      'link_url',
-      getValues('list')
-      .map((item) => (item.link_url ? item.link_url : 'null'))
-      .join(','),
-    )
-
-    const null_blob = new Blob(['null'], {type: 'image/png'})
-    const null_file = new File([null_blob], 'null.png', {
-      type: 'image/png',
-    })
-    const newFileDelYN = []
-
-    getValues('list').map((item) => {
-      if (item.file && item.file.length) {
-        formData.append('file', item.file[0])
-
-        if (item.fileId) {
-          newFileDelYN.push('Y')
-        } else {
-          newFileDelYN.push('N')
-        }
-
-      } else {
-        formData.append('file', null_file)
-        newFileDelYN.push('N')
-      }
-    })
-
-    formData.append('savedFileDelYN', newFileDelYN.join(','))
-    saveBasicClass(formData)
-  }
-
-  // + 버튼 클릭
-  const handleAddList = () => {
-    const newSchedule = {
-      row_id: 0,
-      gubun: null,
-      unit: null,
-      content: null,
-      link_url: null,
-      file: [],
-      fileId: null,
-      savedFileDelYN: 'N',
-    }
-    setValue('list', [
-      ...getValues('list'),
-      newSchedule
-    ])
-  }
-
   // 삭제 버튼 클릭
-  const handleRemove = (pk,idx) => {
+  const handleRemove = (idx, pk) => {
     if(pk && pk > 0) {
       // 기존 데이터 삭제
       if(confirm('삭제하시겠습니까?')) {
@@ -166,10 +158,10 @@ function OnlineBasicClassForm() {
         list: getValues('list').filter((_, i) => i !== idx),
       });
     }
-  }
+  }*/
 
   return (
-    <>
+    <form onSubmit={handleSubmit(handleSave)}>
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium flex items-center">
@@ -198,7 +190,7 @@ function OnlineBasicClassForm() {
                       type="text"
                       className="form-control"
                       defaultValue={item.gubun}
-                      {...register(`list[${index}].gubun`)}
+                      {...register(`list.${index}.gubun`)}
                     />
                   </td>
                   <td>
@@ -206,7 +198,7 @@ function OnlineBasicClassForm() {
                       type="text"
                       className="form-control"
                       defaultValue={item.unit}
-                      {...register(`list[${index}].unit`)}
+                      {...register(`list.${index}.unit`)}
                     />
                   </td>
                   <td>
@@ -214,7 +206,7 @@ function OnlineBasicClassForm() {
                       type="text"
                       className="form-control"
                       defaultValue={item.content}
-                      {...register(`list[${index}].content`)}
+                      {...register(`list.${index}.content`)}
                     />
                   </td>
                   <td>
@@ -222,11 +214,57 @@ function OnlineBasicClassForm() {
                       type="text"
                       className="form-control"
                       defaultValue={item.link_url}
-                      {...register(`list[${index}].link_url`)}
+                      {...register(`list.${index}.link_url`)}
                     />
                   </td>
                   <td>
-                    {item.fileName ? (
+                    <div className="input-group">
+                      {watch(`list.${index}.fileName`) ? (
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`${baseUrl}/v1/contents-data/file-download/${watch('profileId')}`}
+                            className="underline text-blue"
+                          >
+                            {watch(`list.${index}.fileName`)}
+                          </a>
+                          <Lucide
+                            icon="X"
+                            className="w-4 h-4 text-danger cursor-pointer"
+                            onClick={() => {
+                              let list = getValues('list');
+                              list[index].fileName = '';
+
+                              setValue('list', list);
+                            }}
+                          ></Lucide>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            type="file"
+                            className="dp_none"
+                            id={`file-upload-${index}`}
+                            {...register(
+                              `list.${index}.file`,
+                            )}
+                          />
+                          <label htmlFor={`file-upload-${index}`} className="flex items-center">
+                            <input
+                              type="text"
+                              className="form-control file_up bg-white"
+                              placeholder=""
+                              value={item?.file?.length > 0 ? item?.file[0]?.name : ''}
+                              readOnly
+                            />
+                            <div className="input-group-text whitespace-nowrap file_up_btn">
+                              찾기
+                            </div>
+                          </label>
+                        </>
+                      )}
+                    </div>
+
+                    {/*{item.fileName ? (
                       <a
                         href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
                         className="cursor-pointer text-blue underline"
@@ -237,11 +275,22 @@ function OnlineBasicClassForm() {
                       <input
                         type="file"
                         className="form-control"
-                        {...register(`list[${index}].file`)}
+                        {...register(`list.${index}.file`)}
                       />
-                    )}
+                    )}*/}
                   </td>
                   <td>
+                    {index !== 0 && (
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                        onClick={() => handleRemove(index,item?.row_id)}
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </td>
+                  {/*<td>
                     {index > 0 &&
                       <button
                         className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
@@ -250,14 +299,15 @@ function OnlineBasicClassForm() {
                         삭제
                       </button>
                     }
-                  </td>
+                  </td>*/}
                 </tr>
               ))}
               <tr>
                 <td colSpan={8} className="text-center">
                   <button
+                    type="button"
                     className="btn btn-outline-primary border-dotted"
-                    onClick={() => handleAddList()}
+                    onClick={() => handleAdd()}
                   >
                     <Lucide icon="Plus" className="w-4 h-4"></Lucide>
                   </button>
@@ -270,14 +320,14 @@ function OnlineBasicClassForm() {
               <Link to="/online_basic_class">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
-              <button className="btn btn-sky w-24" onClick={() => handleSave()}>
+              <button className="btn btn-sky w-24">
                 저장하기
               </button>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </form>
   )
 }
 

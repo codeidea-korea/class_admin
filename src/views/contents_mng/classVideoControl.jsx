@@ -499,17 +499,17 @@ function ClassVideoForm({ isCreate }) {
                     )}
                   </div>
                 </td>
-                  <td>
-                    {index !== 0 && (
-                    <button
-                      type="button"
-                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                      onClick={() => handleDeleteVideo(index,item?.row_id)}
-                    >
-                      삭제
-                    </button>
-                    )}
-                  </td>
+                <td>
+                  {index !== 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                    onClick={() => handleDeleteVideo(index,item?.row_id)}
+                  >
+                    삭제
+                  </button>
+                  )}
+                </td>
               </tr>
             ))}
             <tr>

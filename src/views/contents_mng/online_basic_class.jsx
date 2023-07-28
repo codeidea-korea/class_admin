@@ -15,6 +15,7 @@ import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+  const [curTab, setCurTab] = useState('영재원');
 
   // 비디오 영상 모달
   const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -38,7 +39,7 @@ function OnlinebasicClass() {
     isLoading: isBasicClassSubject,
     refetch: refetchBasicClassSubject,
   } = useQuery(
-    'getBasicClassSubject',
+    ['getBasicClassSubject', curTab],
     () =>
       request.get(`/admin/content-management/basic-class-subject`, {
         params: {
@@ -56,10 +57,6 @@ function OnlinebasicClass() {
         }
 
         setState({ id: id, subject: subject })
-
-        /*if (data[0]) {
-          setState({ id: data[0].id, subject: data[0].subject })
-        }*/
       },
     },
   )
@@ -82,12 +79,15 @@ function OnlinebasicClass() {
     (data) =>
       request.post(`/admin/content-management/basic-class-subject`, data),
     {
-      onSuccess: () => {
-        refetchBasicClassSubject()
-        setState({
-          isSubject: false,
-        })
+      onSuccess: (res) => {
         alert('추가되었습니다.')
+        refetchBasicClassSubject().then(() => {
+          setState({
+            id: res.row_id,
+            subject: res.subject,
+            isSubject: false
+          })
+        })
       },
     },
   )
@@ -99,17 +99,10 @@ function OnlinebasicClass() {
         request.delete(`/admin/content-management/basic-class-subject/${id}`),
       {
         onSuccess: () => {
-          refetchBasicClassSubject()
-          alert('삭제되었습니다.')
+          refetchBasicClassSubject().then(() => alert('삭제되었습니다.'))
         },
       },
     )
-
-  const [curTab, setCurTab] = useState('영재원');
-
-  useEffect(() => {
-    refetchBasicClassSubject();
-  }, [curTab]);
 
   return (
     <>
@@ -133,6 +126,7 @@ function OnlinebasicClass() {
                   ).subject,
                 })
               }}
+              value={state.id}
             >
               {basicClassSubject?.map((item) => (
                 <option value={item.id} key={item.id}>
@@ -211,18 +205,15 @@ function OnlinebasicClass() {
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      <a href="#" onClick={
-                        () => {
-                          item.fileId
-                            ? (location.href = `${baseUrl}/v1/contents-data/file-download/${item.fileId}`)
-                            : (alert('학습자료가 존재하지 않습니다.'))
-                        }
-                      }>
-                        <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
-                          <Lucide icon="File" className="w-4 h-4"></Lucide>
-                          학습자료
-                        </button>
-                      </a>
+                      {
+                        item?.fileId > 0 &&
+                          <a href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}>
+                            <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
+                              <Lucide icon="File" className="w-4 h-4"></Lucide>
+                              학습자료
+                            </button>
+                          </a>
+                      }
                     </div>
                   </td>
                 </tr>
