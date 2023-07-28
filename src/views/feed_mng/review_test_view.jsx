@@ -1,21 +1,5 @@
-import {
-  Lucide,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-} from '@/base-components'
-import React, { useState, useReducer } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import useAxios from '@/hooks/useAxios'
-import { useRecoilValue } from 'recoil'
-import { userState } from '@/states/userState'
-import { userSchoolYear } from '@/components/helpers'
-import { useQuery, useMutation } from 'react-query'
-import request from '@/utils/request'
-import Loading from '@/components/loading'
-import ReviewTest from './review_test'
-import MentoMng from './mentor_mng'
 
 const ReviewTestView = () => {
   return (

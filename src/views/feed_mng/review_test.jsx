@@ -5,13 +5,8 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useReducer, useEffect } from 'react'
+import React, { useState, useReducer } from 'react'
 import { Link } from 'react-router-dom'
-import useAxios from '@/hooks/useAxios'
-import { useRecoilValue } from 'recoil'
-import { userState } from '@/states/userState'
-import { userSchoolYear } from '@/components/helpers'
-import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 

@@ -1,21 +1,6 @@
-import {
-  Lucide,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-} from '@/base-components'
-import React, { useState, useReducer } from 'react'
+import { Lucide } from '@/base-components'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import useAxios from '@/hooks/useAxios'
-import { useRecoilValue } from 'recoil'
-import { userState } from '@/states/userState'
-import { userSchoolYear } from '@/components/helpers'
-import { useQuery, useMutation } from 'react-query'
-import request from '@/utils/request'
-import Loading from '@/components/loading'
-import ReviewTest from './review_test'
-import MentoMng from './mentor_mng'
 
 const ReviewTestEdit = () => {
   const [data, setData] = useState([
@@ -28,6 +13,28 @@ const ReviewTestEdit = () => {
       student_answer_link: '',
       answerYN: 'Y',
       answer_fileId: '232',
+      grade: '',
+    },
+    {
+      subject: '화학',
+      teacher: '최철호',
+      content: '물질의 성질',
+      date: '2023-07-28',
+      student_answerYN: 'Y',
+      student_answer_link: '',
+      answerYN: 'N',
+      answer_fileId: '',
+      grade: '',
+    },
+    {
+      subject: '화학',
+      teacher: '최철호',
+      content: '물질의 성질',
+      date: '2023-07-28',
+      student_answerYN: 'N',
+      student_answer_link: '',
+      answerYN: 'N',
+      answer_fileId: '',
       grade: '',
     },
   ])
@@ -100,7 +107,7 @@ const ReviewTestEdit = () => {
                   </td>
                   <td>
                     {item.answerYN == 'Y' ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                         <a
                           href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.answer_fileId}`}
                           className="cursor-pointer text-blue underline"
@@ -113,50 +120,43 @@ const ReviewTestEdit = () => {
                         ></Lucide>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <a
-                          href=""
-                          className="cursor-pointer text-blue underline"
+                      <div className="input-group justify-center">
+                        <input
+                          type="file"
+                          className="dp_none"
+                          id={`file-upload-${index}`}
+                        />
+                        <label
+                          htmlFor={`file-upload-${index}`}
+                          className="flex items-center"
                         >
-                          답안 확인하기
-                        </a>
-                        <Lucide
-                          icon="X"
-                          className="w-4 h-4 text-danger cursor-pointer"
-                        ></Lucide>
+                          <input
+                            type="text"
+                            className="form-control file_up bg-white"
+                            placeholder=""
+                            readOnly
+                          />
+                          <div className="input-group-text whitespace-nowrap file_up_btn">
+                            찾기
+                          </div>
+                        </label>
                       </div>
                     )}
                   </td>
                   <td>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      defaultValue=""
-                      placeholder="PASS or FAIL "
-                    />
+                    {item.student_answerYN == 'Y' ? (
+                      <input
+                        type="text"
+                        className="form-control text-center"
+                        defaultValue=""
+                        placeholder="PASS or FAIL "
+                      />
+                    ) : (
+                      '미채점'
+                    )}
                   </td>
                 </tr>
               ))}
-              <tr className="text-center">
-                <td>1</td>
-                <td>화학</td>
-                <td>최철호 선생님</td>
-                <td>물질의 성질</td>
-                <td>YYYY-MM-DD</td>
-                <td>미제출</td>
-                <td>-</td>
-                <td>Fail</td>
-              </tr>
-              <tr className="text-center">
-                <td>1</td>
-                <td>화학</td>
-                <td>최철호 선생님</td>
-                <td>물질의 성질</td>
-                <td>YYYY-MM-DD</td>
-                <td>미제출</td>
-                <td>-</td>
-                <td>미채점</td>
-              </tr>
               <tr>
                 <td colSpan={8} className="text-center">
                   <button
