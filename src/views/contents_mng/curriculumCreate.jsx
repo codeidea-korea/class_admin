@@ -398,6 +398,7 @@ function CurriculumCreate({ isCreate }) {
                       <td>
                         {index >= 0 &&
                           <button
+                            type="button"
                             className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
                             onClick={() => handleDeleteVideo(index, item, 'week')}
                           >
@@ -503,6 +504,7 @@ function CurriculumCreate({ isCreate }) {
                       <td>
                         {index >= 0 &&
                           <button
+                            type="button"
                             className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
                             onClick={() => handleDeleteVideo(index, item, 'weekend')}
                           >
@@ -539,7 +541,7 @@ function CurriculumCreate({ isCreate }) {
                 isCreate ? (
                   <button className="btn btn-sky w-24">추가하기</button>
                 ) : (
-                  <button className="btn btn-sky w-24">수정하기</button>
+                  <button type="submit" className="btn btn-sky w-24">수정하기</button>
                 )
               }
             </div>
