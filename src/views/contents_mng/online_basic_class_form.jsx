@@ -11,6 +11,7 @@ function OnlineBasicClassForm() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const [delDataList, setDelDataList] = useState([])
   const { getValues, setValue, watch, reset, register, handleSubmit } = useForm({
     defaultValues: {
       list: [],
@@ -52,12 +53,47 @@ function OnlineBasicClassForm() {
       type: 'image/png',
     });
 
+    delDataList.map((item) => {
+      formData.append('row_id', item?.row_id ?? 0);
+      formData.append('gubun', item?.gubun ?? '');
+      formData.append('unit', item?.unit ?? '');
+      formData.append('content', item?.content ?? '');
+      formData.append('link_url', item?.link_url ?? '');
+      formData.append('delYN', 'Y');
+
+      if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('savedFileDelYN', 'Y');
+          formData.append('file', item.file[0]);
+
+        }else { // 새로 등록할 파일이 없으면
+          if(item.fileName) { // 기존 파일을 유지하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'N');
+          }else { // 기존 파일을 삭제하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'Y');
+          }
+        }
+
+      }else { // 기존에 등록된 파일이 없으면
+        formData.append('savedFileDelYN', 'N');
+
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('file', item.file[0]);
+        }else {
+          formData.append('file', null_file);
+        }
+      }
+    })
+
     data.list.map((item) => {
       formData.append('row_id', item?.row_id ?? 0);
       formData.append('gubun', item?.gubun ?? '');
       formData.append('unit', item?.unit ?? '');
       formData.append('content', item?.content ?? '');
       formData.append('link_url', item?.link_url ?? '');
+      formData.append('delYN', 'N');
 
         if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
           if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
@@ -117,11 +153,13 @@ function OnlineBasicClassForm() {
   }
 
   // 삭제 버튼 클릭
-  const handleRemove = (idx, pk) => {
+  const handleRemove = (idx, item) => {
     if (confirm('삭제하시겠습니까?')) {
       let origin = getValues('list');
       origin.splice(idx, 1);
       setValue('list', origin);
+
+      setDelDataList([...delDataList, item])
     }
   }
 
@@ -280,11 +318,11 @@ function OnlineBasicClassForm() {
                     )}*/}
                   </td>
                   <td>
-                    {index !== 0 && (
+                    {index >= 0 && (
                       <button
                         type="button"
                         className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                        onClick={() => handleRemove(index,item?.row_id)}
+                        onClick={() => handleRemove(index,item)}
                       >
                         삭제
                       </button>
