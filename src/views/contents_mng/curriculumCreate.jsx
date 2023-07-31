@@ -120,23 +120,23 @@ function CurriculumCreate({ isCreate }) {
 
     // 주중 수업 삭제
     delDataWeekList.map((item) => {
-      formData.append('week_id', item.id ?? 0)
-      formData.append('week_month', item.month)
-      formData.append('week_order_number', item.order_number)
-      formData.append('week_textbook', item.textbook)
-      formData.append('week_objective', item.objective)
-      formData.append('week_content', item.content)
+      formData.append('week_id', item.id)
+      formData.append('week_month', '')
+      formData.append('week_order_number', '')
+      formData.append('week_textbook', '')
+      formData.append('week_objective', '')
+      formData.append('week_content', '')
       formData.append('week_delYN', 'Y')
     })
 
     // 주말 수업 삭제
     delDataWeekendList.map((item) => {
-      formData.append('weekend_id', item.id ?? 0)
-      formData.append('weekend_month', item.month)
-      formData.append('weekend_order_number', item.order_number)
-      formData.append('weekend_textbook', item.textbook)
-      formData.append('weekend_objective', item.objective)
-      formData.append('weekend_content', item.content)
+      formData.append('weekend_id', item.id)
+      formData.append('weekend_month', '')
+      formData.append('weekend_order_number', '')
+      formData.append('weekend_textbook', '')
+      formData.append('weekend_objective', '')
+      formData.append('weekend_content', '')
       formData.append('weekend_delYN', 'Y')
     })
 

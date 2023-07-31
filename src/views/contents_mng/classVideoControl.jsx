@@ -147,55 +147,23 @@ function ClassVideoForm({ isCreate }) {
       }
     }
 
-    delDataList.forEach((item) => {
-      formData.append('order_number', item.order_number);
-      formData.append('gubun', item.gubun);
-      formData.append('cdate', item.cdate);
-      formData.append('unit', item.unit);
-      formData.append('content', item.content);
-      formData.append('link_url', item.link_url);
-      formData.append('delYN', 'Y');
-
-      // 수정이면
-      if(!isCreate) {
-        formData.append('row_id', item?.row_id > 0 ? item.row_id : 0);
+    // 수정할때 삭제시킬 데이터 셋팅
+    if(!isCreate) {
+      delDataList.forEach((item) => {
+        formData.append('row_id', item?.row_id);
         formData.append('target_id', id);
+        formData.append('savedFileDelYN', '');
+        formData.append('file', null_file);
 
-        if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
-          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-            formData.append('savedFileDelYN', 'Y');
-            formData.append('file', item.file[0]);
-
-          }else { // 새로 등록할 파일이 없으면
-            if(item.fileName) { // 기존 파일을 유지하는 경우
-              formData.append('file', null_file);
-              formData.append('savedFileDelYN', 'N');
-            }else { // 기존 파일을 삭제하는 경우
-              formData.append('file', null_file);
-              formData.append('savedFileDelYN', 'Y');
-            }
-          }
-
-        }else { // 기존에 등록된 파일이 없으면
-          formData.append('savedFileDelYN', 'N');
-
-          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-            formData.append('file', item.file[0]);
-          }else {
-            formData.append('file', null_file);
-          }
-        }
-
-        // 등록이면
-      }else {
-        if (item.file && item.file.length) {
-          formData.append('file', item.file[0]);
-
-        }else {
-          formData.append('file', null_file);
-        }
-      }
-    });
+        formData.append('order_number', '');
+        formData.append('gubun', '');
+        formData.append('cdate', '');
+        formData.append('unit', '');
+        formData.append('content', '');
+        formData.append('link_url', '');
+        formData.append('delYN', 'Y');
+      });
+    }
 
     // 상세 정보
     data.classVideoScheduleRequests.map((item) => {

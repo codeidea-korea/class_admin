@@ -75,7 +75,8 @@ const ShOnlineMngEdit = () => {
     let rowIdList = [], subjectUnitIdList = [], titleList = [], linkUrlList = [], delYnList = [];
 
     getValues('list').map((item) => {
-      console.log(item)
+      if(!temp) return;
+
       // 제목, 링크는 필수값
       if(!item?.title) {
         alert('제목을 입력하세요.');
@@ -95,11 +96,13 @@ const ShOnlineMngEdit = () => {
       delYnList.push(item.delYN ? item.delYN : 'N');
     })
 
+    if(!temp) return;
+
     delDataList.forEach((item) => {
       rowIdList.push(item.row_id)
       subjectUnitIdList.push(item.subjectUnitId)
-      titleList.push(item.title)
-      linkUrlList.push(item.link_url)
+      titleList.push('')
+      linkUrlList.push('')
       delYnList.push('Y')
     });
 

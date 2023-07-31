@@ -47,19 +47,31 @@ function OnlineBasicClassForm() {
   // 저장하기 버튼 클릭
   const handleSave = async (data) => {
     const formData = new FormData();
-
     const null_blob = new Blob(['null'], {type: 'image/png'});
     const null_file = new File([null_blob], 'null.png', {
       type: 'image/png',
     });
 
+    // 삭제할 데이터 리스트 셋팅
     delDataList.map((item) => {
+      formData.append('row_id', item?.row_id);
+      formData.append('gubun', '');
+      formData.append('unit', '');
+      formData.append('content', '');
+      formData.append('link_url', '');
+      formData.append('delYN', 'Y');
+
+      formData.append('file', null_file);
+      formData.append('savedFileDelYN', '');
+    })
+
+    data.list.map((item) => {
       formData.append('row_id', item?.row_id ?? 0);
       formData.append('gubun', item?.gubun ?? '');
       formData.append('unit', item?.unit ?? '');
       formData.append('content', item?.content ?? '');
       formData.append('link_url', item?.link_url ?? '');
-      formData.append('delYN', 'Y');
+      formData.append('delYN', 'N');
 
       if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
         if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
@@ -85,40 +97,6 @@ function OnlineBasicClassForm() {
           formData.append('file', null_file);
         }
       }
-    })
-
-    data.list.map((item) => {
-      formData.append('row_id', item?.row_id ?? 0);
-      formData.append('gubun', item?.gubun ?? '');
-      formData.append('unit', item?.unit ?? '');
-      formData.append('content', item?.content ?? '');
-      formData.append('link_url', item?.link_url ?? '');
-      formData.append('delYN', 'N');
-
-        if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
-          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-            formData.append('savedFileDelYN', 'Y');
-            formData.append('file', item.file[0]);
-
-          }else { // 새로 등록할 파일이 없으면
-            if(item.fileName) { // 기존 파일을 유지하는 경우
-              formData.append('file', null_file);
-              formData.append('savedFileDelYN', 'N');
-            }else { // 기존 파일을 삭제하는 경우
-              formData.append('file', null_file);
-              formData.append('savedFileDelYN', 'Y');
-            }
-          }
-
-        }else { // 기존에 등록된 파일이 없으면
-          formData.append('savedFileDelYN', 'N');
-
-          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-            formData.append('file', item.file[0]);
-          }else {
-            formData.append('file', null_file);
-          }
-        }
     })
 
     saveBasicClass(formData)

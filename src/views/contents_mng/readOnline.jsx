@@ -16,7 +16,7 @@ const ReadOnline = () => {
 
   const [data, setData] = useState([])
   const [pageParams, setPageParams] = useState({
-    totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10,
+    totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 99,
   })
 
   // 비디오 영상 모달
@@ -130,7 +130,7 @@ const ReadOnline = () => {
           ))}
           </tbody>
         </table>
-        <div className='mt-5 flex items-center justify-center'>
+        {/*<div className='mt-5 flex items-center justify-center'>
           <div className='intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center'>
             <nav className='w-full sm:w-auto sm:mr-auto'>
               <ReactPaginate
@@ -153,7 +153,7 @@ const ReadOnline = () => {
               />
             </nav>
           </div>
-        </div>
+        </div>*/}
       </div>
 
       {/* BEGIN: Modal 영상보기 */}

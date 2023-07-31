@@ -111,15 +111,16 @@ const GeOnlineMngEdit = () => {
       delYnList.push(item.delYN ? item.delYN : 'N');
     })
 
+    if(!temp) return;
+
+    // 삭제할 데이터 리스트 셋팅
     delDataList.forEach((item) => {
       rowIdList.push(item.row_id)
       subjectUnitIdList.push(item.subjectUnitId)
-      titleList.push(item.title)
-      linkUrlList.push(item.link_url)
+      titleList.push('')
+      linkUrlList.push('')
       delYnList.push('Y')
     })
-
-    if(!temp) return;
 
     const formData = new FormData()
     formData.append('row_id', rowIdList.length > 1 ? rowIdList.join(',') : rowIdList)

@@ -73,21 +73,60 @@ const ReadOnlineEdit = () => {
 
   // 저장하기 버튼 클릭
   const handleSave = async () => {
-    let idList = getValues('list').map((item) => (item.id ? item.id : 0))
+    if(getValues('list')?.length === 0) {
+      alert('저장할 데이터를 입력하세요.');
+      return;
+    }
+
+    /* 파일 */
+    const null_blob = new Blob(['null'], { type: 'image/png' })
+    const null_file = new File([null_blob], 'null.png', {
+      type: 'image/png',
+    })
+
+    let temp = true;
+    let idList = [], subjectNameList = [], titleList = [], videoList = [], delYnList = [];
+
+    getValues('list').map((item) => {
+      if(!temp) return;
+
+      // 제목, 링크는 필수값
+      if(!item?.title) {
+        alert('제목을 입력하세요.');
+        temp = false;
+        return temp;
+      }
+      if(!item?.video) {
+        alert('링크를 입력하세요.');
+        temp = false;
+        return temp;
+      }
+
+      idList.push(item.id ? item.id : 0);
+      subjectNameList.push(item.subjectName ? item.subjectName : '');
+      titleList.push(item.title ? item.title : '');
+      videoList.push(item.video ? item.video : '');
+      delYnList.push(item.delYN ? item.delYN : 'N');
+    })
+
+    if(!temp) return;
+
+    /*let idList = getValues('list').map((item) => (item.id ? item.id : 0))
     let subjectNameList = getValues('list').map((item) => (item.subjectName ? item.subjectName : ''))
     let titleList = getValues('list').map((item) => (item.title ? item.title : ''))
     let videoList = getValues('list').map((item) => (item.video ? item.video : ''))
-    let delYnList = getValues('list').map((item) => (item.delYN ? item.delYN : 'N'))
+    let delYnList = getValues('list').map((item) => (item.delYN ? item.delYN : 'N'))*/
+
+    const formData = new FormData();
 
     delDataList.forEach((item) => {
       idList.push(item.id)
-      subjectNameList.push(item.subjectName)
-      titleList.push(item.title)
-      videoList.push(item.video)
+      subjectNameList.push('')
+      titleList.push('')
+      videoList.push('')
       delYnList.push('Y')
     })
 
-    const formData = new FormData()
     formData.append('id', idList.join(','))
     formData.append('subjectName', subjectNameList.join(','))
     formData.append('title', titleList.join(','))
@@ -96,12 +135,6 @@ const ReadOnlineEdit = () => {
 
     formData.append('totalCount', Number(getValues('list').length) + Number(delDataList.length))
     formData.append('divideType', curTab)
-
-    /* 파일 */
-    const null_blob = new Blob(['null'], { type: 'image/png' })
-    const null_file = new File([null_blob], 'null.png', {
-      type: 'image/png',
-    })
 
     const newFileDelYN = []
 
