@@ -69,6 +69,7 @@ import ReviewTest from '../views/feed_mng/review_test'
 import MentoTabMng from '../views/feed_mng/mentoTabMng'
 import ReviewTestView from '../views/feed_mng/review_test_view'
 import ReviewTestEdit from '../views/feed_mng/review_test_edit'
+import FeedTabMng from '../views/feed_mng/feedTabMng'
 
 function Router() {
   const routes = [
@@ -165,7 +166,7 @@ function Router() {
           path: '/feed_mng',
           element: (
             <PrivateRoute
-              element={<FeedMng />}
+              element={<FeedTabMng />}
               role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
@@ -182,7 +183,10 @@ function Router() {
         {
           path: '/mento_mng',
           element: (
-            <PrivateRoute element={<MentoMng />} role={['ADMIN', 'DIRECTOR']} />
+            <PrivateRoute
+              element={<MentoTabMng />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
           ),
         },
         {
@@ -190,7 +194,7 @@ function Router() {
           element: (
             <PrivateRoute
               element={<ReviewTestView />}
-              role={['ADMIN', 'DIRECTOR']}
+              role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
         },
@@ -199,7 +203,7 @@ function Router() {
           element: (
             <PrivateRoute
               element={<ReviewTestEdit />}
-              role={['ADMIN', 'DIRECTOR']}
+              role={['ADMIN', 'DIRECTOR', 'TEACHER']}
             />
           ),
         },

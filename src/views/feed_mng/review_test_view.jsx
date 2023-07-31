@@ -1,30 +1,40 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { userState } from '@/states/userState'
+import { useRecoilValue } from 'recoil'
 
 const ReviewTestView = () => {
+  const user = useRecoilValue(userState)
   return (
     <React.Fragment>
       <div className="flex gap-2 mt-5">
-        <Link to="/mento_mng" className="btn bg-white w-36">
-          자기소개서
-        </Link>
-        <button
-          className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
-        >
-          문제은행
-        </button>
-        <Link to="/mento_mng?review" className="btn btn-primary w-36">
-          복습테스트
-        </Link>
+        {user.authority == 'TEACHER' ? (
+          <>
+            <Link to="/feed_mng" className="btn bg-white w-36">
+              자기소개서
+            </Link>
+            <Link to="/feed_mng?review" className="btn btn-primary w-36">
+              복습테스트
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/mento_mng" className="btn bg-white w-36">
+              자기소개서
+            </Link>
+            <Link to="/mento_mng?review" className="btn btn-primary w-36">
+              복습테스트
+            </Link>
+          </>
+        )}
       </div>
 
       <div className="intro-y box mt-5 p-5">
         <div className="flex justify-between gap-2">
           <div>
-            <div className="font-medium">담당선생님 : 최철호 선생님</div>
+            <div className="font-medium">담당 선생님 : 최철호 선생님</div>
             <div className="flex items-center gap-2 font-medium">
-              담당학생 : ghdrlfehd
+              담당 학생 : ghdrlfehd
             </div>
           </div>
           <div>
@@ -51,7 +61,7 @@ const ReviewTestView = () => {
                 <td>화학</td>
                 <td>최철호 선생님</td>
                 <td>물질의 성질</td>
-                <td>YYYY-MM-DD</td>
+                <td>YYYY.MM.DD</td>
                 <td>
                   <a href="" className="underline" download>
                     제출
@@ -69,7 +79,7 @@ const ReviewTestView = () => {
                 <td>화학</td>
                 <td>최철호 선생님</td>
                 <td>물질의 성질</td>
-                <td>YYYY-MM-DD</td>
+                <td>YYYY.MM.DD</td>
                 <td>미제출</td>
                 <td>-</td>
                 <td>Fail</td>
@@ -79,7 +89,7 @@ const ReviewTestView = () => {
                 <td>화학</td>
                 <td>최철호 선생님</td>
                 <td>물질의 성질</td>
-                <td>YYYY-MM-DD</td>
+                <td>YYYY.MM.DD</td>
                 <td>미제출</td>
                 <td>-</td>
                 <td>미채점</td>

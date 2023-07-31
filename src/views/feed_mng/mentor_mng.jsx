@@ -213,7 +213,7 @@ function MentoMng() {
 
   return (
     <React.Fragment>
-      <div className="flex gap-2 mt-5">
+      {/* <div className="flex gap-2 mt-5">
         <Link to="/mento_mng">
           <button className="btn btn-primary w-36">자기소개서</button>
         </Link>
@@ -223,7 +223,7 @@ function MentoMng() {
         >
           복습테스트
         </button>
-      </div>
+      </div> */}
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="ml-auto">

@@ -16,8 +16,9 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 import ReviewTest from './review_test'
 import MentoMng from './mentor_mng'
+import FeedMng from './feed_mng'
 
-const MentoTabMng = () => {
+const FeedTabMng = () => {
   const url = useLocation().search
   const [tab, setTab] = useState('자기소개서')
 
@@ -52,9 +53,9 @@ const MentoTabMng = () => {
         </button>
       </div>
 
-      {tab == '자기소개서' && <MentoMng />}
+      {tab == '자기소개서' && <FeedMng />}
       {tab == '복습테스트' && <ReviewTest />}
     </React.Fragment>
   )
 }
-export default MentoTabMng
+export default FeedTabMng
