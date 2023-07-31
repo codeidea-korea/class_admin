@@ -169,7 +169,7 @@ const PriorQuestionEdit = () => {
                     />
                   </td>
                   <td>
-                    {index > 0 && (
+                    {index >= 0 && (
                       <button
                         className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
                         onClick={() => deleteHandle(item.rowId)}
