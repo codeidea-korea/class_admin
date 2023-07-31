@@ -7,7 +7,7 @@ import {
   TabPanel,
 } from '@/base-components'
 import { Link } from 'react-router-dom'
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { useQuery, useMutation } from 'react-query'
 import {useForm, useWatch} from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -20,6 +20,8 @@ function CurriculumCreate({ isCreate }) {
   const navigate = useNavigate()
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [delDataWeekList, setDelDataWeekList] = useState([])
+  const [delDataWeekendList, setDelDataWeekendList] = useState([])
   const [isOgFile, setIsOgFile] = useState(false);
   const { register, watch, getValues, setValue, reset, resetField, handleSubmit } = useForm(
     {
@@ -117,6 +119,28 @@ function CurriculumCreate({ isCreate }) {
       }
     }
 
+    // 주중 수업 삭제
+    delDataWeekList.map((item) => {
+      formData.append('week_id', item.id ?? 0)
+      formData.append('week_month', item.month)
+      formData.append('week_order_number', item.order_number)
+      formData.append('week_textbook', item.textbook)
+      formData.append('week_objective', item.objective)
+      formData.append('week_content', item.content)
+      formData.append('week_delYN', 'Y')
+    })
+
+    // 주말 수업 삭제
+    delDataWeekendList.map((item) => {
+      formData.append('weekend_id', item.id ?? 0)
+      formData.append('weekend_month', item.month)
+      formData.append('weekend_order_number', item.order_number)
+      formData.append('weekend_textbook', item.textbook)
+      formData.append('weekend_objective', item.objective)
+      formData.append('weekend_content', item.content)
+      formData.append('weekend_delYN', 'Y')
+    })
+
     // 주중 수업 상세 커리큘럼
     data.scheduleWeeks.map((item) => {
       formData.append('week_id', item.id ?? 0)
@@ -125,6 +149,7 @@ function CurriculumCreate({ isCreate }) {
       formData.append('week_textbook', item.textbook)
       formData.append('week_objective', item.objective)
       formData.append('week_content', item.content)
+      formData.append('week_delYN', 'N')
     })
 
     // 주말 수업 상세 커리큘럼
@@ -135,6 +160,7 @@ function CurriculumCreate({ isCreate }) {
       formData.append('weekend_textbook', item.textbook)
       formData.append('weekend_objective', item.objective)
       formData.append('weekend_content', item.content)
+      formData.append('weekend_delYN', 'N')
     })
 
     createCurriculum(formData)
@@ -157,6 +183,25 @@ function CurriculumCreate({ isCreate }) {
 
     if(type === 'scheduleWeekends') {
       // resetField('scheduleWeekends', { keepError: true })
+    }
+  }
+
+  // 삭제 버튼 클릭
+  const handleDeleteVideo = (idx, item, flagStr) => {
+    if (confirm('삭제하시겠습니까?')) {
+      if(flagStr === 'week') {
+        let origin = getValues('scheduleWeeks');
+        origin.splice(idx,1);
+        setValue('scheduleWeeks', origin);
+
+        setDelDataWeekList([...delDataWeekList, item])
+      } else {
+        let origin = getValues('scheduleWeekends');
+        origin.splice(idx,1);
+        setValue('scheduleWeekends', origin);
+
+        setDelDataWeekendList([...delDataWeekendList, item])
+      }
     }
   }
 
@@ -280,6 +325,7 @@ function CurriculumCreate({ isCreate }) {
                     <td>교재</td>
                     <td>학습목표</td>
                     <td>학습 단원 및 내용</td>
+                    <td>삭제</td>
                   </tr>
                   </thead>
                   <tbody>
@@ -349,6 +395,16 @@ function CurriculumCreate({ isCreate }) {
                           )}
                         />
                       </td>
+                      <td>
+                        {index >= 0 &&
+                          <button
+                            className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
+                            onClick={() => handleDeleteVideo(index, item, 'week')}
+                          >
+                            삭제
+                          </button>
+                        }
+                      </td>
                     </tr>
                   ))}
                   <tr>
@@ -374,6 +430,7 @@ function CurriculumCreate({ isCreate }) {
                     <td>교재</td>
                     <td>학습목표</td>
                     <td>학습 단원 및 내용</td>
+                    <td>삭제</td>
                   </tr>
                   </thead>
                   <tbody>
@@ -442,6 +499,16 @@ function CurriculumCreate({ isCreate }) {
                             `scheduleWeekends.${index}.content`,{ required: true }
                           )}
                         />
+                      </td>
+                      <td>
+                        {index >= 0 &&
+                          <button
+                            className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
+                            onClick={() => handleDeleteVideo(index, item, 'weekend')}
+                          >
+                            삭제
+                          </button>
+                        }
                       </td>
                     </tr>
                   ))}
