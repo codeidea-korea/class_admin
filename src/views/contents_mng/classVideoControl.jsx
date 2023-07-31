@@ -18,6 +18,7 @@ function ClassVideoForm({ isCreate }) {
   const api = useAxios();
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [delDataList, setDelDataList] = useState([])
   const [isOgFile, setIsOgFile] = useState(false);
   const { register, watch, getValues, setValue, reset, handleSubmit } = useForm(
     {
@@ -146,6 +147,56 @@ function ClassVideoForm({ isCreate }) {
       }
     }
 
+    delDataList.forEach((item) => {
+      formData.append('order_number', item.order_number);
+      formData.append('gubun', item.gubun);
+      formData.append('cdate', item.cdate);
+      formData.append('unit', item.unit);
+      formData.append('content', item.content);
+      formData.append('link_url', item.link_url);
+      formData.append('delYN', 'Y');
+
+      // 수정이면
+      if(!isCreate) {
+        formData.append('row_id', item?.row_id > 0 ? item.row_id : 0);
+        formData.append('target_id', id);
+
+        if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+            formData.append('savedFileDelYN', 'Y');
+            formData.append('file', item.file[0]);
+
+          }else { // 새로 등록할 파일이 없으면
+            if(item.fileName) { // 기존 파일을 유지하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'N');
+            }else { // 기존 파일을 삭제하는 경우
+              formData.append('file', null_file);
+              formData.append('savedFileDelYN', 'Y');
+            }
+          }
+
+        }else { // 기존에 등록된 파일이 없으면
+          formData.append('savedFileDelYN', 'N');
+
+          if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+            formData.append('file', item.file[0]);
+          }else {
+            formData.append('file', null_file);
+          }
+        }
+
+        // 등록이면
+      }else {
+        if (item.file && item.file.length) {
+          formData.append('file', item.file[0]);
+
+        }else {
+          formData.append('file', null_file);
+        }
+      }
+    });
+
     // 상세 정보
     data.classVideoScheduleRequests.map((item) => {
       formData.append('order_number', item.order_number);
@@ -154,6 +205,7 @@ function ClassVideoForm({ isCreate }) {
       formData.append('unit', item.unit);
       formData.append('content', item.content);
       formData.append('link_url', item.link_url);
+      formData.append('delYN', 'N');
 
       // 수정이면
       if(!isCreate) {
@@ -258,12 +310,13 @@ function ClassVideoForm({ isCreate }) {
   }
 
   // 삭제 버튼 클릭
-  const handleDeleteVideo = (idx, sId) => {
+  const handleDeleteVideo = (idx, item) => {
     if (confirm('삭제하시겠습니까?')) {
       let origin = getValues('classVideoScheduleRequests');
       origin.splice(idx,1);
       setValue('classVideoScheduleRequests', origin);
 
+      setDelDataList([...delDataList, item])
       /* 삭제 버튼 눌렀을 때 바로 API 통신하는 로직 */
       /*if(sId > 0) {
         // sId가 있는경우 === 기존에 등록된 데이터를 삭제하는 경우
@@ -504,7 +557,7 @@ function ClassVideoForm({ isCreate }) {
                   <button
                     type="button"
                     className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                    onClick={() => handleDeleteVideo(index,item?.row_id)}
+                    onClick={() => handleDeleteVideo(index,item)}
                   >
                     삭제
                   </button>
