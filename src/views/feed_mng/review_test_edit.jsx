@@ -79,8 +79,7 @@ const ReviewTestEdit = () => {
       questionYN: 'N',
       question_fildId: '',
     }
-    setData([addData, ...data])
-    setValue('list', [addData, ...data])
+    setValue('list', [addData, ...getValues('list')])
   }
   return (
     <React.Fragment>
@@ -176,6 +175,9 @@ const ReviewTestEdit = () => {
                             value={
                               item?.file?.length > 0 ? item?.file[0]?.name : ''
                             }
+                            key={
+                              item?.file?.length > 0 ? item?.file[0]?.name : ''
+                            }
                             readOnly
                           />
                           <div className="input-group-text whitespace-nowrap file_up_btn">
@@ -226,6 +228,11 @@ const ReviewTestEdit = () => {
                             className="form-control file_up bg-white"
                             placeholder=""
                             value={
+                              item?.answerFile?.length > 0
+                                ? item?.answerFile[0]?.name
+                                : ''
+                            }
+                            key={
                               item?.answerFile?.length > 0
                                 ? item?.answerFile[0]?.name
                                 : ''
