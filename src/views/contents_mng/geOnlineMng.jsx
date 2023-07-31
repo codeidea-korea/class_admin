@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
-import { Link } from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMutation, useQuery } from 'react-query'
@@ -9,7 +9,8 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
-  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
+  const navigate = useNavigate();
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
 
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
@@ -24,7 +25,7 @@ const GeOnlineMng = () => {
     totalPages: 0,
     totalElements: 0,
     currentPage: 1,
-    pageRangeDisplayed: 10,
+    pageRangeDisplayed: 9999,
   })
 
   const { getValues, watch, reset, register } = useForm({
@@ -44,7 +45,7 @@ const GeOnlineMng = () => {
     isLoading: isBasicClassSubject,
     refetch: refetchBasicClassSubject,
   } = useQuery(
-    'getBasicClassSubject',
+    ['getBasicClassSubject',curTab,stuTab],
     () =>
       request.get(`/admin/content-management/onlineSubjectUnit`, {
         params: {
@@ -57,6 +58,9 @@ const GeOnlineMng = () => {
         if (data[0]) {
           setSubId(data[0].row_id)
           setSubName(data[0].title)
+        }else {
+          setSubId(0)
+          refetchBasicClass()
         }
       },
     },
@@ -65,7 +69,7 @@ const GeOnlineMng = () => {
   // 리스트 가져오기
   const {
     data: basicClass,
-    isLoading: isBasicClassm,
+    isLoading: isBasicClass,
     refetch: refetchBasicClass,
   } = useQuery(
     ['getBasicClass', subId],
@@ -114,11 +118,13 @@ const GeOnlineMng = () => {
       },
     )
 
-  useEffect(() => {
-    refetchBasicClassSubject()
-  }, [curTab, stuTab])
-
-  // console.log(subName)
+  const goEdit = () => {
+    if(subId > 0) {
+      navigate(`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}&curTab=${curTab}`);
+    }else {
+      alert('과목을 추가해주세요.');
+    }
+  }
 
   return (
     <>
@@ -127,7 +133,10 @@ const GeOnlineMng = () => {
           className={
             'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')
           }
-          onClick={() => setCurTab('MATH')}
+          onClick={() => {
+            setStuTab('ELEMENTARY');
+            setCurTab('MATH');
+          }}
         >
           수학
         </button>
@@ -135,13 +144,17 @@ const GeOnlineMng = () => {
           className={
             'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')
           }
-          onClick={() => setCurTab('SCIENCE')}
+          onClick={() => {
+            setStuTab('ELEMENTARY');
+            setCurTab('SCIENCE');
+          }}
         >
           과학
         </button>
       </div>
       <div className='intro-y box mt-5 relative'>
-        {(isBasicClassSubject || isBasicClassm) && <Loading />}
+        {(isBasicClassSubject || isBasicClass) && <Loading />}
+
         <div className='p-5'>
           <div className='flex items-center gap-3'>
             <div>구분:</div>
@@ -150,16 +163,18 @@ const GeOnlineMng = () => {
               onChange={(e) => {
                 setStuTab(e.target.value)
               }}
+              value={stuTab}
             >
               <option value='ELEMENTARY'>초등학생</option>
               <option value='MIDDLE'>중학생</option>
             </select>
             <select
-              className='form-control w-28'
+              className='form-control w-40'
               onChange={(e) => {
                 setSubId(e.target.value)
                 setSubName(e.target.selectedOptions[0].innerText)
               }}
+              value={subId}
             >
               {basicClassSubject?.map((item) => (
                 <option key={item.row_id} value={item.row_id}>
@@ -185,11 +200,9 @@ const GeOnlineMng = () => {
               >
                 과목삭제
               </button>
-              <Link
-                to={`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}&curTab=${curTab}`}
-              >
+              <a href={'#none'} onClick={goEdit}>
                 <button className='btn btn-sky w-24'>수정</button>
-              </Link>
+              </a>
             </div>
           </div>
           <table className='table table-hover mt-5'>
@@ -222,7 +235,7 @@ const GeOnlineMng = () => {
             )}
             </tbody>
           </table>
-          <div className='mt-5 flex items-center justify-center'>
+          {/*<div className='mt-5 flex items-center justify-center'>
             <div className='intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center'>
               <nav className='w-full sm:w-auto sm:mr-auto'>
                 <ReactPaginate
@@ -245,7 +258,7 @@ const GeOnlineMng = () => {
                 />
               </nav>
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
       {/* BEGIN: Modal 과목추가하기 */}
@@ -281,11 +294,15 @@ const GeOnlineMng = () => {
             type='button'
             className='btn btn-sky w-24'
             onClick={() => {
-              addClassSubject({
-                title: getValues('subjectUnit'),
-                subjectType: curTab,
-                studentType: stuTab,
-              })
+              if(getValues('subjectUnit')) {
+                addClassSubject({
+                  title: getValues('subjectUnit'),
+                  subjectType: curTab,
+                  studentType: stuTab,
+                })
+              }else {
+                alert('과목을 입력하세요.');
+              }
             }}
           >
             확인

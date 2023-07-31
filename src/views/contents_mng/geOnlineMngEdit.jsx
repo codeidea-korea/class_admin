@@ -32,11 +32,13 @@ const GeOnlineMngEdit = () => {
   // 삭제
   const [delDataList, setDelDataList] = useState([])
   const deleteHandle = (data, index) => {
-    if (data.row_id > 0) {
-      setDelDataList([...delDataList, data])
-    }
+    if(confirm('삭제하시겠습니까?')) {
+      if (data.row_id > 0) {
+        setDelDataList([...delDataList, data])
+      }
 
-    reset({ list: getValues('list').filter((i, n) => n !== index) })
+      reset({ list: getValues('list').filter((i, n) => n !== index) })
+    }
   }
 
   // 리스트 가져오기
@@ -78,38 +80,53 @@ const GeOnlineMngEdit = () => {
 
   // 저장버튼
   const handleSave = () => {
-    let rowIdList = getValues('list').map((item) =>
-      item.row_id ? item.row_id : 0,
-    )
-    let subjectUnitId = getValues('list').map((item) =>
-      item.subjectUnitId ? item.subjectUnitId : id,
-    )
-    let titleList = getValues('list').map((item) =>
-      item.title ? item.title : '',
-    )
-    let linkUrlList = getValues('list').map((item) =>
-      item.link_url ? item.link_url : '',
-    )
-    let delYnList = getValues('list').map((item) =>
-      item.delYN ? item.delYN : 'N',
-    )
+    if(getValues('list')?.length === 0) {
+      alert('저장할 데이터를 입력하세요.');
+      return;
+    }
+
+    let temp = true;
+    let rowIdList = [], subjectUnitIdList = [], titleList = [], linkUrlList = [], delYnList = [];
+
+    getValues('list').map((item) => {
+      if(!temp) return;
+
+      // 제목, 링크는 필수값
+      if(!item?.title) {
+        alert('제목을 입력하세요.');
+        temp = false;
+        return temp;
+      }
+
+      if(!item?.link_url) {
+        alert('링크를 입력하세요.');
+        temp = false;
+        return temp;
+      }
+
+      rowIdList.push(item.row_id ? item.row_id : 0);
+      subjectUnitIdList.push(id);
+      titleList.push(item.title ? item.title : '');
+      linkUrlList.push(item.link_url ? item.link_url : '');
+      delYnList.push(item.delYN ? item.delYN : 'N');
+    })
 
     delDataList.forEach((item) => {
       rowIdList.push(item.row_id)
-      subjectUnitId.push(item.subjectUnitId)
+      subjectUnitIdList.push(item.subjectUnitId)
       titleList.push(item.title)
       linkUrlList.push(item.link_url)
       delYnList.push('Y')
     })
 
-    // console.log(rowIdList)
+    if(!temp) return;
 
     const formData = new FormData()
-    formData.append('row_id', rowIdList.join(','))
-    formData.append('subjectUnitId', subjectUnitId.join(','))
-    formData.append('title', titleList.join(','))
-    formData.append('link_url', linkUrlList.join(','))
-    formData.append('delYN', delYnList.join(','))
+    formData.append('row_id', rowIdList.length > 1 ? rowIdList.join(',') : rowIdList)
+    formData.append('subjectUnitId', subjectUnitIdList.length > 1 ?  subjectUnitIdList.join(',') : subjectUnitIdList)
+    formData.append('title', titleList.length > 1 ? titleList.join(',') : titleList)
+    formData.append('link_url', linkUrlList.length > 1 ? linkUrlList.join(',') : linkUrlList)
+    formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
 
     formData.append(
       'totalCount',
@@ -135,57 +152,57 @@ const GeOnlineMngEdit = () => {
         <div className="intro-y p-5">
           <table className="table table-hover">
             <thead>
-              <tr className="bg-slate-100 text-center">
-                <td>번호</td>
-                <td>과목</td>
-                <td>제목</td>
-                <td>링크</td>
-                <td>삭제</td>
-              </tr>
+            <tr className="bg-slate-100 text-center">
+              <td>번호</td>
+              <td>과목</td>
+              <td>제목</td>
+              <td>링크</td>
+              <td>삭제</td>
+            </tr>
             </thead>
             <tbody>
-              {watch('list')?.map((item, index) => (
-                <tr className="text-center" key={index}>
-                  <td>{index + 1}</td>
-                  <td>{searchParams.get('subject')}</td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      defaultValue={item.title}
-                      key={item.title}
-                      {...register(`list[${index}].title`)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      defaultValue={item.link_url}
-                      key={item.link_url}
-                      {...register(`list[${index}].link_url`)}
-                    />
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                      onClick={() => deleteHandle(item, index)}
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              <tr>
-                <td colSpan={5} className="text-center">
+            {watch('list')?.map((item, index) => (
+              <tr className="text-center" key={index}>
+                <td>{index + 1}</td>
+                <td>{searchParams.get('subject')}</td>
+                <td>
+                  <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={item.title}
+                    key={item.title}
+                    {...register(`list[${index}].title`)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={item.link_url}
+                    key={item.link_url}
+                    {...register(`list[${index}].link_url`)}
+                  />
+                </td>
+                <td>
                   <button
-                    className="btn btn-outline-primary border-dotted"
-                    onClick={() => handleAddList()}
+                    className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                    onClick={() => deleteHandle(item, index)}
                   >
-                    <Lucide icon="Plus" className="w-4 h-4"></Lucide>
+                    삭제
                   </button>
                 </td>
               </tr>
+            ))}
+            <tr>
+              <td colSpan={5} className="text-center">
+                <button
+                  className="btn btn-outline-primary border-dotted"
+                  onClick={() => handleAddList()}
+                >
+                  <Lucide icon="Plus" className="w-4 h-4"></Lucide>
+                </button>
+              </td>
+            </tr>
             </tbody>
           </table>
           <div className="flex mt-3 justify-center">

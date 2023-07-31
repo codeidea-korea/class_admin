@@ -6,6 +6,7 @@ import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
+import Loading from "@/components/loading";
 
 const ShOnlineMng = () => {
   // 과목추가 모달
@@ -20,7 +21,7 @@ const ShOnlineMng = () => {
     totalPages: 0,
     totalElements: 0,
     currentPage: 1,
-    pageRangeDisplayed: 10,
+    pageRangeDisplayed: 9999,
   })
 
   const { getValues, watch, reset, register } = useForm({
@@ -33,13 +34,13 @@ const ShOnlineMng = () => {
     setPageParams({ ...pageParams, currentPage: (event.selected + 1) })
   }
 
-  // 단원 리스트 가져오기
+  // 구분 리스트 가져오기
   const {
     data: basicClassSubject,
     isLoading: isBasicClassSubject,
     refetch: refetchBasicClassSubject,
   } = useQuery(
-    'getBasicClassSubject',
+    ['getBasicClassSubject', curTab],
     () =>
       request.get(`/admin/content-management/onlineSubjectUnit`, {
         params: {
@@ -57,10 +58,10 @@ const ShOnlineMng = () => {
     },
   )
 
-  // 리스트 가져오기
+  // 세부내용 리스트 가져오기
   const {
     data: basicClass,
-    isLoading: isBasicClassm,
+    isLoading: isBasicClass,
     refetch: refetchBasicClass,
   } = useQuery(
     ['getBasicClass', subId],
@@ -109,111 +110,112 @@ const ShOnlineMng = () => {
       },
     )
 
-  useEffect(() => {
-    refetchBasicClassSubject()
-  }, [curTab, pageParams])
-
-  return (<>
-    <div className='flex gap-2 mt-5'>
-      <button className={'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')}
-              onClick={() => {
-                setCurTab('MATH')
-              }}>수학
-      </button>
-      <button className={'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')}
-              onClick={() => {
-                setCurTab('SCIENCE')
-              }}>과학
-      </button>
-    </div>
-    <div className='intro-y box mt-5 relative'>
-      <div className='p-5'>
-        <div className='flex items-center gap-3'>
-          <div>구분:</div>
-          <select
-            className='form-control w-28'
-            onChange={(e) => {
-              setSubId(e.target.value)
-              setSubName(e.target.selectedOptions[0].innerText)
-            }}
-          >
-            {basicClassSubject?.map((item) => (
-              <option key={item.row_id} value={item.row_id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
-          <button
-            className='btn btn-outline-primary border-dotted'
-            onClick={() => setSubject(true)}
-          >
-            <Lucide icon='Plus' className='w-4 h-4'></Lucide>
-          </button>
-          <div className='flex ml-auto gap-2'>
-            <button
-              className='btn btn-danger w-24'
-              onClick={() => {
-                if (confirm('과목을 삭제하시겠습니까?')) {
-                  deleteClassSubject(subId)
-                }
-              }}
-            >
-              과목삭제
-            </button>
-            <Link to={`/sh_online_mng/edit?curTab=${curTab}&subject=${subName}&id=${subId}`}>
-              <button className='btn btn-sky w-24'>수정</button>
-            </Link>
-          </div>
-        </div>
-        <table className='table table-hover mt-5'>
-          <thead>
-          <tr className='bg-slate-100 text-center'>
-            <td>번호</td>
-            <td>제목</td>
-            <td>링크</td>
-          </tr>
-          </thead>
-          <tbody>
-          {basicClass?.content?.length > 0 ? (
-            basicClass?.content?.map((item, index) => (
-              <tr className='text-center' key={index}>
-                <td>{index + 1}</td>
-                <td>{item.title}</td>
-                <td><a href={item.link_url} target='_blank'>{item.link_url}</a></td>
-              </tr>
-            ))
-          ) : (
-            <tr className='text-center'>
-              <td colSpan={3}>데이터가 존재하지 않습니다.</td>
-            </tr>
-          )}
-          </tbody>
-        </table>
-        <div className='mt-5 flex items-center justify-center'>
-          <div className='intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center'>
-            <nav className='w-full sm:w-auto sm:mr-auto'>
-              <ReactPaginate
-                className={'pagination justify-center'}
-                pageClassName={'page-item'}
-                pageLinkClassName={'page-link'}
-                breakLinkClassName={'page-item'}
-                breakLabel='...'
-                nextClassName={'page-item'}
-                nextLinkClassName={'page-link'}
-                nextLabel={<ChevronRight className='w-4 h-4' />}
-                previousClassName={'page-item'}
-                previousLinkClassName={'page-link'}
-                onPageChange={handlePageClick}
-                previousLabel={<ChevronLeft className='w-4 h-4' />}
-                activeClassName={'page-item active'}
-                pageRangeDisplayed={pageParams.pageRangeDisplayed}
-                pageCount={pageParams.totalPages}
-                renderOnZeroPageCount={props => null}
-              />
-            </nav>
-          </div>
-        </div>
+  return (
+    <>
+      <div className='flex gap-2 mt-5'>
+        <button className={'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')}
+                onClick={() => {
+                  setCurTab('MATH')
+                }}>수학
+        </button>
+        <button className={'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')}
+                onClick={() => {
+                  setCurTab('SCIENCE')
+                }}>과학
+        </button>
       </div>
+    <div className='intro-y box mt-5 relative'>
+      {
+        (isBasicClassSubject || isBasicClass) ? <Loading /> :
+          <div className='p-5'>
+            <div className='flex items-center gap-3'>
+              <div>구분:</div>
+              <select
+                className='form-control w-40'
+                onChange={(e) => {
+                  setSubId(e.target.value)
+                  setSubName(e.target.selectedOptions[0].innerText)
+                }}
+                value={subId}
+              >
+                {basicClassSubject?.map((item) => (
+                  <option key={item.row_id} value={item.row_id}>
+                    {item.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                className='btn btn-outline-primary border-dotted'
+                onClick={() => setSubject(true)}
+              >
+                <Lucide icon='Plus' className='w-4 h-4'></Lucide>
+              </button>
+              <div className='flex ml-auto gap-2'>
+                <button
+                  className='btn btn-danger w-24'
+                  onClick={() => {
+                    if (confirm('과목을 삭제하시겠습니까?')) {
+                      deleteClassSubject(subId)
+                    }
+                  }}
+                >
+                  과목삭제
+                </button>
+                <Link to={`/sh_online_mng/edit?curTab=${curTab}&subject=${subName}&id=${subId}`}>
+                  <button className='btn btn-sky w-24'>수정</button>
+                </Link>
+              </div>
+            </div>
+            <table className='table table-hover mt-5'>
+              <thead>
+              <tr className='bg-slate-100 text-center'>
+                <td>번호</td>
+                <td>제목</td>
+                <td>링크</td>
+              </tr>
+              </thead>
+              <tbody>
+              {basicClass?.content?.length > 0 ? (
+                basicClass?.content?.map((item, index) => (
+                  <tr className='text-center' key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.title}</td>
+                    <td><a href={item.link_url} target='_blank'>{item.link_url}</a></td>
+                  </tr>
+                ))
+              ) : (
+                <tr className='text-center'>
+                  <td colSpan={3}>데이터가 존재하지 않습니다.</td>
+                </tr>
+              )}
+              </tbody>
+            </table>
+            {/*<div className='mt-5 flex items-center justify-center'>
+              <div className='intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center'>
+                <nav className='w-full sm:w-auto sm:mr-auto'>
+                  <ReactPaginate
+                    className={'pagination justify-center'}
+                    pageClassName={'page-item'}
+                    pageLinkClassName={'page-link'}
+                    breakLinkClassName={'page-item'}
+                    breakLabel='...'
+                    nextClassName={'page-item'}
+                    nextLinkClassName={'page-link'}
+                    nextLabel={<ChevronRight className='w-4 h-4' />}
+                    previousClassName={'page-item'}
+                    previousLinkClassName={'page-link'}
+                    onPageChange={handlePageClick}
+                    previousLabel={<ChevronLeft className='w-4 h-4' />}
+                    activeClassName={'page-item active'}
+                    pageRangeDisplayed={pageParams.pageRangeDisplayed}
+                    pageCount={pageParams.totalPages}
+                    renderOnZeroPageCount={props => null}
+                  />
+                </nav>
+              </div>
+            </div>*/}
+          </div>
+      }
     </div>
     {/* BEGIN: Modal 과목추가하기 */}
     <Modal show={subject} onHidden={() => setSubject(false)}>
@@ -248,11 +250,15 @@ const ShOnlineMng = () => {
           type='button'
           className='btn btn-sky w-24'
           onClick={() => {
-            addClassSubject({
-              title: getValues('subjectUnit'),
-              subjectType: curTab,
-              studentType: 'HIGHSCHOOL',
-            })
+            if(getValues('subjectUnit')) {
+              addClassSubject({
+                title: getValues('subjectUnit'),
+                subjectType: curTab,
+                studentType: 'HIGHSCHOOL',
+              })
+            }else {
+              alert('과목을 입력하세요.');
+            }
           }}
         >
           확인
