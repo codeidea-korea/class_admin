@@ -74,9 +74,8 @@ function CurriculumCreate({ isCreate }) {
     },
     {
       onSuccess: (data) => {
-        setTimeout(function() {
-          navigate('/curriculum')
-        },500)
+        alert(isCreate ? '등록되었습니다.' : '수정되었습니다.');
+        navigate('/curriculum');
       },
     },
   )
@@ -195,6 +194,7 @@ function CurriculumCreate({ isCreate }) {
         setValue('scheduleWeeks', origin);
 
         setDelDataWeekList([...delDataWeekList, item])
+
       } else {
         let origin = getValues('scheduleWeekends');
         origin.splice(idx,1);
@@ -409,7 +409,7 @@ function CurriculumCreate({ isCreate }) {
                     </tr>
                   ))}
                   <tr>
-                    <td colSpan={5} className="text-center">
+                    <td colSpan={6} className="text-center">
                       <button
                         className="btn btn-outline-primary border-dotted"
                         type="button"
@@ -515,7 +515,7 @@ function CurriculumCreate({ isCreate }) {
                     </tr>
                   ))}
                   <tr>
-                    <td colSpan={5} className="text-center">
+                    <td colSpan={6} className="text-center">
                       <button
                         className="btn btn-outline-primary border-dotted"
                         type="button"
