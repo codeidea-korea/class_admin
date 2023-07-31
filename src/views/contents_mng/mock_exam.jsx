@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useState} from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import {
   Lucide,
   Modal,
@@ -13,7 +13,9 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
-  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+  const basicCurTab = sessionStorage.getItem('basicCurTab') == null ? '영재원' : sessionStorage.getItem('basicCurTab')
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
+  const [curTab, setCurTab] = useState(basicCurTab)
 
   // 비디오 영상 모달
   const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -49,12 +51,12 @@ function OnlinebasicClass() {
       }),
     {
       onSuccess: (data) => {
-        let id = '';
-        let gubun = '';
+        let id = ''
+        let gubun = ''
 
         if (data[0]) {
-          id = data[0].id;
-          gubun = data[0].gubun;
+          id = data[0].id
+          gubun = data[0].gubun
         }
 
         setState({ id: id, gubun: gubun })
@@ -105,26 +107,38 @@ function OnlinebasicClass() {
       },
     )
 
-  const [curTab, setCurTab] = useState('영재원');
-
   useEffect(() => {
-    refetchBasicClassSubject();
-  }, [curTab]);
+    refetchBasicClassSubject()
+  }, [curTab])
 
   return (
     <>
-      <div className="flex gap-2 mt-5">
-        <button className={"btn w-36" + (curTab === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => setCurTab('영재원')}>영재원</button>
-        <button className={"btn w-36" + (curTab === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => setCurTab('영재학교')}>영재학교</button>
-        <button className={"btn w-36" + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => { alert('준비중입니다.'); {/*setCurTab('과학고')*/}}}>과학고</button>
+      <div className='flex gap-2 mt-5'>
+        <button className={'btn w-36' + (curTab === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => {
+          setCurTab('영재원')
+          sessionStorage.setItem('basicCurTab', '영재원')
+        }}>영재원
+        </button>
+        <button className={'btn w-36' + (curTab === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => {
+          setCurTab('영재학교')
+          sessionStorage.setItem('basicCurTab', '영재학교')
+        }}>영재학교
+        </button>
+        <button className={'btn w-36' + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => {
+          alert('준비중입니다.')
+          {/*setCurTab('과학고')
+            sessionStorage.setItem('basicCurTab', '과학고')
+          */}
+        }}>과학고
+        </button>
       </div>
-      <div className="intro-y box mt-5 relative">
+      <div className='intro-y box mt-5 relative'>
         {(isBasicClassSubject || isBasicClassm) && <Loading />}
-        <div className="p-5">
-          <div className="flex items-center gap-3">
+        <div className='p-5'>
+          <div className='flex items-center gap-3'>
             <div>구분:</div>
             <select
-              className="form-control w-40"
+              className='form-control w-40'
               onChange={(e) => {
                 setState({
                   id: e.target.value,
@@ -143,19 +157,19 @@ function OnlinebasicClass() {
             </select>
 
             <button
-              className="btn btn-outline-primary border-dotted"
+              className='btn btn-outline-primary border-dotted'
               onClick={() => {
                 setState({
-                  isSubject: true
+                  isSubject: true,
                 })
               }}
             >
-              <Lucide icon="Plus" className="w-4 h-4"></Lucide>
+              <Lucide icon='Plus' className='w-4 h-4'></Lucide>
             </button>
 
-            <div className="flex ml-auto gap-2">
+            <div className='flex ml-auto gap-2'>
               <button
-                className="btn btn-danger w-24"
+                className='btn btn-danger w-24'
                 onClick={() => {
                   if (confirm('과목을 삭제하시겠습니까?')) {
                     deleteClassSubject(state.id)
@@ -165,67 +179,67 @@ function OnlinebasicClass() {
                 과목삭제
               </button>
               <Link to={`/mock_exam/edit/${state.id}?gubun=${state.gubun}`}>
-                <button className="btn btn-sky w-24">수정</button>
+                <button className='btn btn-sky w-24'>수정</button>
               </Link>
             </div>
           </div>
 
-          <table className="table table-hover mt-5">
+          <table className='table table-hover mt-5'>
             <thead>
-              <tr className="bg-slate-100 text-center">
-                <td className="">회차</td>
-                <td>과목</td>
-                <td>시험일자</td>
-                <td>모의고사 유형</td>
-                <td>풀이영상</td>
-                <td>학습자료</td>
-              </tr>
+            <tr className='bg-slate-100 text-center'>
+              <td className=''>회차</td>
+              <td>과목</td>
+              <td>시험일자</td>
+              <td>모의고사 유형</td>
+              <td>풀이영상</td>
+              <td>학습자료</td>
+            </tr>
             </thead>
             <tbody>
-              {basicClass?.length > 0 ? basicClass && basicClass?.map((item) => (
-                <tr className="text-center" key={`basicClass-${item.row_id}`}>
-                  <td>{item.order_number}</td>
-                  <td>{item.subject}</td>
-                  <td>{item.exam_date}</td>
-                  <td className="text-left">{item.exam_type}</td>
-                  <td>
-                    <div className="flex justify-center">
-                      {
-                        (item?.link_url && item?.link_url?.includes('/watch?v=')) &&
-                        <button
-                          className="btn btn-outline-primary flex items-center gap-2"
-                          onClick={() => {
-                            setState({
-                              isVideo: true,
-                              video: item.link_url.replace('/watch?v=', '/embed/'),
-                            })
-                          }}
-                        >
-                          <Lucide icon="Video" className="w-4 h-4"></Lucide>
-                          영상보기
+            {basicClass?.length > 0 ? basicClass && basicClass?.map((item) => (
+              <tr className='text-center' key={`basicClass-${item.row_id}`}>
+                <td>{item.order_number}</td>
+                <td>{item.subject}</td>
+                <td>{item.exam_date}</td>
+                <td className='text-left'>{item.exam_type}</td>
+                <td>
+                  <div className='flex justify-center'>
+                    {
+                      (item?.link_url && item?.link_url?.includes('/watch?v=')) &&
+                      <button
+                        className='btn btn-outline-primary flex items-center gap-2'
+                        onClick={() => {
+                          setState({
+                            isVideo: true,
+                            video: item.link_url.replace('/watch?v=', '/embed/'),
+                          })
+                        }}
+                      >
+                        <Lucide icon='Video' className='w-4 h-4'></Lucide>
+                        영상보기
+                      </button>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <div className='flex justify-center'>
+                    {
+                      (item.fileId && item.fileId > 0) &&
+                      <a href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}>
+                        <button type={'button'} className='btn btn-outline-pending flex items-center gap-2'>
+                          <Lucide icon='File' className='w-4 h-4'></Lucide>
+                          학습자료
                         </button>
-                      }
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex justify-center">
-                      {
-                        (item.fileId && item.fileId > 0) &&
-                        <a href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}>
-                          <button type={"button"} className="btn btn-outline-pending flex items-center gap-2">
-                            <Lucide icon="File" className="w-4 h-4"></Lucide>
-                            학습자료
-                          </button>
-                        </a>
-                      }
-                    </div>
-                  </td>
-                </tr>
-              )) :
-                <tr className="text-center">
-                  <td colSpan={6}>데이터가 존재하지 않습니다.</td>
-                </tr>
-              }
+                      </a>
+                    }
+                  </div>
+                </td>
+              </tr>
+            )) :
+              <tr className='text-center'>
+                <td colSpan={6}>데이터가 존재하지 않습니다.</td>
+              </tr>
+            }
             </tbody>
           </table>
         </div>
@@ -233,8 +247,8 @@ function OnlinebasicClass() {
 
       {/* BEGIN: Modal 영상보기 */}
       <Modal
-        size="modal-xl"
-        backdrop=""
+        size='modal-xl'
+        backdrop=''
         show={state.isVideo}
         onHidden={() => {
           setState({
@@ -242,22 +256,22 @@ function OnlinebasicClass() {
           })
         }}
       >
-        <ModalBody className="video_frame relative">
+        <ModalBody className='video_frame relative'>
           {isDeleteClassSubject && <Loading />}
           <button
-            className="video_x"
+            className='video_x'
             onClick={() => {
               setState({
                 isVideo: false,
               })
             }}
           >
-            <Lucide icon="X" className="w-8 h-8 text-white" />
+            <Lucide icon='X' className='w-8 h-8 text-white' />
           </button>
           <iframe
             src={state.video}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            title='YouTube video player'
+            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
             allowFullScreen
           ></iframe>
         </ModalBody>
@@ -274,32 +288,32 @@ function OnlinebasicClass() {
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">과목 추가하기</h2>
+          <h2 className='font-medium text-base mr-auto'>과목 추가하기</h2>
           <button
-            className="btn btn-rounded-secondary hidden sm:flex p-1"
+            className='btn btn-rounded-secondary hidden sm:flex p-1'
             onClick={() => {
               setState({
                 isSubject: false,
               })
             }}
           >
-            <Lucide icon="X" className="w-4 h-4" />
+            <Lucide icon='X' className='w-4 h-4' />
           </button>
         </ModalHeader>
         <ModalBody>
-          <div className="flex items-center">
-            <div className="w-16 shrink-0">과목</div>
+          <div className='flex items-center'>
+            <div className='w-16 shrink-0'>과목</div>
             <input
-              type="text"
-              className="form-control w-full"
+              type='text'
+              className='form-control w-full'
               {...register('subject')}
             />
           </div>
         </ModalBody>
         <ModalFooter>
           <button
-            type="button"
-            className="btn btn-ouline-secondary w-24 mr-2"
+            type='button'
+            className='btn btn-ouline-secondary w-24 mr-2'
             onClick={() => {
               setState({
                 isSubject: false,
@@ -309,8 +323,8 @@ function OnlinebasicClass() {
             취소
           </button>
           <button
-            type="button"
-            className="btn btn-sky w-24"
+            type='button'
+            className='btn btn-sky w-24'
             onClick={() => {
               addClassSubject({
                 field_name: curTab,

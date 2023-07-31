@@ -8,6 +8,7 @@ import { userState } from '@/states/userState'
 import useAxios from '@/hooks/useAxios'
 
 const ReadOnline = () => {
+  const readCurTab = sessionStorage.getItem('readCurTab') == null ? 'EDU_GIFTED' : sessionStorage.getItem('readCurTab')
   const [listLength, setListLength] = useState(0)
   const api = useAxios()
   const user = useRecoilValue(userState)
@@ -25,7 +26,7 @@ const ReadOnline = () => {
   })
 
   // 탭 이동
-  const [curTab, setCurTab] = useState('EDU_GIFTED')
+  const [curTab, setCurTab] = useState(readCurTab)
 
   // 페이지네이션 클릭
   const handlePageClick = (event) => {
@@ -54,10 +55,18 @@ const ReadOnline = () => {
   return (<>
     <div className='flex gap-2 mt-5'>
       <button className={'btn w-32 ' + (curTab === 'EDU_GIFTED' ? 'btn-primary' : 'bg-white')}
-              onClick={() => setCurTab('EDU_GIFTED')}>영재원
+              onClick={() => {
+                setCurTab('EDU_GIFTED')
+                sessionStorage.setItem('readCurTab', 'EDU_GIFTED');
+              }
+              }>영재원
       </button>
       <button className={'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')}
-              onClick={() => setCurTab('SCIENCE')}>과학고
+              onClick={() => {
+                setCurTab('SCIENCE')
+                sessionStorage.setItem('readCurTab', 'SCIENCE');
+              }
+              }>과학고
       </button>
     </div>
     <div className='intro-y box mt-5 relative'>

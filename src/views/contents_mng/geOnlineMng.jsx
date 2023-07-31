@@ -9,14 +9,14 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
+  const geCurTab = sessionStorage.getItem('geCurTab') == null ? 'MATH' : sessionStorage.getItem('geCurTab')
   const navigate = useNavigate();
-  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
 
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
   // 탭 이동
-  const [curTab, setCurTab] = useState('MATH')
+  const [curTab, setCurTab] = useState(geCurTab)
   const [stuTab, setStuTab] = useState('ELEMENTARY')
 
   const [subId, setSubId] = useState()
@@ -136,6 +136,7 @@ const GeOnlineMng = () => {
           onClick={() => {
             setStuTab('ELEMENTARY');
             setCurTab('MATH');
+            sessionStorage.setItem('geCurTab', 'MATH');
           }}
         >
           수학
@@ -147,6 +148,7 @@ const GeOnlineMng = () => {
           onClick={() => {
             setStuTab('ELEMENTARY');
             setCurTab('SCIENCE');
+            sessionStorage.setItem('geCurTab', 'SCIENCE');
           }}
         >
           과학

@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import ReactPaginate from 'react-paginate'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
-import Loading from "@/components/loading";
+import Loading from '@/components/loading'
 
 const ShOnlineMng = () => {
+  const shCurTab = sessionStorage.getItem('shCurTab') == null ? 'MATH' : sessionStorage.getItem('shCurTab')
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
   // 탭 이동
-  const [curTab, setCurTab] = useState('MATH')
+  const [curTab, setCurTab] = useState(shCurTab)
 
   const [subId, setSubId] = useState()
   const [subName, setSubName] = useState()
@@ -116,11 +115,13 @@ const ShOnlineMng = () => {
         <button className={'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')}
                 onClick={() => {
                   setCurTab('MATH')
+                  sessionStorage.setItem('shCurTab', 'MATH')
                 }}>수학
         </button>
         <button className={'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')}
                 onClick={() => {
                   setCurTab('SCIENCE')
+                  sessionStorage.setItem('shCurTab', 'SCIENCE')
                 }}>과학
         </button>
       </div>

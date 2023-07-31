@@ -1,14 +1,11 @@
 import { Lucide } from '@/base-components'
-import { useLocation, Link } from 'react-router-dom'
-import React, { useState, useReducer } from 'react'
-import { useRecoilValue } from 'recoil'
-import { userState } from '@/states/userState'
+import { Link, useLocation } from 'react-router-dom'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 
 const ShOnlineMngEdit = () => {
-  const user = useRecoilValue(userState)
   const userLocation = useLocation()
   const queryParams = new URLSearchParams(userLocation.search)
   const curTab = queryParams.get('curTab')
