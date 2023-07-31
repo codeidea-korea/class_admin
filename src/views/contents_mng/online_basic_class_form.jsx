@@ -296,7 +296,7 @@ function OnlineBasicClassForm() {
                     )}*/}
                   </td>
                   <td>
-                    {index >= 0 && (
+                    { getValues('list')?.length > 1 && (
                       <button
                         type="button"
                         className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
@@ -306,16 +306,6 @@ function OnlineBasicClassForm() {
                       </button>
                     )}
                   </td>
-                  {/*<td>
-                    {index > 0 &&
-                      <button
-                        className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                        onClick={() => { handleRemove(item.row_id,index); }}
-                      >
-                        삭제
-                      </button>
-                    }
-                  </td>*/}
                 </tr>
               ))}
               <tr>

@@ -185,12 +185,14 @@ const GeOnlineMngEdit = () => {
                   />
                 </td>
                 <td>
-                  <button
-                    className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
-                    onClick={() => deleteHandle(item, index)}
-                  >
-                    삭제
-                  </button>
+                  { getValues('list')?.length > 1 &&
+                    <button
+                      className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
+                      onClick={() => deleteHandle(item, index)}
+                    >
+                      삭제
+                    </button>
+                  }
                 </td>
               </tr>
             ))}

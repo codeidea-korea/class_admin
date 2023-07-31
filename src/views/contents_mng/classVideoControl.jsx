@@ -521,7 +521,7 @@ function ClassVideoForm({ isCreate }) {
                   </div>
                 </td>
                 <td>
-                  {index !== 0 && (
+                  { getValues('classVideoScheduleRequests')?.length > 1 && (
                   <button
                     type="button"
                     className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"

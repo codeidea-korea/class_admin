@@ -396,7 +396,7 @@ function CurriculumCreate({ isCreate }) {
                         />
                       </td>
                       <td>
-                        {index >= 0 &&
+                        { getValues('scheduleWeeks')?.length > 1 &&
                           <button
                             type="button"
                             className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
@@ -502,7 +502,7 @@ function CurriculumCreate({ isCreate }) {
                         />
                       </td>
                       <td>
-                        {index >= 0 &&
+                        { getValues('scheduleWeekends')?.length > 1 &&
                           <button
                             type="button"
                             className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
