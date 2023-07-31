@@ -76,14 +76,14 @@ function NoticeView() {
           </div>
 
           {/* 첨부파일을 등록했는데 그걸 이미지로 확정짓고 개발하는건 아닌것같음, 위에 첨부파일 항목 추가했음 */}
-          {/*{noticeData?.fileId && (
+          {noticeData?.fileId && (
             <div className="p-5">
               <img
                 src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
                 alt=""
               />
             </div>
-          )}*/}
+          )}
 
           <div
             className="p-5"

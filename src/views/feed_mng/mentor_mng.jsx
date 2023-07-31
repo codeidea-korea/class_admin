@@ -5,7 +5,7 @@ import {
   ModalHeader,
   ModalFooter,
 } from '@/base-components'
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
@@ -217,12 +217,12 @@ function MentoMng() {
         <Link to="/mento_mng">
           <button className="btn btn-primary w-36">자기소개서</button>
         </Link>
-        {/* <button
+        <button
           className="btn bg-white w-36"
-          onClick={() => alert('준비중입니다.')}
+          onClick={() => alert("준비중입니다.")}
         >
-          문제은행
-        </button> */}
+          복습테스트
+        </button>
       </div>
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">

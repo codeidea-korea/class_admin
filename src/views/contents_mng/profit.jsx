@@ -58,6 +58,8 @@ function Profit() {
     {
       onSuccess: () => {
         alert('삭제되었습니다.');
+        const allBtn = document.querySelector('.table thead input[type="checkbox"]')
+        allBtn.checked = false;
 
         if(profit.page > 1) {
           setProfit({

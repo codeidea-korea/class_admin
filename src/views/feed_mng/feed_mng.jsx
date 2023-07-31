@@ -70,7 +70,7 @@ function FeedMng() {
           className="btn bg-white w-36"
           onClick={() => alert("준비중입니다.")}
         >
-          문제은행
+          복습테스트
         </button>
       </div>
       <div className="intro-y box mt-5">
