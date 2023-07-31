@@ -111,12 +111,6 @@ const ReadOnlineEdit = () => {
 
     if(!temp) return;
 
-    /*let idList = getValues('list').map((item) => (item.id ? item.id : 0))
-    let subjectNameList = getValues('list').map((item) => (item.subjectName ? item.subjectName : ''))
-    let titleList = getValues('list').map((item) => (item.title ? item.title : ''))
-    let videoList = getValues('list').map((item) => (item.video ? item.video : ''))
-    let delYnList = getValues('list').map((item) => (item.delYN ? item.delYN : 'N'))*/
-
     const formData = new FormData();
 
     delDataList.forEach((item) => {
