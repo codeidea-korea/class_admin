@@ -6,6 +6,7 @@ import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 
 const PriorQuestionEdit = () => {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
   const [pageParams, setPageParams] = useState({
     totalPages: 0,
     totalElements: 0,
@@ -239,17 +240,23 @@ const PriorQuestionEdit = () => {
                   </td>
                   <td>
                     <div className="input-group justify-center">
-                      {item.fileName ? (
+                      {watch(`list.${index}.fileName`) ? (
                         <div className="flex items-center gap-2">
                           <a
-                            href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
+                            href={`${baseUrl}/v1/contents-data/file-download/${watch('fileId')}`}
                             className="cursor-pointer text-blue underline"
                           >
-                            {item.fileName}
+                            {watch(`list.${index}.fileName`)}
                           </a>
                           <Lucide
                             icon="X"
                             className="w-4 h-4 text-danger cursor-pointer"
+                            onClick={() => {
+                              let list = getValues('list');
+                              list[index].fileName = '';
+
+                              setValue('list', list);
+                            }}
                           ></Lucide>
                         </div>
                       ) : (
@@ -260,19 +267,12 @@ const PriorQuestionEdit = () => {
                             id={`file-upload-${index}`}
                             {...register(`list.${index}.file`)}
                           />
-                          <label
-                            htmlFor={`file-upload-${index}`}
-                            className="flex items-center"
-                          >
+                          <label htmlFor={`file-upload-${index}`} className="flex items-center">
                             <input
                               type="text"
                               className="form-control file_up bg-white"
                               placeholder=""
-                              value={
-                                item?.file?.length > 0
-                                  ? item?.file[0]?.name
-                                  : ''
-                              }
+                              value={item?.file?.length > 0 ? item?.file[0]?.name : ''}
                               readOnly
                             />
                             <div className="input-group-text whitespace-nowrap file_up_btn">
