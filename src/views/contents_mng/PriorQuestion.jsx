@@ -9,39 +9,39 @@ import {
 import { Link } from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useQuery } from 'react-query'
+import request from '@/utils/request'
+import { useForm } from 'react-hook-form'
 
 const PriorQuestion = () => {
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
-  const [data, setData] = useState([
+  const [pageParams, setPageParams] = useState({
+    totalPages: 0,
+    totalElements: 0,
+    currentPage: 1,
+    pageRangeDisplayed: 9999,
+  })
+
+  // 리스트 가져오기
+  const {
+    data: priorQuestion,
+    isLoading: isPriorQuestion,
+    refetch: refetchPriorQuestion,
+  } = useQuery(
+    'getPriorQuestion',
+    () =>
+      request.get(`/admin/content-management/prior-question`, {
+        params: {
+          page: pageParams.currentPage,
+          limit: pageParams.pageRangeDisplayed,
+        },
+      }),
     {
-      rowId: 1,
-      year: '2022',
-      title: '부산과학고',
-      link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-      fileId: '',
+      onSuccess: (data) => {
+        setPageParams({ ...pageParams, totalPages: data.totalPages, totalElements: data.totalElements })
+      },
     },
-    {
-      rowId: 2,
-      year: '2022',
-      title: '부산일 과학고',
-      link_url: '',
-      fileId: '478',
-    },
-    {
-      rowId: 3,
-      year: '2021',
-      title: '부산과학고',
-      link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-      fileId: '',
-    },
-    {
-      rowId: 4,
-      year: '2021',
-      title: '부산일 과학고',
-      link_url: '',
-      fileId: '478',
-    },
-  ])
+  )
 
   // 비디오 영상 모달
   const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -74,11 +74,12 @@ const PriorQuestion = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index) => (
+            {priorQuestion?.content?.length > 0 ? (
+              priorQuestion?.content?.map((item, index) => (
                 <tr className="text-center" key={index}>
-                  <td>{item.rowId}</td>
+                  <td>{item.id}</td>
                   <td>{item.year}</td>
-                  <td>{item.title}</td>
+                  <td>{item.schoolName}</td>
                   <td>
                     <div className="flex justify-center">
                       {item.fileId && item.fileId > 0 && (
@@ -98,28 +99,31 @@ const PriorQuestion = () => {
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      {item?.link_url &&
-                        item?.link_url?.includes('/watch?v=') && (
-                          <button
-                            className="btn btn-outline-primary flex items-center gap-2"
-                            onClick={() => {
-                              setState({
-                                isVideo: true,
-                                video: item.link_url.replace(
-                                  '/watch?v=',
-                                  '/embed/',
-                                ),
-                              })
-                            }}
-                          >
-                            <Lucide icon="Video" className="w-4 h-4"></Lucide>
-                            영상보기
-                          </button>
-                        )}
+                      <button
+                        className="btn btn-outline-primary flex items-center gap-2"
+                        onClick={
+                        () => {
+                          (item.linkUrl && item.linkUrl.includes('/watch?v='))
+                            ? setState({
+                              isVideo: true,
+                              video: item.linkUrl.replace('/watch?v=', '/embed/'),
+                            })
+                            : alert('영상이 존재하지 않습니다.')
+                          }
+                        }
+                      >
+                        <Lucide icon="Video" className="w-4 h-4"></Lucide>
+                        영상보기
+                      </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+            ) : (
+              <tr className='text-center'>
+                <td colSpan={5}>데이터가 존재하지 않습니다.</td>
+              </tr>
+            )}
             </tbody>
           </table>
           <div className="mt-5 flex items-center justify-center">

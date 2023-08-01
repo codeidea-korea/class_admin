@@ -9,15 +9,30 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
-  const geCurTab = sessionStorage.getItem('geCurTab') == null ? 'MATH' : sessionStorage.getItem('geCurTab')
+  let [menuData, setMenuData] = useState({
+    curTab: 'MATH',
+    stuTab: 'ELEMENTARY',
+    subId: 0
+  });
+
+  const search = sessionStorage.getItem('search') == null ? null : JSON.parse(sessionStorage.getItem('search'));
+  if(search !== null && search.readOnline !== null) {
+    setMenuData({ ...menuData, curTab: search.readOnline.curTab, stuTab: search.readOnline.stuTab, subId: search.readOnline.subId})
+  }
+
+  const setSearchData = (key, value) => {
+    search.readOnline[key] = value;
+    sessionStorage.setItem('search', JSON.stringify(search))
+  }
+
   const navigate = useNavigate();
 
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
   // 탭 이동
-  const [curTab, setCurTab] = useState(geCurTab)
-  const [stuTab, setStuTab] = useState('ELEMENTARY')
+  const [curTab, setCurTab] = useState(menuData.curTab)
+  const [stuTab, setStuTab] = useState(menuData.stuTab)
 
   const [subId, setSubId] = useState()
   const [subName, setSubName] = useState()
@@ -135,8 +150,9 @@ const GeOnlineMng = () => {
           }
           onClick={() => {
             setStuTab('ELEMENTARY');
+            setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
             setCurTab('MATH');
-            sessionStorage.setItem('geCurTab', 'MATH');
+            setMenuData({ ...menuData, curTab: 'MATH'})
           }}
         >
           수학
@@ -147,8 +163,9 @@ const GeOnlineMng = () => {
           }
           onClick={() => {
             setStuTab('ELEMENTARY');
+            setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
             setCurTab('SCIENCE');
-            sessionStorage.setItem('geCurTab', 'SCIENCE');
+            setMenuData({ ...menuData, curTab: 'SCIENCE'})
           }}
         >
           과학
@@ -164,6 +181,7 @@ const GeOnlineMng = () => {
               className='form-control w-40'
               onChange={(e) => {
                 setStuTab(e.target.value)
+                setMenuData({ ...menuData, stuTab: e.target.value})
               }}
               value={stuTab}
             >
@@ -175,6 +193,7 @@ const GeOnlineMng = () => {
               onChange={(e) => {
                 setSubId(e.target.value)
                 setSubName(e.target.selectedOptions[0].innerText)
+                setMenuData({ ...menuData, subId: e.target.value})
               }}
               value={subId}
             >

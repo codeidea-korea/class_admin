@@ -1,50 +1,17 @@
-import { useEffect, useReducer, useState } from 'react'
-import {
-  Lucide,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@/base-components'
+import { useState } from 'react'
+import { Lucide } from '@/base-components'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useMutation, useQuery } from 'react-query'
+import request from '@/utils/request'
 
 const PriorQuestionEdit = () => {
-  const [data, setData] = useState([
-    {
-      rowId: 1,
-      year: '2022',
-      title: '부산과학고',
-      link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-      fileId: '',
-      fileName: '',
-    },
-    {
-      rowId: 2,
-      year: '2022',
-      title: '부산일 과학고',
-      link_url: '',
-      fileId: '478',
-      fileName: '파일이름',
-    },
-    {
-      rowId: 3,
-      year: '2021',
-      title: '부산과학고',
-      link_url: 'https://youtube.com/watch?v=rUpaFIOoCY0',
-      fileId: '',
-      fileName: '',
-    },
-    {
-      rowId: 4,
-      year: '2021',
-      title: '부산일 과학고',
-      link_url: '',
-      fileId: '478',
-      fileName: '파일이름',
-    },
-  ])
+  const [pageParams, setPageParams] = useState({
+    totalPages: 0,
+    totalElements: 0,
+    currentPage: 1,
+    pageRangeDisplayed: 9999,
+  })
 
   const { getValues, setValue, watch, reset, register } = useForm({
     defaultValues: {
@@ -52,28 +19,181 @@ const PriorQuestionEdit = () => {
     },
   })
 
-  useEffect(() => {
-    reset({ list: data })
-  }, [])
-
   // + 버튼 클릭
   const handleAddList = () => {
     const addData = {
-      rowId: data.length + 1,
+      id: 0,
       year: '',
-      title: '',
-      link_url: '',
+      schoolName: '',
+      linkUrl: '',
       fileId: '',
       fileName: '',
     }
-    setData([...data, addData])
-    setValue('list', [...data, addData])
+    setValue('list', [...getValues('list'), addData])
   }
+
   // 삭제
-  const deleteHandle = (rowId) => {
-    const result = data.filter((item) => item.rowId !== rowId)
-    setData(result)
-    setValue('list', result)
+  const [delDataList, setDelDataList] = useState([])
+  const deleteHandle = (data, index) => {
+    if(confirm('삭제하시겠습니까?')) {
+      if (data.id > 0) {
+        setDelDataList([...delDataList, data])
+      }
+
+      reset({ list: getValues('list').filter((i, n) => n !== index) })
+    }
+  }
+
+  // 리스트 가져오기
+  const {
+    data: priorQuestion,
+    isLoading: isPriorQuestion,
+    refetch: refetchPriorQuestion,
+  } = useQuery(
+    'getPriorQuestion',
+    () =>
+      request.get(`/admin/content-management/prior-question`, {
+        params: {
+          page: pageParams.currentPage,
+          limit: pageParams.pageRangeDisplayed,
+        },
+      }),
+    {
+      onSuccess: (data) => {
+        reset({ list: data.content })
+      },
+    },
+  )
+
+  // 저장
+  const { mutate: saveData } = useMutation(
+    (data) =>
+      request.put(`/admin/content-management/prior-question`, data),
+    {
+      onSuccess: () => {
+        alert('저장되었습니다.')
+        location.reload()
+      },
+      onError: (e) => {
+        console.log(e)
+      },
+    },
+  )
+
+  // 저장버튼
+  const handleSave = () => {
+    if(getValues('list')?.length === 0) {
+      alert('저장할 데이터를 입력하세요.');
+      return;
+    }
+
+    let temp = true;
+    let idList = [], yearList = [], schoolNameList = [], linkUrlList = [], delYnList = [];
+
+    getValues('list').map((item) => {
+      if(!temp) return;
+
+      // 제목, 링크는 필수값
+      if(!item?.schoolName) {
+        alert('제목을 입력하세요.');
+        temp = false;
+        return temp;
+      }
+
+      if(!item?.linkUrl) {
+        alert('링크를 입력하세요.');
+        temp = false;
+        return temp;
+      }
+
+      idList.push(item.id ? item.id : 0);
+      yearList.push(item.year ? item.year : '');
+      schoolNameList.push(item.schoolName ? item.schoolName : '');
+      linkUrlList.push(item.linkUrl ? item.linkUrl : '');
+      delYnList.push(item.delYN ? item.delYN : 'N');
+    })
+
+    if(!temp) return;
+
+    // 삭제할 데이터 리스트 셋팅
+    delDataList.forEach((item) => {
+      idList.push(item.id)
+      yearList.push('')
+      schoolNameList.push('')
+      linkUrlList.push('')
+      delYnList.push('Y')
+    })
+
+    const formData = new FormData()
+    formData.append('id', idList.length > 1 ? idList.join(',') : idList)
+    formData.append('year', yearList.length > 1 ? yearList.join(',') : yearList)
+    formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
+    formData.append('linkUrl', linkUrlList.length > 1 ? linkUrlList.join(',') : linkUrlList)
+    formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
+
+    const newFileDelYN = []
+
+    /* 파일 */
+    const null_blob = new Blob(['null'], { type: 'image/png' })
+    const null_file = new File([null_blob], 'null.png', {
+      type: 'image/png',
+    })
+
+    getValues('list').map((item) => {
+      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          newFileDelYN.push('Y')
+          formData.append('file', item.file[0])
+
+        } else { // 새로 등록할 파일이 없으면
+          if (item.fileName) { // 기존 파일을 유지하는 경우
+            formData.append('file', null_file)
+            newFileDelYN.push('N')
+          } else { // 기존 파일을 삭제하는 경우
+            formData.append('file', null_file)
+            newFileDelYN.push('Y')
+          }
+        }
+
+      } else { // 기존에 등록된 파일이 없으면
+        newFileDelYN.push('N')
+
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('file', item.file[0])
+        } else {
+          formData.append('file', null_file)
+        }
+      }
+    })
+
+    delDataList.map((item) => {
+      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          newFileDelYN.push('Y')
+          formData.append('file', item.file[0])
+
+        } else { // 새로 등록할 파일이 없으면
+          if (item.fileName) { // 기존 파일을 유지하는 경우
+            formData.append('file', null_file)
+            newFileDelYN.push('N')
+          } else { // 기존 파일을 삭제하는 경우
+            formData.append('file', null_file)
+            newFileDelYN.push('Y')
+          }
+        }
+
+      } else { // 기존에 등록된 파일이 없으면
+        newFileDelYN.push('N')
+
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('file', item.file[0])
+        } else {
+          formData.append('file', null_file)
+        }
+      }
+    })
+
+    saveData(formData);
   }
 
   return (
@@ -104,14 +224,16 @@ const PriorQuestionEdit = () => {
                       className="form-control w-28"
                       defaultValue={item.year}
                       key={item.year}
+                      {...register(`list[${index}].year`)}
                     />
                   </td>
                   <td>
                     <input
                       type="text"
                       className="form-control"
-                      defaultValue={item.title}
-                      key={item.title}
+                      defaultValue={item.schoolName}
+                      key={item.schoolName}
+                      {...register(`list[${index}].schoolName`)}
                     />
                   </td>
                   <td>
@@ -164,8 +286,9 @@ const PriorQuestionEdit = () => {
                     <input
                       type="text"
                       className="form-control"
-                      defaultValue={item.link_url}
-                      key={item.link_url}
+                      defaultValue={item.linkUrl}
+                      key={item.linkUrl}
+                      {...register(`list[${index}].linkUrl`)}
                     />
                   </td>
                   <td>
@@ -197,7 +320,7 @@ const PriorQuestionEdit = () => {
               <Link to="/prior_question">
                 <button className="btn bg-white w-24">취소</button>
               </Link>
-              <button className="btn btn-sky w-24">저장하기</button>
+              <button className="btn btn-sky w-24" onClick={handleSave}>저장하기</button>
             </div>
           </div>
         </div>
