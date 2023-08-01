@@ -192,6 +192,7 @@ const PriorQuestionEdit = () => {
         }
       }
     })
+    formData.append('savedFileDelYN', newFileDelYN.join(','))
 
     saveData(formData);
   }
