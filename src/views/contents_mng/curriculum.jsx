@@ -1,6 +1,6 @@
 import { Lucide, Modal, ModalBody } from '@/base-components'
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate ,useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import Default_img from '@/assets/images/default_image.jpg'
 import Loading from '@/components/loading'
 import Person from '@/assets/images/img02.png'
@@ -8,11 +8,21 @@ import { useQuery } from 'react-query'
 import request from '@/utils/request'
 
 function CurriCulum() {
+  const url = useLocation().search;
+  const navigate = useNavigate();
   const cuCurTab = sessionStorage.getItem('cuCurTab') == null ? '영재학교' : sessionStorage.getItem('cuCurTab')
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const [video, videoDetail] = useState(false)
   const [videoSrc, setVideoSrc] = useState('')
-  const [fieldName, setFieldName] = useState(cuCurTab)
+  const [fieldName, setFieldName] = useState('')
+
+  useEffect(()=>{
+    if(url=="?sch"){
+      setFieldName('과학고')
+    }else{
+      setFieldName('영재학교')
+    }
+  },[url])
 
   const { data: curriculumList, isLoading: isGetCurriculumList } = useQuery(
     ['getCurriculum', fieldName],
@@ -40,12 +50,14 @@ function CurriCulum() {
           alert('준비중입니다.')
           {/*setFieldName('영재원')
             sessionStorage.setItem('cuCurTab', '영재원')
+            // 영재원 탭 사용시 navigate 추가와 위에 url 변경시 탭 수정 필요
           */}
         }}>영재원
         </button>
         <button className={'btn w-36' + (fieldName === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setFieldName('영재학교')
           sessionStorage.setItem('cuCurTab', '영재학교')
+          navigate('')
         }
         }>영재학교
         </button>
@@ -54,6 +66,7 @@ function CurriCulum() {
           }
           setFieldName('과학고')
           sessionStorage.setItem('cuCurTab', '과학고')
+          navigate('?sch')
         }}>과학고
         </button>
       </div>

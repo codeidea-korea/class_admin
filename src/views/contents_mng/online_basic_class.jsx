@@ -1,15 +1,18 @@
-import { useReducer, useState } from 'react'
+import { useReducer, useState, useEffect } from 'react'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery } from 'react-query'
 import { useForm } from 'react-hook-form'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
+  const url = useLocation().search;
+  const params = new URLSearchParams(location.search);
+  const navigate = useNavigate();
   const onlineBasicCurTab = sessionStorage.getItem('onlineBasicCurTab') == null ? '영재원' : sessionStorage.getItem('onlineBasicCurTab')
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
-  const [curTab, setCurTab] = useState(onlineBasicCurTab)
+  const [curTab, setCurTab] = useState("")
 
   // 비디오 영상 모달
   const [state, setState] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -98,18 +101,53 @@ function OnlinebasicClass() {
       },
     )
 
+  // url 수정
+  useEffect(()=>{
+    if(params.get('tab') == 'gsh'){
+      setCurTab("영재학교")
+    }else{
+      setCurTab("영재원")
+    }
+    
+    if(basicClassSubject){
+      if(params.get('subject')){
+        setTimeout(function(){
+          setState({
+            id: params.get('subject'),
+            subject: basicClassSubject?.find(
+              (item) => item.id === Number(params.get('subject')),
+              ).subject,
+          })
+        },100)
+      }else{
+        const select = document.querySelector('.subject_search option')
+        if(select){
+          setState({
+            id: select.value,
+            subject: basicClassSubject.find(
+              (item) => item.id === Number(select.value),
+            ).subject,
+          })
+        }
+      }
+    }
+  },[url,basicClassSubject])
+
+
   return (
     <>
       <div className='flex gap-2 mt-5'>
         <button className={'btn w-36' + (curTab === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setCurTab('영재원')
           sessionStorage.setItem('onlineBasicCurTab','영재원')
+          navigate('?tab=geh')
         }
         }>영재원
         </button>
         <button className={'btn w-36' + (curTab === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setCurTab('영재학교')
           sessionStorage.setItem('onlineBasicCurTab','영재학교')
+          navigate('?tab=gsh')
         }}>영재학교
         </button>
         <button className={'btn w-36' + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => {
@@ -126,7 +164,7 @@ function OnlinebasicClass() {
           <div className='flex items-center gap-3'>
             <div>과목:</div>
             <select
-              className='form-control w-40'
+              className='form-control w-40 subject_search'
               onChange={(e) => {
                 setState({
                   id: e.target.value,
@@ -134,6 +172,7 @@ function OnlinebasicClass() {
                     (item) => item.id === Number(e.target.value),
                   ).subject,
                 })
+                navigate(`?tab=${curTab=="영재원"?"geh":"gsh"}&subject=${e.target.value}`)
               }}
               value={state.id}
             >

@@ -6,7 +6,7 @@ import {
   ModalFooter,
 } from '@/base-components'
 import React, { useState, useReducer, useEffect } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
@@ -18,14 +18,17 @@ import ReviewTest from './review_test'
 import MentoMng from './mentor_mng'
 
 const MentoTabMng = () => {
+  const navigate = useNavigate()
   const url = useLocation().search
-  const [tab, setTab] = useState('자기소개서')
+  const [tab, setTab] = useState('')
 
   useEffect(() => {
     if (url == '?review') {
       setTab('복습테스트')
+    }else{
+      setTab('자기소개서')
     }
-  }, [])
+  }, [url])
 
   return (
     <React.Fragment>
@@ -36,6 +39,7 @@ const MentoTabMng = () => {
           }
           onClick={() => {
             setTab('자기소개서')
+            navigate('')
           }}
         >
           자기소개서
@@ -46,6 +50,7 @@ const MentoTabMng = () => {
           }
           onClick={() => {
             setTab('복습테스트')
+            navigate('?review')
           }}
         >
           복습테스트
