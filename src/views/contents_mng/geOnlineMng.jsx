@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useNavigate, useLocation} from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMutation, useQuery } from 'react-query'
@@ -9,6 +9,8 @@ import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
+  const url = useLocation().search;
+  const params = new URLSearchParams(location.search);
   let [menuData, setMenuData] = useState({
     curTab: 'MATH',
     stuTab: 'ELEMENTARY',
@@ -141,6 +143,44 @@ const GeOnlineMng = () => {
     }
   }
 
+  useEffect(()=>{
+    if(params.get('tab') == 'SCIENCE'){
+      setCurTab("SCIENCE")
+    }else{
+      setCurTab("MATH")
+    }
+
+    if(basicClassSubject){
+      if(params.get('stu')){
+        setTimeout(function(){
+          setStuTab(params.get('stu'))
+          setMenuData({ ...menuData, stuTab: params.get('stu')})
+        },100)
+      }else{
+        setStuTab('ELEMENTARY')
+        setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
+      }
+
+      if(params.get('sub')){
+        setTimeout(function(){
+          const select = document.querySelector('.subject_search')
+          setSubId(params.get('sub'))
+          // setSubName(select.selectedOptions[0].innerText)
+          setMenuData({ ...menuData, subId: params.get('sub')})
+          console.log(select.option)
+        },100)
+      }else{
+        const select = document.querySelector('.subject_search2 option')
+        if(select){
+          setSubId(select.value)
+          setMenuData({ ...menuData, subId: select.value})
+        }
+      }
+    }
+
+
+  },[url,basicClassSubject])
+
   return (
     <>
       <div className='flex gap-2 mt-5'>
@@ -153,6 +193,7 @@ const GeOnlineMng = () => {
             setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
             setCurTab('MATH');
             setMenuData({ ...menuData, curTab: 'MATH'})
+            navigate('?tab=MATH')
           }}
         >
           수학
@@ -166,6 +207,7 @@ const GeOnlineMng = () => {
             setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
             setCurTab('SCIENCE');
             setMenuData({ ...menuData, curTab: 'SCIENCE'})
+            navigate('?tab=SCIENCE')
           }}
         >
           과학
@@ -175,13 +217,14 @@ const GeOnlineMng = () => {
         {(isBasicClassSubject || isBasicClass) && <Loading />}
 
         <div className='p-5'>
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-3 subject_search'>
             <div>구분:</div>
             <select
               className='form-control w-40'
               onChange={(e) => {
                 setStuTab(e.target.value)
                 setMenuData({ ...menuData, stuTab: e.target.value})
+                navigate(`?tab=${curTab}&stu=${e.target.value}`)
               }}
               value={stuTab}
             >
@@ -189,11 +232,12 @@ const GeOnlineMng = () => {
               <option value='MIDDLE'>중학생</option>
             </select>
             <select
-              className='form-control w-40'
+              className='form-control w-40 subject_search2'
               onChange={(e) => {
                 setSubId(e.target.value)
                 setSubName(e.target.selectedOptions[0].innerText)
                 setMenuData({ ...menuData, subId: e.target.value})
+                navigate(`?tab=${curTab}&stu=${stuTab}&sub=${e.target.value}`)
               }}
               value={subId}
             >
@@ -221,7 +265,7 @@ const GeOnlineMng = () => {
               >
                 과목삭제
               </button>
-              <a href={'#none'} onClick={goEdit}>
+              <a onClick={goEdit}>
                 <button className='btn btn-sky w-24'>수정</button>
               </a>
             </div>

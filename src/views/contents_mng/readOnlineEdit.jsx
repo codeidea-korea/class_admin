@@ -217,7 +217,7 @@ const ReadOnlineEdit = () => {
       <div className='intro-y box mt-5'>
         <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
           <div className='text-lg font-medium flex items-center'>
-            영재원
+            {sessionStorage.getItem('readCurTab')=="SCIENCE" ? "과학고":"영재원"}
           </div>
         </div>
         <div className='intro-y p-5'>

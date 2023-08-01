@@ -7,6 +7,7 @@ import {
   DropdownItem,
 } from '@/base-components'
 import React, { useState, useReducer, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
@@ -15,6 +16,9 @@ import _ from 'lodash'
 import {useForm} from "react-hook-form";
 
 function Contents() {
+  const url = useLocation().search;
+  const params = new URLSearchParams(location.search);
+  const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
 
   const [menu, setMenu] = useReducer((prev, next) => ({ ...prev, ...next }), {
@@ -126,6 +130,37 @@ function Contents() {
     updateMenuDetail(formData)
   }
 
+  useEffect(()=>{
+    if(params.get('tab')){
+      setMenu({
+        mainMenu: params.get('tab'),
+      })
+    }else{
+        const tab = document.querySelector('.drop_01 li a');
+        if(tab){
+          setMenu({
+            mainMenu: tab.innerHTML,
+          })
+      }
+    }
+
+    if(params.get('tab2')){
+      setMenu({
+        code: params.get('tab2'),
+        subMenu: params.get('tabName'),
+      })
+    }else{
+      const tab = document.querySelector('.drop_02 li');
+      const tabTxt = document.querySelector('.drop_02 li a');
+      if(tab){
+        setMenu({
+          code: tab.getAttribute('data-value'),
+          subMenu: tabTxt.innerHTML
+        })
+      }
+    }
+  },[url])
+
   return (
     <div className="relative">
       {(isGetMenus ||
@@ -141,7 +176,7 @@ function Contents() {
                 <Lucide icon="ChevronDown" className="w-4 h-4 ml-3"></Lucide>
               </DropdownToggle>
               <DropdownMenu className="w-40">
-                <DropdownContent>
+                <DropdownContent className="drop_01">
                   {menu.mainMenuList?.map((item) => (
                     <DropdownItem
                       key={item.ca_code1}
@@ -152,6 +187,8 @@ function Contents() {
                         setMenu({
                           mainMenu: item.ca_code1_name,
                         })
+                        console.log(item)
+                        navigate(`?tab=${item.ca_code1_name}`)
                         dismiss()
                       }}
                     >
@@ -173,10 +210,11 @@ function Contents() {
                   <Lucide icon="ChevronDown" className="w-4 h-4 ml-3"></Lucide>
                 </DropdownToggle>
                 <DropdownMenu className="w-60">
-                  <DropdownContent>
+                  <DropdownContent className="drop_02">
                     {menu.subMenuList.map((item) => (
                       <DropdownItem
                         key={item.ca_code2}
+                        data-value={item.ca_code2}
                         className={`${
                           menu.subMenu === item.ca_code2_name && 'drop_active'
                         }`}
@@ -185,6 +223,8 @@ function Contents() {
                             subMenu: item.ca_code2_name,
                             code: item.ca_code2,
                           })
+                          console.log(item)
+                          navigate(`?tab=${menu.mainMenu}&tab2=${item.ca_code2}&tabName=${item.ca_code2_name}`)
                           dismiss()
                         }}
                       >

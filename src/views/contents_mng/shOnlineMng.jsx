@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState , useEffect } from 'react'
+import { Link , useLocation , useNavigate} from 'react-router-dom'
 import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
@@ -7,12 +7,15 @@ import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-compo
 import Loading from '@/components/loading'
 
 const ShOnlineMng = () => {
+  const url = useLocation().search;
+  const params = new URLSearchParams(location.search)
+  const navigate = useNavigate();
   const shCurTab = sessionStorage.getItem('shCurTab') == null ? 'MATH' : sessionStorage.getItem('shCurTab')
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
 
   // 탭 이동
-  const [curTab, setCurTab] = useState(shCurTab)
+  const [curTab, setCurTab] = useState("MATH")
 
   const [subId, setSubId] = useState()
   const [subName, setSubName] = useState()
@@ -109,6 +112,33 @@ const ShOnlineMng = () => {
       },
     )
 
+  // url 수정
+  useEffect(()=>{
+    if(params.get('tab') == 'SCIENCE'){
+      setCurTab("SCIENCE")
+    }else{
+      setCurTab("MATH")
+    }
+
+    if(basicClassSubject){
+      if(params.get('subject')){
+        setTimeout(function(){
+          setSubId(params.get('subject'))
+          setSubName(basicClassSubject?.find(
+            (item) => item.row_id === Number(params.get('subject')),
+            ).title)
+        },100)
+      }else{
+        const select = document.querySelector('.subject_search option')
+        if(select){
+          setSubId(select.value)
+          setSubName(select.innerText)
+        }
+      }
+    }
+    
+  },[url,basicClassSubject])
+
   return (
     <>
       <div className='flex gap-2 mt-5'>
@@ -116,12 +146,14 @@ const ShOnlineMng = () => {
                 onClick={() => {
                   setCurTab('MATH')
                   sessionStorage.setItem('shCurTab', 'MATH')
+                  navigate('?tab=MATH')
                 }}>수학
         </button>
         <button className={'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')}
                 onClick={() => {
                   setCurTab('SCIENCE')
                   sessionStorage.setItem('shCurTab', 'SCIENCE')
+                  navigate('?tab=SCIENCE')
                 }}>과학
         </button>
       </div>
@@ -132,10 +164,11 @@ const ShOnlineMng = () => {
             <div className='flex items-center gap-3'>
               <div>구분:</div>
               <select
-                className='form-control w-40'
+                className='form-control w-40 subject_search'
                 onChange={(e) => {
                   setSubId(e.target.value)
                   setSubName(e.target.selectedOptions[0].innerText)
+                  navigate(`?tab=${curTab=="MATH"?"MATH":"SCIENCE"}&subject=${e.target.value}`)
                 }}
                 value={subId}
               >

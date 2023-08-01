@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react'
 import { Lucide, Modal, ModalBody } from '@/base-components'
-import { Link } from 'react-router-dom'
+import { Link , useLocation , useNavigate} from 'react-router-dom'
 import ReactPaginate from 'react-paginate'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecoilValue } from 'recoil'
@@ -8,6 +8,8 @@ import { userState } from '@/states/userState'
 import useAxios from '@/hooks/useAxios'
 
 const ReadOnline = () => {
+  const url = useLocation().search;
+  const navigate = useNavigate();
   const readCurTab = sessionStorage.getItem('readCurTab') == null ? 'EDU_GIFTED' : sessionStorage.getItem('readCurTab')
   const [listLength, setListLength] = useState(0)
   const api = useAxios()
@@ -26,7 +28,7 @@ const ReadOnline = () => {
   })
 
   // 탭 이동
-  const [curTab, setCurTab] = useState(readCurTab)
+  const [curTab, setCurTab] = useState()
 
   // 페이지네이션 클릭
   const handlePageClick = (event) => {
@@ -52,12 +54,21 @@ const ReadOnline = () => {
     getDataList()
   }, [curTab, pageParams.currentPage])
 
+  useEffect(()=>{
+    if(url == "?sch"){
+      setCurTab('SCIENCE')
+    }else{
+      setCurTab('EDU_GIFTED')
+    }
+  },[url])
+
   return (<>
     <div className='flex gap-2 mt-5'>
       <button className={'btn w-32 ' + (curTab === 'EDU_GIFTED' ? 'btn-primary' : 'bg-white')}
               onClick={() => {
                 setCurTab('EDU_GIFTED')
                 sessionStorage.setItem('readCurTab', 'EDU_GIFTED');
+                navigate('')
               }
               }>영재원
       </button>
@@ -65,6 +76,7 @@ const ReadOnline = () => {
               onClick={() => {
                 setCurTab('SCIENCE')
                 sessionStorage.setItem('readCurTab', 'SCIENCE');
+                navigate('?sch')
               }
               }>과학고
       </button>

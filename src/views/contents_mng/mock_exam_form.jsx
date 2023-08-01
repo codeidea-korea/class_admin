@@ -201,7 +201,7 @@ function OnlineBasicClassForm() {
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium flex items-center">
-            영재학교
+            {sessionStorage.getItem('basicCurTab')}
             <Lucide icon="ChevronRight" className="w-6 h-6 mx-3"></Lucide>
             {searchParams.get('gubun')}
           </div>
