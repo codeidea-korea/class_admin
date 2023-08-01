@@ -6,14 +6,17 @@ import {
   DropdownContent,
   DropdownItem,
 } from '@/base-components'
-import { useState, useReducer, useEffect } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 import { useQuery, useMutation } from 'react-query'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 import useDidMountEffect from '@/hooks/useDidMountEffect'
 import _ from 'lodash'
+import {useForm} from "react-hook-form";
 
 function Contents() {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+
   const [menu, setMenu] = useReducer((prev, next) => ({ ...prev, ...next }), {
     mainMenu: '',
     mainMenuList: [],
@@ -21,6 +24,12 @@ function Contents() {
     subMenuList: [],
     menuDetailList: [],
     code: '',
+  })
+
+  const { getValues, setValue, watch, reset, register, handleSubmit } = useForm({
+    defaultValues: {
+      list: [],
+    },
   })
 
   const { isLoading: isGetMenus } = useQuery(
@@ -59,9 +68,7 @@ function Contents() {
     {
       enabled: !!menu.code,
       onSuccess: (data) => {
-        setMenu({
-          menuDetailList: data,
-        })
+        reset({ list: data })
       },
     },
   )
@@ -77,70 +84,47 @@ function Contents() {
       },
     )
 
-  const handleChangeFile = (e, id) => {
-    const file = e.target.files[0]
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => {
-      setMenu({
-        menuDetailList: menu.menuDetailList.map((child) => {
-          if (child.id === id) {
-            return {
-              ...child,
-              savedFileDelYN: 'N',
-              file: file,
-            }
-          } else {
-            return {
-              ...child,
-              savedFileDelYN: 'N',
-            }
+  // 저장하기 버튼 클릭
+  const handleSave = async (data) => {
+    const formData = new FormData();
+    const null_blob = new Blob(['null'], {type: 'image/png'});
+    const null_file = new File([null_blob], 'null.png', {
+      type: 'image/png',
+    });
+
+    data.list.map((item) => {
+      console.log(item)
+      formData.append('id', item.id)
+      formData.append('link_url', item.link_url)
+
+      if(item.fileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('savedFileDelYN', 'Y')
+          formData.append('file', item.file[0]);
+
+        }else { // 새로 등록할 파일이 없으면
+          if(item.fileName) { // 기존 파일을 유지하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'N')
+          }else { // 기존 파일을 삭제하는 경우
+            formData.append('file', null_file);
+            formData.append('savedFileDelYN', 'Y')
           }
-        }),
-      })
-    }
-  }
+        }
 
-  const omit = (obj, ...props) => {
-    const result = { ...obj }
-    props.forEach((prop) => {
-      delete result[prop]
-    })
-    return result
-  }
+      }else { // 기존에 등록된 파일이 없으면
+        formData.append('savedFileDelYN', 'N')
 
-  const null_blob = new Blob(['null'], { type: 'image/png' })
-  const null_file = new File([null_blob], 'null.png', { type: 'image/png' })
-
-  const handleSubmit = (data) => {
-    const formData = new FormData()
-    const newFileDelYN = []
-    data.map((item) => {
-      if (item.file) {
-        formData.append('file', item.file)
-      } else {
-        formData.append('file', null_file)
-      }
-      if (item.fileId) {
-        newFileDelYN.push('Y')
-      } else {
-        newFileDelYN.push('N')
+        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
+          formData.append('file', item.file[0]);
+        }else {
+          formData.append('file', null_file);
+        }
       }
     })
-    formData.append('id', _.map(data, 'id').join(','))
-    formData.append('link_url', _.map(data, 'link_url').join(','))
-    formData.append('savedFileDelYN', newFileDelYN.join(','))
 
     updateMenuDetail(formData)
   }
-
-  // useDidMountEffect(() => {
-  //   if (!menu.subMenuList) return
-  //   const code = menu.subMenuList?.find(
-  //     (item) => item.ca_code2_name === menu.subMenu,
-  //   ).ca_code2
-  //   refetchMenuDetail()
-  // }, [menu.subMenu])
 
   return (
     <div className="relative">
@@ -215,84 +199,70 @@ function Contents() {
         )}
       </div>
       <div className="intro-y p-5 box mt-5">
-        <div className="flex justify-end">
-          <button
-            className="btn btn-sky w-24"
-            onClick={() => handleSubmit(menu.menuDetailList)}
-          >
-            저장
-          </button>
-        </div>
-        <table className="table mt-5 table-bordered">
-          <tbody>
-          <tr className="bg-slate-100 text-center">
-            <td>화면</td>
-            <td>버튼 명</td>
-            <td>링크/파일</td>
-          </tr>
-          {menu.menuDetailList.map((item) => (
-            <tr key={item.id}>
-              <td>{item.screen_name}</td>
-              <td>{item.btn_name}</td>
-              <td>
-                {item.tf_file ? (
-                  item.fileName ? (
-                    <div className="flex items-center">
-                      <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.fileId}`}
-                        className="cursor-pointer text-blue underline"
-                      >
-                        {item.fileName}
-                      </a>
-                      <a
-                        className="text-danger ml-4 cursor-pointer"
-                        onClick={() => {
-                          setMenu({
-                            menuDetailList: menu.menuDetailList.map((child) =>
-                              child.id === item.id
-                                ? {
-                                  ...child,
-                                  file: '',
-                                  tf_file: true,
-                                  fileName: false,
-                                  savedFileDelYN: 'Y',
-                                }
-                                : child,
-                            ),
-                          })
-                        }}
-                      >
-                        삭제
-                      </a>
-                    </div>
+        <form onSubmit={handleSubmit(handleSave)}>
+          <div className="flex justify-end">
+            <button
+              className="btn btn-sky w-24"
+              onClick={() => handleSubmit(menu.menuDetailList)}
+            >
+              저장
+            </button>
+          </div>
+          <table className="table mt-5 table-bordered">
+            <tbody>
+            <tr className="bg-slate-100 text-center">
+              <td>화면</td>
+              <td>버튼 명</td>
+              <td>링크/파일</td>
+            </tr>
+            {watch('list').map((item, index) => (
+              <tr key={item.id}>
+                <td>{item.screen_name}</td>
+                <td>{item.btn_name}</td>
+                <td>
+                  {item.tf_file ? (
+                    item.fileName ? (
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
+                          className="underline text-blue"
+                        >
+                          {item.fileName}
+                        </a>
+                        <Lucide
+                          icon="X"
+                          className="w-4 h-4 text-danger cursor-pointer"
+                          onClick={() => {
+                            let list = getValues('list');
+                            list[index].fileName = '';
+
+                            setValue('list', list);
+                          }}
+                        ></Lucide>
+                      </div>
+                    ) : (
+                      <input
+                        type="file"
+                        className="form-control"
+                        {...register(
+                          `list.${index}.file`,
+                        )}
+                      />
+                    )
                   ) : (
                     <input
-                      type="file"
+                      type="text"
                       className="form-control"
-                      onChange={(e) => handleChangeFile(e, item.id)}
+                      defaultValue={item.link_url}
+                      {...register(`list.${index}.link_url`)}
                     />
-                  )
-                ) : (
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={item.link_url}
-                    onChange={(e) =>
-                      setMenu({
-                        menuDetailList: menu.menuDetailList.map((child) =>
-                          child.id === item.id
-                            ? { ...child, link_url: e.target.value }
-                            : child,
-                        ),
-                      })
-                    }
-                  />
-                )}
-              </td>
-            </tr>
-          ))}
-          </tbody>
-        </table>
+                  )}
+                </td>
+              </tr>
+            ))}
+            </tbody>
+          </table>
+        </form>
       </div>
     </div>
   )
