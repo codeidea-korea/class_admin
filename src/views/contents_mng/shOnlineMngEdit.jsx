@@ -202,7 +202,7 @@ const ShOnlineMngEdit = () => {
           </table>
           <div className='flex mt-3 justify-center'>
             <div className='flex gap-2'>
-              <Link to='/sh_online_mng'>
+              <Link to={`/sh_online_mng?tab=${curTab}&subject=${queryParams.get('id')}`}>
                 <button className='btn bg-white w-24'>취소</button>
               </Link>
               <button className='btn btn-sky w-24' onClick={() => handleSave()}>

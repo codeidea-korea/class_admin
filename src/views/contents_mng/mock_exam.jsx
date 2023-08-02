@@ -77,10 +77,10 @@ function OnlinebasicClass() {
     () => request.get(`/admin/content-management/mock-exam/${state.id}`),
     {
       enabled: !!state.id,
-      select: (data) =>
-        data.sort((a, b) => {
-          return new Date(b.exam_date) - new Date(a.exam_date)
-        }),
+      // select: (data) =>
+      //   data.sort((a, b) => {
+      //     return new Date(b.exam_date) - new Date(a.exam_date)
+      //   }),
     },
   )
 
@@ -220,7 +220,7 @@ function OnlinebasicClass() {
               >
                 과목삭제
               </button>
-              <Link to={`/mock_exam/edit/${state.id}?gubun=${state.gubun}`}>
+              <Link to={`/mock_exam/edit/${state.id}?gubun=${state.gubun}&gubunId=${params.get('subject')}`}>
                 <button className='btn btn-sky w-24'>수정</button>
               </Link>
             </div>

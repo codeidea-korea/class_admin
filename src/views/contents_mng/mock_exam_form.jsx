@@ -10,6 +10,7 @@ import request from '@/utils/request'
 function OnlineBasicClassForm() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const params = new URLSearchParams(location.search)
   const [searchParams, setSearchParams] = useSearchParams()
   const { getValues, setValue, watch, reset, register } = useForm({
     defaultValues: {
@@ -37,7 +38,7 @@ function OnlineBasicClassForm() {
       onSuccess: () => {
         refetchBasicClass()
         alert('저장되었습니다.')
-        navigate('/mock_exam')
+        navigate(`/mock_exam?tab=${sessionStorage.getItem('basicCurTab')=="영재학교"?"gsh":"geh"}&subject=${params.get('gubunId')}`)
       },
     },
   )
@@ -379,7 +380,7 @@ function OnlineBasicClassForm() {
           </table>
           <div className="flex mt-3 justify-center">
             <div className="flex gap-2">
-              <Link to="/mock_exam">
+              <Link to={`/mock_exam?tab=${sessionStorage.getItem('basicCurTab')=="영재학교"?"gsh":"geh"}&subject=${params.get('gubunId')}`}>
                 <button className="btn bg-white w-24">취소</button>
               </Link>
               <button className="btn btn-sky w-24" onClick={() => handleSave()}>

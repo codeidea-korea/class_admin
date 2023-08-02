@@ -53,7 +53,7 @@ const ReadOnlineEdit = () => {
       onSuccess: () => {
         refetchBasicClass()
         alert('저장되었습니다.')
-        navigate('/read_online')
+        navigate(`/read_online?${sessionStorage.getItem('readCurTab')=="SCIENCE" ? "sch":""}`)
       },
       onError: (e) => {
         console.log(e)
@@ -331,7 +331,7 @@ const ReadOnlineEdit = () => {
           </table>
           <div className='flex mt-3 justify-center'>
             <div className='flex gap-2'>
-              <Link to='/read_online'>
+              <Link to={`/read_online?${sessionStorage.getItem('readCurTab')=="SCIENCE" ? "sch":""}`}>
                 <button className='btn bg-white w-24'>취소</button>
               </Link>
               <button className='btn btn-sky w-24' onClick={() => handleSave()}>

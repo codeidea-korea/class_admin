@@ -108,7 +108,7 @@ function CurriCulum() {
                       </button>
                       <Link
                         // to={`/curriculum_view?subject=${item.subject}`}
-                        to={`/curriculum/${item.id}?subject=${item.subject}`}
+                        to={`/curriculum/${item.id}?subject=${item.subject}&tab=${sessionStorage.getItem('cuCurTab')}`}
                         className='w-full'
                       >
                         <button className='btn btn-secondary  w-full rounded-full'>

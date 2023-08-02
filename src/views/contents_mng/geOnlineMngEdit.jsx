@@ -210,7 +210,7 @@ const GeOnlineMngEdit = () => {
           </table>
           <div className="flex mt-3 justify-center">
             <div className="flex gap-2">
-              <Link to="/ge_online_mng">
+              <Link to={`/ge_online_mng?tab=${searchParams.get('curTab')}&stu=${searchParams.get('student')}&sub=${searchParams.get('id')}`}>
                 <button className="btn bg-white w-24">취소</button>
               </Link>
               <button className="btn btn-sky w-24" onClick={() => handleSave()}>

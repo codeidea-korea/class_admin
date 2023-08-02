@@ -207,7 +207,7 @@ function OnlinebasicClass() {
                 과목삭제
               </button>
               <Link
-                to={`/online_basic_class_form/${state.id}?subject=${state.subject}`}
+                to={`/online_basic_class_form/${state.id}?subject=${state.subject}&gubunId=${params.get('subject')}`}
               >
                 <button className='btn btn-sky w-24'>수정</button>
               </Link>

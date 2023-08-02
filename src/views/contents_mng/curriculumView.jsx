@@ -229,7 +229,7 @@ function CurriCulumView() {
       <div class="box p-5 mt-5">
         <div class="flex">
           <div class="flex gap-2 ml-auto">
-            <Link to="/curriculum">
+            <Link to={`/curriculum?${searchParams.get('tab')=="과학고"?"sch":""}`}>
               <button className="btn bg-white w-24">목록</button>
             </Link>
             <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>

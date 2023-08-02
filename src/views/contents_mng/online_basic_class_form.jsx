@@ -8,6 +8,7 @@ import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL;
+  const params = new URLSearchParams(location.search)
   const { id } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -323,7 +324,7 @@ function OnlineBasicClassForm() {
           </table>
           <div className="flex mt-3 justify-center">
             <div className="flex gap-2">
-              <Link to="/online_basic_class">
+              <Link to={`/online_basic_class?tab=${sessionStorage.getItem('onlineBasicCurTab')=="과학고"?"sch":sessionStorage.getItem('onlineBasicCurTab')=="영재학교"?"gsh":"geh"}&subject=${params.get('gubunId')}`}>
                 <button className="btn bg-white w-24">취소</button>
               </Link>
               <button className="btn btn-sky w-24">
