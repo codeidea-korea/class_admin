@@ -303,7 +303,7 @@ function MentoMng() {
                       <td>학년</td>
                       <td>학생 등록일</td>
                       <td>전형</td>
-                      <td></td>
+                      <td>삭제</td>
                     </tr>
                     {item.mentorApplicationList?.map((child, index) => (
                       <tr className="text-center" key={`student-${child.id}`}>

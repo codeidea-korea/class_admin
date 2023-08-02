@@ -1,6 +1,6 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Lucide } from '@/base-components'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
@@ -10,9 +10,8 @@ import { userState } from '@/states/userState'
 const ReadOnlineEdit = () => {
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
-  const userLocation = useLocation()
-  const queryParams = new URLSearchParams(userLocation.search)
-  const curTab = queryParams.get('curTab')
+  const params = new URLSearchParams(location.search)
+  const curTab = params.get('curTab')
   const [delDataList, setDelDataList] = useState([])
 
   const { getValues, setValue, watch, reset, register } = useForm({
@@ -53,7 +52,7 @@ const ReadOnlineEdit = () => {
       onSuccess: () => {
         refetchBasicClass()
         alert('저장되었습니다.')
-        navigate(`/read_online?${sessionStorage.getItem('readCurTab')=="SCIENCE" ? "sch":""}`)
+        navigate(`/read_online?${sessionStorage.getItem('readCurTab') == 'SCIENCE' ? 'sch' : ''}`)
       },
       onError: (e) => {
         console.log(e)
@@ -73,45 +72,40 @@ const ReadOnlineEdit = () => {
 
   // 저장하기 버튼 클릭
   const handleSave = async () => {
-    if(getValues('list')?.length === 0) {
-      alert('저장할 데이터를 입력하세요.');
-      return;
-    }
-
     /* 파일 */
     const null_blob = new Blob(['null'], { type: 'image/png' })
     const null_file = new File([null_blob], 'null.png', {
       type: 'image/png',
     })
 
-    let temp = true;
-    let idList = [], subjectNameList = [], titleList = [], videoList = [], delYnList = [];
+    let temp = true
+    let idList = [], subjectNameList = [], titleList = [], videoList = [], delYnList = []
 
     getValues('list').map((item) => {
-      if(!temp) return;
+      if (!temp) return
 
       // 제목, 링크는 필수값
-      if(!item?.title) {
-        alert('제목을 입력하세요.');
-        temp = false;
-        return temp;
+      if (!item?.title) {
+        alert('제목을 입력하세요.')
+        temp = false
+        return temp
       }
-      if(!item?.video) {
-        alert('링크를 입력하세요.');
-        temp = false;
-        return temp;
+      if (!item?.video) {
+        alert('링크를 입력하세요.')
+        temp = false
+        return temp
       }
 
-      idList.push(item.id ? item.id : 0);
-      subjectNameList.push(item.subjectName ? item.subjectName : '');
-      titleList.push(item.title ? item.title : '');
-      videoList.push(item.video ? item.video : '');
-      delYnList.push(item.delYN ? item.delYN : 'N');
+      idList.push(item.id ? item.id : 0)
+      subjectNameList.push(item.subjectName ? item.subjectName : '')
+      titleList.push(item.title ? item.title : '')
+      videoList.push(item.video ? item.video : '')
+      delYnList.push(item.delYN ? item.delYN : 'N')
     })
 
-    if(!temp) return;
+    if (!temp) return
 
-    const formData = new FormData();
+    const formData = new FormData()
 
     delDataList.forEach((item) => {
       idList.push(item.id)
@@ -217,7 +211,7 @@ const ReadOnlineEdit = () => {
       <div className='intro-y box mt-5'>
         <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
           <div className='text-lg font-medium flex items-center'>
-            {sessionStorage.getItem('readCurTab')=="SCIENCE" ? "과학고":"영재원"}
+            {sessionStorage.getItem('readCurTab') == 'SCIENCE' ? '과학고' : '영재원'}
           </div>
         </div>
         <div className='intro-y p-5'>
@@ -305,7 +299,7 @@ const ReadOnlineEdit = () => {
                   </div>
                 </td>
                 <td>
-                  {getValues('list')?.length > 1 &&
+                  {getValues('list')?.length > 0 &&
                     <button
                       className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
                       onClick={() => handleDeleteVideo(index, item)}
@@ -331,7 +325,7 @@ const ReadOnlineEdit = () => {
           </table>
           <div className='flex mt-3 justify-center'>
             <div className='flex gap-2'>
-              <Link to={`/read_online?${sessionStorage.getItem('readCurTab')=="SCIENCE" ? "sch":""}`}>
+              <Link to={`/read_online?${sessionStorage.getItem('readCurTab') == 'SCIENCE' ? 'sch' : ''}`}>
                 <button className='btn bg-white w-24'>취소</button>
               </Link>
               <button className='btn btn-sky w-24' onClick={() => handleSave()}>

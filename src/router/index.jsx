@@ -190,7 +190,7 @@ function Router() {
           ),
         },
         {
-          path: '/mento_mng/view/:id',
+          path: '/mento_mng/view',
           element: (
             <PrivateRoute
               element={<ReviewTestView />}
@@ -199,7 +199,7 @@ function Router() {
           ),
         },
         {
-          path: '/mento_mng/edit/:id',
+          path: '/mento_mng/edit',
           element: (
             <PrivateRoute
               element={<ReviewTestEdit />}
