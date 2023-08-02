@@ -39,7 +39,7 @@ const ReviewTestEdit = () => {
       }),
     {
       onSuccess: (data) => {
-        reset({ list: data.content })
+        reset({ list: data })
       },
     },
   )
@@ -327,7 +327,7 @@ const ReviewTestEdit = () => {
                     </div>
                   )}
                 </td>
-                <td>{item.date}
+                <td>{item.creDate}
                 </td>
                 <td>
                   {item.answerFileId && item.answerFileId !== 0 ? (

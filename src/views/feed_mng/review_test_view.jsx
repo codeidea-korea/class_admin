@@ -66,7 +66,8 @@ const ReviewTestView = () => {
             </div>
           </div>
           <div>
-            <Link to={`/mento_mng/edit?id=${id}&teacher-id=${teacherId}&name=${name}&teacher-name=${teacherName}`} className='btn btn-sky w-24'>
+            <Link to={`/mento_mng/edit?id=${id}&teacher-id=${teacherId}&name=${name}&teacher-name=${teacherName}`}
+                  className='btn btn-sky w-24'>
               Test 등록
             </Link>
           </div>
@@ -95,26 +96,38 @@ const ReviewTestView = () => {
                   <td>{teacherName} 선생님</td>
                   <td>{item.content}</td>
                   <td>
-                    <a href='' className='underline' download>
-                      보기
-                    </a>
+                    {item.questionFileId && item.questionFileId !== 0 ? (
+                      <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.questionFileId}`}
+                         className='underline' download>
+                        보기
+                      </a>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                   <td>{item.creDate}</td>
                   <td>
-                    {item.isSubmit == 'Y' ? (
-                      <a href='' className='underline' download>
+                    {item.answerFileId && item.answerFileId !== 0 ? (
+                      <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.answerFileId}`}
+                         className='underline' download>
                         제출
                       </a>
                     ) : (
-                      미제출
+                      '미제출'
                     )}
                   </td>
                   <td>
-                    <a href='' className='underline' download>
-                      답안 확인하기
-                    </a>
+                    {item.modelAnswerFileId && item.modelAnswerFileId !== 0 ? (
+                      <a
+                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.modelAnswerFileId}`}
+                        className='underline' download>
+                        답안 확인하기
+                      </a>
+                    ) : (
+                      '-'
+                    )}
                   </td>
-                  <td>{item.scoringStatus}</td>
+                  <td>{item.scoringStatus === 'NO_STATUS' ? '미채점' : item.scoringStatus}</td>
                 </tr>
               ))
             ) : (
@@ -122,36 +135,6 @@ const ReviewTestView = () => {
                 <td colSpan={9}>데이터가 존재하지 않습니다.</td>
               </tr>
             )}
-            <tr className='text-center'>
-              <td>1</td>
-              <td>화학</td>
-              <td>최철호 선생님</td>
-              <td>물질의 성질</td>
-              <td>
-                <a href='' className='underline' download>
-                  보기
-                </a>
-              </td>
-              <td>YYYY.MM.DD</td>
-              <td>미제출</td>
-              <td>-</td>
-              <td>Fail</td>
-            </tr>
-            <tr className='text-center'>
-              <td>1</td>
-              <td>화학</td>
-              <td>최철호 선생님</td>
-              <td>물질의 성질</td>
-              <td>
-                <a href='' className='underline' download>
-                  보기
-                </a>
-              </td>
-              <td>YYYY.MM.DD</td>
-              <td>미제출</td>
-              <td>-</td>
-              <td>미채점</td>
-            </tr>
             </tbody>
           </table>
         </div>
