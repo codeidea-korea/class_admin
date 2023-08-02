@@ -220,7 +220,6 @@ const ReviewTest = () => {
                         <td>학교</td>
                         <td>학년</td>
                         <td>학생 등록일</td>
-                        <td>분류</td>
                         <td>테스트</td>
                         <td>
                           <button className='btn btn-outline-danger bg-white btn-sm'>
@@ -236,7 +235,6 @@ const ReviewTest = () => {
                           <td>{child.schoolName}</td>
                           <td>{child.grade}</td>
                           <td>{child.creDate}</td>
-                          <td></td>
                           <td>
                             <Link
                               to={`/mento_mng/view?id=${child.id}&teacher-id=${item.id}&name=${child.name}&teacher-name=${item.teacherName}`}
