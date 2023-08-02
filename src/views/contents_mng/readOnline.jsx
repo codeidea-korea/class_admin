@@ -28,7 +28,7 @@ const ReadOnline = () => {
   })
 
   // 탭 이동
-  const [curTab, setCurTab] = useState()
+  const [curTab, setCurTab] = useState(url === '?sch' ? 'SCIENCE' : 'MATH')
 
   // 페이지네이션 클릭
   const handlePageClick = (event) => {
