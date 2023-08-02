@@ -105,6 +105,8 @@ function OnlinebasicClass() {
   useEffect(()=>{
     if(params.get('tab') == 'gsh'){
       setCurTab("영재학교")
+    }else if(params.get('tab') == 'sch'){
+      setCurTab("과학고")
     }else{
       setCurTab("영재원")
     }
@@ -151,10 +153,9 @@ function OnlinebasicClass() {
         }}>영재학교
         </button>
         <button className={'btn w-36' + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => {
-          alert('준비중입니다.')
-          {/*setCurTab('과학고')
+          setCurTab('과학고')
           sessionStorage.setItem('onlineBasicCurTab','과학고')
-          */}
+          navigate('?tab=sch')
         }}>과학고
         </button>
       </div>
@@ -172,7 +173,7 @@ function OnlinebasicClass() {
                     (item) => item.id === Number(e.target.value),
                   ).subject,
                 })
-                navigate(`?tab=${curTab=="영재원"?"geh":"gsh"}&subject=${e.target.value}`)
+                navigate(`?tab=${curTab=="영재원"?"geh":curTab=="과학고"?"sch":"gsh"}&subject=${e.target.value}`)
               }}
               value={state.id}
             >

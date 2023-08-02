@@ -48,7 +48,7 @@ function LifeRecordEdit() {
                 <input
                   type="text"
                   className="form-control w-52"
-                  placeholder="이름을 입력하 주세요."
+                  placeholder="이름을 입력해주세요."
                 />
               </td>
             </tr>
