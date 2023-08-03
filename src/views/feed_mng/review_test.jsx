@@ -433,6 +433,13 @@ const ReviewTest = () => {
         onHidden={() => {
           setPopSearchStrudentSelMentorId(0)
           setAddStudentPop(false)
+          setTxtSearchWord({
+            searchStudentWord: '',
+            searchTeacherWord: '',
+            serachField: '',
+          })
+          setSearchedStudentList()
+          setAddStudentIds([])
         }}
       >
         <ModalHeader>
@@ -442,6 +449,13 @@ const ReviewTest = () => {
             onClick={() => {
               setPopSearchStrudentSelMentorId(0)
               setAddStudentPop(false)
+              setTxtSearchWord({
+                searchStudentWord: '',
+                searchTeacherWord: '',
+                serachField: '',
+              })
+              setSearchedStudentList()
+              setAddStudentIds([])
             }}
           >
             <Lucide icon='X' className='w-4 h-4' />
@@ -455,6 +469,7 @@ const ReviewTest = () => {
                 name={'searchStudentWord'}
                 className='form-control w-52'
                 placeholder='아이디/전화번호/이름'
+                value={txtSearchWord.searchStudentWord}
                 onChange={handleTxtSearchWord}
               />
               <button
@@ -514,6 +529,13 @@ const ReviewTest = () => {
             onClick={() => {
               setPopSearchStrudentSelMentorId(0)
               setAddStudentPop(false)
+              setTxtSearchWord({
+                searchStudentWord: '',
+                searchTeacherWord: '',
+                serachField: '',
+              })
+              setSearchedStudentList()
+              setAddStudentIds([])
             }}
           >
             취소
