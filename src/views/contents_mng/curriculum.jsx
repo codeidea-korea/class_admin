@@ -46,14 +46,14 @@ function CurriCulum() {
   return (
     <>
       <div className='flex gap-2 mt-5'>
-        <button className={'btn w-36' + (fieldName === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => {
-          alert('준비중입니다.')
-          {/*setFieldName('영재원')
-            sessionStorage.setItem('cuCurTab', '영재원')
-            // 영재원 탭 사용시 navigate 추가와 위에 url 변경시 탭 수정 필요
-          */}
-        }}>영재원
-        </button>
+        {/*<button className={'btn w-36' + (fieldName === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => {*/}
+        {/*  alert('준비중입니다.')*/}
+        {/*  /!*setFieldName('영재원')*/}
+        {/*    sessionStorage.setItem('cuCurTab', '영재원')*/}
+        {/*    // 영재원 탭 사용시 navigate 추가와 위에 url 변경시 탭 수정 필요*/}
+        {/*  *!/*/}
+        {/*}}>영재원*/}
+        {/*</button>*/}
         <button className={'btn w-36' + (fieldName === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setFieldName('영재학교')
           sessionStorage.setItem('cuCurTab', '영재학교')
