@@ -126,32 +126,32 @@ const PriorQuestion = () => {
             )}
             </tbody>
           </table>
-          <div className="mt-5 flex items-center justify-center">
-            <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
-              <nav className="w-full sm:w-auto sm:mr-auto">
-                <ReactPaginate
-                  className={'pagination justify-center'}
-                  pageClassName={'page-item'}
-                  pageLinkClassName={'page-link'}
-                  breakLinkClassName={'page-item'}
-                  breakLabel="..."
-                  nextClassName={'page-item'}
-                  nextLinkClassName={'page-link'}
-                  nextLabel={<ChevronRight className="w-4 h-4" />}
-                  previousClassName={'page-item'}
-                  previousLinkClassName={'page-link'}
-                  onPageChange={handlePageClick}
-                  previousLabel={<ChevronLeft className="w-4 h-4" />}
-                  activeClassName={'page-item active'}
-                  // pageRangeDisplayed={pageParams.pageRangeDisplayed}
-                  pageRangeDisplayed={'10'}
-                  // pageCount={pageParams.totalPages}
-                  pageCount={'3'}
-                  renderOnZeroPageCount={(props) => null}
-                />
-              </nav>
-            </div>
-          </div>
+          {/*<div className="mt-5 flex items-center justify-center">*/}
+          {/*  <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">*/}
+          {/*    <nav className="w-full sm:w-auto sm:mr-auto">*/}
+          {/*      <ReactPaginate*/}
+          {/*        className={'pagination justify-center'}*/}
+          {/*        pageClassName={'page-item'}*/}
+          {/*        pageLinkClassName={'page-link'}*/}
+          {/*        breakLinkClassName={'page-item'}*/}
+          {/*        breakLabel="..."*/}
+          {/*        nextClassName={'page-item'}*/}
+          {/*        nextLinkClassName={'page-link'}*/}
+          {/*        nextLabel={<ChevronRight className="w-4 h-4" />}*/}
+          {/*        previousClassName={'page-item'}*/}
+          {/*        previousLinkClassName={'page-link'}*/}
+          {/*        onPageChange={handlePageClick}*/}
+          {/*        previousLabel={<ChevronLeft className="w-4 h-4" />}*/}
+          {/*        activeClassName={'page-item active'}*/}
+          {/*        // pageRangeDisplayed={pageParams.pageRangeDisplayed}*/}
+          {/*        pageRangeDisplayed={'10'}*/}
+          {/*        // pageCount={pageParams.totalPages}*/}
+          {/*        pageCount={'3'}*/}
+          {/*        renderOnZeroPageCount={(props) => null}*/}
+          {/*      />*/}
+          {/*    </nav>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
         </div>
 
         {/* BEGIN: Modal 영상보기 */}

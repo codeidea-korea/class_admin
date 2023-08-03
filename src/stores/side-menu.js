@@ -112,10 +112,10 @@ const sideMenu = atom({
         ],
       },
 
-      {
-        icon: 'Bell',
-        title: '알림',
-      },
+        // {
+        //   icon: 'Bell',
+        //   title: '알림',
+        // },
       {
         icon: 'Laptop',
         pathname: '/reservation',
