@@ -148,6 +148,45 @@ const ReviewTest = () => {
     setTxtSearchWord({ [name]: value })
   }
 
+  /** 학생 삭제 */
+  const DeleteStudentHandle = (id) => {
+    let deleteStu = []
+    const input = document.querySelectorAll(`.tableId_${id} tbody input`)
+    input.forEach((item)=>{
+      if(item.checked){
+        deleteStu.push(Number(item.value))
+      }
+    })
+
+    let params = {
+			"id": id,
+			"studentId": deleteStu
+    }
+
+    if(deleteStu.length == 0){
+      alert("삭제할 학생을 선택해주세요.")
+      return false
+    }
+
+    DeleteStudent(params)
+    
+  }
+  const DeleteStudent = async (params)=>{
+    await api
+    .delete(`/admin/mentor-management/review-test/delete`, {
+      headers: {Authorization: `Bearer ${user.token}`},
+      withCredentials: true,
+      data: params,
+    })
+    .then((res) => {
+      console.log(res)
+      if (res.status === 200) {
+        alert("삭제되었습니다.")
+        refetchMentorList()
+      }
+    })
+  }
+
   return (
     <React.Fragment>
       <div className='intro-y box mt-5'>
@@ -219,26 +258,28 @@ const ReviewTest = () => {
                     )}
                   </div>
                   <div className='overflow-x-auto mt-5'>
-                    <table className='table table-hover'>
+                    <table className={`table table-hover tableId_${item.id}`}>
+                      <thead>
+                        <tr className='text-center bg-slate-100 font-medium'>
+                          <td>번호</td>
+                          <td>아이디</td>
+                          <td>이름</td>
+                          <td>학교</td>
+                          <td>학년</td>
+                          <td>학생 등록일</td>
+                          <td>테스트</td>
+                          <td>
+                            {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
+                              <button className='btn btn-outline-danger bg-white btn-sm' onClick={()=>DeleteStudentHandle(item.id)}>
+                                삭제
+                              </button>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                        </tr>
+                      </thead>
                       <tbody>
-                      <tr className='text-center bg-slate-100 font-medium'>
-                        <td>번호</td>
-                        <td>아이디</td>
-                        <td>이름</td>
-                        <td>학교</td>
-                        <td>학년</td>
-                        <td>학생 등록일</td>
-                        <td>테스트</td>
-                        <td>
-                          {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
-                            <button className='btn btn-outline-danger bg-white btn-sm'>
-                              삭제
-                            </button>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                      </tr>
                       {item.studentList?.map((child, index) => (
                         <tr className='text-center' key={`student-${child.id}`}>
                           <td>{index + 1}</td>
@@ -264,6 +305,7 @@ const ReviewTest = () => {
                               <input
                                 type='checkbox'
                                 className='form-check-input chk1 custom-cursor-on-hover'
+                                value={child.id}
                               />
                             ) : (
                               '-'

@@ -101,6 +101,11 @@ const sideMenu = atom({
           },
           {
             icon: '',
+            pathname: '/compet_question',
+            title: '각종대회 문제 풀이',
+          },
+          {
+            icon: '',
             pathname: '/mock_exam',
             title: '회차별 모의고사',
           },
