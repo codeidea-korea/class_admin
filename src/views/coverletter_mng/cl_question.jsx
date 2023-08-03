@@ -20,6 +20,7 @@ function ClQuestion(props) {
     const [modQuestionParams, setModQuestionParams] = useState({
         typeId: props.typeId, number: 0, title: '', tip: '', limit: 0
     });
+    
 
     /** handler */
     const handleAddParams = (event) => {
@@ -36,7 +37,7 @@ function ClQuestion(props) {
         if (addQuestionParams.title === "") { alert('문항 타이틀을 입력해주세요.'); return false; }
         if (addQuestionParams.tip === "") { alert('자소서 꿀팁을 입력해주세요.'); return false; }
         if (addQuestionParams.limit === "") { alert('글자수 제한을 입력해주세요.'); return false; }
-        await api.post(`/admin/personal-statement/question`, addQuestionParams, 
+        await api.post(`/admin/personal-statement/question`, {...addQuestionParams, typeId:props.typeId}, 
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
 			console.log(res)
