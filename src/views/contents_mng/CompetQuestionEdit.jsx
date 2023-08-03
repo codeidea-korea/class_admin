@@ -8,6 +8,9 @@ import request from '@/utils/request'
 const CompetQuestionEdit = () => {
   const navigate = useNavigate()
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
+  const params = new URLSearchParams(location.search)
+  const subId = params.get('sub-id')
+
   const [pageParams, setPageParams] = useState({
     totalPages: 0,
     totalElements: 0,
@@ -25,11 +28,12 @@ const CompetQuestionEdit = () => {
   const handleAddList = () => {
     const addData = {
       id: 0,
-      year: '',
-      schoolName: '',
+      content: '',
       linkUrl: '',
-      fileId: '',
-      fileName: '',
+      questionFileId: '',
+      questionFileName: '',
+      analyzeFileId: '',
+      analyzeFileName: '',
     }
     setValue('list', [...getValues('list'), addData])
   }
@@ -41,28 +45,27 @@ const CompetQuestionEdit = () => {
       if (data.id > 0) {
         setDelDataList([...delDataList, data])
       }
-
       reset({ list: getValues('list').filter((i, n) => n !== index) })
     }
   }
 
   // 리스트 가져오기
   const {
-    data: priorQuestion,
-    isLoading: isPriorQuestion,
-    refetch: refetchPriorQuestion,
+    data: competQuestion,
+    isLoading: isCompetQuestion,
+    refetch: refetchCompetQuestion,
   } = useQuery(
     'getPriorQuestion',
     () =>
-      request.get(`/admin/content-management/prior-question`, {
+      request.get(`/admin/content-management/compet-question`, {
         params: {
           page: pageParams.currentPage,
           limit: pageParams.pageRangeDisplayed,
+          competType: subId,
         },
       }),
     {
       onSuccess: (data) => {
-        reset({ list: data.content })
       },
     },
   )
@@ -70,7 +73,7 @@ const CompetQuestionEdit = () => {
   // 저장
   const { mutate: saveData } = useMutation(
     (data) =>
-      request.put(`/admin/content-management/prior-question`, data),
+      request.put(`/admin/content-management/compet-question`, data),
     {
       onSuccess: () => {
         alert('저장되었습니다.')
@@ -90,27 +93,18 @@ const CompetQuestionEdit = () => {
     }
 
     let temp = true
-    let idList = [], yearList = [], schoolNameList = [], linkUrlList = [], delYnList = []
+    let idList = [], contentList = [], linkUrlList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
 
-      // 제목, 링크는 필수값
-      if (!item?.schoolName) {
-        alert('제목을 입력하세요.')
+      if (!item?.content) {
+        alert('내용을 입력하세요.')
         temp = false
         return temp
       }
-
-      if (!item?.linkUrl) {
-        alert('링크를 입력하세요.')
-        temp = false
-        return temp
-      }
-
       idList.push(item.id ? item.id : 0)
-      yearList.push(item.year ? item.year : '')
-      schoolNameList.push(item.schoolName ? item.schoolName : '')
+      contentList.push(item.content ? item.content : '')
       linkUrlList.push(item.linkUrl ? item.linkUrl : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
     })
@@ -120,20 +114,19 @@ const CompetQuestionEdit = () => {
     // 삭제할 데이터 리스트 셋팅
     delDataList.forEach((item) => {
       idList.push(item.id)
-      yearList.push('')
-      schoolNameList.push('')
+      contentList.push('')
       linkUrlList.push('')
       delYnList.push('Y')
     })
 
     const formData = new FormData()
     formData.append('id', idList.length > 1 ? idList.join(',') : idList)
-    formData.append('year', yearList.length > 1 ? yearList.join(',') : yearList)
-    formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
+    formData.append('content', contentList.length > 1 ? contentList.join(',') : contentList)
     formData.append('linkUrl', linkUrlList.length > 1 ? linkUrlList.join(',') : linkUrlList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
 
-    const newFileDelYN = []
+    const newQuestionFileDelYN = []
+    const newAnalyzeFileDelYN = []
 
     /* 파일 */
     const null_blob = new Blob(['null'], { type: 'image/png' })
@@ -142,59 +135,54 @@ const CompetQuestionEdit = () => {
     })
 
     getValues('list').map((item) => {
-      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          newFileDelYN.push('Y')
-          formData.append('file', item.file[0])
-
+      if (item.questionFileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.questionFile && item.questionFile.length) { // 새로 등록할 파일이 있으면
+          newQuestionFileDelYN.push('Y')
+          formData.append('questionFile', item.questionFile[0])
         } else { // 새로 등록할 파일이 없으면
-          if (item.fileName) { // 기존 파일을 유지하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('N')
+          if (item.questionFileName) { // 기존 파일을 유지하는 경우
+            formData.append('questionFile', null_file)
+            newQuestionFileDelYN.push('N')
           } else { // 기존 파일을 삭제하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('Y')
+            formData.append('questionFile', null_file)
+            newQuestionFileDelYN.push('Y')
           }
         }
-
       } else { // 기존에 등록된 파일이 없으면
-        newFileDelYN.push('N')
-
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          formData.append('file', item.file[0])
+        newQuestionFileDelYN.push('N')
+        if (item.questionFile && item.questionFile.length) { // 새로 등록할 파일이 있으면
+          formData.append('questionFile', item.questionFile[0])
         } else {
-          formData.append('file', null_file)
+          formData.append('questionFile', null_file)
+        }
+      }
+
+      if (item.analyzeFileId > 0) { // 기존에 등록된 파일이 있으면
+        if (item.analyzeFile && item.analyzeFile.length) { // 새로 등록할 파일이 있으면
+          newAnalyzeFileDelYN.push('Y')
+          formData.append('analyzeFile', item.analyzeFile[0])
+        } else { // 새로 등록할 파일이 없으면
+          if (item.analyzeFileName) { // 기존 파일을 유지하는 경우
+            formData.append('analyzeFile', null_file)
+            newAnalyzeFileDelYN.push('N')
+          } else { // 기존 파일을 삭제하는 경우
+            formData.append('analyzeFile', null_file)
+            newAnalyzeFileDelYN.push('Y')
+          }
+        }
+      } else { // 기존에 등록된 파일이 없으면
+        newAnalyzeFileDelYN.push('N')
+        if (item.analyzeFile && item.analyzeFile.length) { // 새로 등록할 파일이 있으면
+          formData.append('analyzeFile', item.analyzeFile[0])
+        } else {
+          formData.append('analyzeFile', null_file)
         }
       }
     })
+    formData.append('savedQuestionFileDelYN', newQuestionFileDelYN.join(','))
+    formData.append('savedAnalyzeFileDelYN', newAnalyzeFileDelYN.join(','))
 
-    delDataList.map((item) => {
-      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          newFileDelYN.push('Y')
-          formData.append('file', item.file[0])
-
-        } else { // 새로 등록할 파일이 없으면
-          if (item.fileName) { // 기존 파일을 유지하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('N')
-          } else { // 기존 파일을 삭제하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('Y')
-          }
-        }
-
-      } else { // 기존에 등록된 파일이 없으면
-        newFileDelYN.push('N')
-
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          formData.append('file', item.file[0])
-        } else {
-          formData.append('file', null_file)
-        }
-      }
-    })
-    formData.append('savedFileDelYN', newFileDelYN.join(','))
+    formData.append('competType', subId)
 
     saveData(formData)
   }
@@ -202,19 +190,19 @@ const CompetQuestionEdit = () => {
   return (
     <>
       <div className='intro-y box mt-5'>
-        <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
-          <div className="text-lg font-medium flex items-center">{sessionStorage.getItem('competQuestionCurTab')}</div>
+        <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
+          <div className='text-lg font-medium flex items-center'>{sessionStorage.getItem('competQuestionCurTab')}</div>
         </div>
         <div className='intro-y p-5'>
           <table className='table table-hover'>
             <thead>
             <tr className='bg-slate-100 text-center'>
-                <td>번호</td>
-                <td>내용</td>
-                <td>기출문제</td>
-                <td>분석</td>
-                <td>풀이영상</td>
-                <td>삭제</td>
+              <td>번호</td>
+              <td>내용</td>
+              <td>기출문제</td>
+              <td>분석</td>
+              <td>풀이영상</td>
+              <td>삭제</td>
             </tr>
             </thead>
             <tbody>
@@ -225,28 +213,27 @@ const CompetQuestionEdit = () => {
                   <input
                     type='text'
                     className='form-control'
-                    defaultValue={item.schoolName}
-                    key={item.schoolName}
-                    {...register(`list[${index}].schoolName`)}
+                    defaultValue={item.content}
+                    key={item.content}
+                    {...register(`list[${index}].content`)}
                   />
                 </td>
                 <td>
                   <div className='input-group justify-center'>
-                    {watch(`list.${index}.fileName`) ? (
+                    {watch(`list.${index}.questionFileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`${baseUrl}/v1/contents-data/file-download/${watch('fileId')}`}
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('questionFileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
-                          {watch(`list.${index}.fileName`)}
+                          {watch(`list.${index}.questionFileName`)}
                         </a>
                         <Lucide
                           icon='X'
                           className='w-4 h-4 text-danger cursor-pointer'
                           onClick={() => {
                             let list = getValues('list')
-                            list[index].fileName = ''
-
+                            list[index].questionFileName = ''
                             setValue('list', list)
                           }}
                         ></Lucide>
@@ -257,14 +244,14 @@ const CompetQuestionEdit = () => {
                           type='file'
                           className='dp_none'
                           id={`file-upload-${index}`}
-                          {...register(`list.${index}.file`)}
+                          {...register(`list.${index}.questionFile`)}
                         />
                         <label htmlFor={`file-upload-${index}`} className='flex items-center'>
                           <input
                             type='text'
                             className='form-control file_up bg-white'
                             placeholder=''
-                            value={item?.file?.length > 0 ? item?.file[0]?.name : ''}
+                            value={item?.questionFile?.length > 0 ? item?.questionFile[0]?.name : ''}
                             readOnly
                           />
                           <div className='input-group-text whitespace-nowrap file_up_btn'>
@@ -277,21 +264,20 @@ const CompetQuestionEdit = () => {
                 </td>
                 <td>
                   <div className='input-group justify-center'>
-                    {watch(`list.${index}.fileName2`) ? (
+                    {watch(`list.${index}.analyzeFileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`${baseUrl}/v1/contents-data/file-download/${watch('fileId')}`}
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('analyzeFileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
-                          {watch(`list.${index}.fileName2`)}
+                          {watch(`list.${index}.analyzeFileName`)}
                         </a>
                         <Lucide
                           icon='X'
                           className='w-4 h-4 text-danger cursor-pointer'
                           onClick={() => {
                             let list = getValues('list')
-                            list[index].fileName = ''
-
+                            list[index].analyzeFileName = ''
                             setValue('list', list)
                           }}
                         ></Lucide>
@@ -302,14 +288,14 @@ const CompetQuestionEdit = () => {
                           type='file'
                           className='dp_none'
                           id={`file-upload-${index}2`}
-                          {...register(`list.${index}.file2`)}
+                          {...register(`list.${index}.analyzeFile`)}
                         />
                         <label htmlFor={`file-upload-${index}2`} className='flex items-center'>
                           <input
                             type='text'
                             className='form-control file_up bg-white'
                             placeholder=''
-                            value={item?.file2?.length > 0 ? item?.file2[0]?.name : ''}
+                            value={item?.analyzeFile?.length > 0 ? item?.analyzeFile[0]?.name : ''}
                             readOnly
                           />
                           <div className='input-group-text whitespace-nowrap file_up_btn'>
@@ -330,10 +316,10 @@ const CompetQuestionEdit = () => {
                   />
                 </td>
                 <td>
-                  {index >= 0 && (
+                  {getValues('list')?.length > 0 && (
                     <button
                       className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
-                      onClick={() => deleteHandle(item.rowId)}
+                      onClick={() => deleteHandle(item.id)}
                     >
                       삭제
                     </button>

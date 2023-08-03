@@ -1,22 +1,15 @@
 import { useEffect, useReducer, useState } from 'react'
-import {
-  Lucide,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@/base-components'
-import { Link , useLocation , useNavigate} from 'react-router-dom'
-import { useQuery, useMutation } from 'react-query'
+import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useMutation, useQuery } from 'react-query'
 import { useForm } from 'react-hook-form'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 function OnlinebasicClass() {
-  const url = useLocation().search;
+  const url = useLocation().search
   const params = new URLSearchParams(location.search)
-  const navigate = useNavigate();
-  const basicCurTab = sessionStorage.getItem('basicCurTab') == null ? '영재원' : sessionStorage.getItem('basicCurTab')
+  const navigate = useNavigate()
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const [curTab, setCurTab] = useState('')
 
@@ -45,7 +38,7 @@ function OnlinebasicClass() {
     isLoading: isBasicClassSubject,
     refetch: refetchBasicClassSubject,
   } = useQuery(
-    ['getBasicClassSubject',curTab],
+    ['getBasicClassSubject', curTab],
     () =>
       request.get(`/admin/content-management/mock-exam-gubun`, {
         params: {
@@ -111,65 +104,57 @@ function OnlinebasicClass() {
     )
 
 
-    useEffect(()=>{
-      if(params.get('tab') == 'gsh'){
-        setCurTab("영재학교")
-      }else{
-        setCurTab("영재원")
-      }
-  
-      if(basicClassSubject){
-        if(params.get('subject')){
-          setTimeout(function(){
-            setState({
-              id: params.get('subject'),
-              gubun: basicClassSubject?.find(
-                (item) => item.id === Number(params.get('subject')),
-                ).gubun,
-            })
-          },100)
-        }else{
-          const select = document.querySelector('.subject_search option')
-          if(select){
-            setState({
-              id: select.value,
-              gubun: basicClassSubject.find(
-                (item) => item.id === Number(select.value),
-              ).gubun,
-            })
-          }
+  useEffect(() => {
+    if (params.get('tab') == 'gsh') {
+      setCurTab('영재학교')
+    } else {
+      setCurTab('영재원')
+    }
+
+    if (basicClassSubject) {
+      if (params.get('subject')) {
+        setTimeout(function() {
+          setState({
+            id: params.get('subject'),
+            gubun: basicClassSubject?.find(
+              (item) => item.id === Number(params.get('subject')),
+            ).gubun,
+          })
+        }, 100)
+      } else {
+        const select = document.querySelector('.subject_search option')
+        if (select) {
+          setState({
+            id: select.value,
+            gubun: basicClassSubject.find(
+              (item) => item.id === Number(select.value),
+            ).gubun,
+          })
         }
       }
-  
-    },[url,basicClassSubject])
+    }
 
+  }, [url, basicClassSubject])
 
-    
-
-  
-
-  
 
   return (
     <>
       <div className='flex gap-2 mt-5'>
         <button className={'btn w-36' + (curTab === '영재원' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setCurTab('영재원')
-          sessionStorage.setItem('basicCurTab', '영재원')
           navigate('?tab=geh')
         }}>영재원
         </button>
         <button className={'btn w-36' + (curTab === '영재학교' ? ' btn-primary' : ' bg-white')} onClick={() => {
           setCurTab('영재학교')
-          sessionStorage.setItem('basicCurTab', '영재학교')
           navigate('?tab=gsh')
         }}>영재학교
         </button>
         <button className={'btn w-36' + (curTab === '과학고' ? ' btn-primary' : ' bg-white')} onClick={() => {
           alert('준비중입니다.')
           {/*setCurTab('과학고')
-            sessionStorage.setItem('basicCurTab', '과학고')
-          */}
+          */
+          }
         }}>과학고
         </button>
       </div>
@@ -187,7 +172,7 @@ function OnlinebasicClass() {
                     (item) => item.id === Number(e.target.value),
                   ).gubun,
                 })
-                navigate(`?tab=${curTab=="영재원"?"geh":"gsh"}&subject=${e.target.value}`)
+                navigate(`?tab=${curTab == '영재원' ? 'geh' : 'gsh'}&subject=${e.target.value}`)
               }}
               value={state.id}
             >

@@ -350,7 +350,7 @@ function OnlineBasicClassForm() {
                     )}*/}
                   </td>
                   <td>
-                    {getValues('list')?.length > 1 && (
+                    {getValues('list')?.length > 0 && (
                       <button
                         className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
                         onClick={() => handleDeleteVideo(index,item?.row_id)}
