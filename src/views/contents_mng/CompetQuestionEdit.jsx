@@ -49,12 +49,7 @@ const CompetQuestionEdit = () => {
     }
   }
 
-  // 리스트 가져오기
-  const {
-    data: competQuestion,
-    isLoading: isCompetQuestion,
-    refetch: refetchCompetQuestion,
-  } = useQuery(
+  useQuery(
     'getPriorQuestion',
     () =>
       request.get(`/admin/content-management/compet-question`, {
@@ -66,6 +61,7 @@ const CompetQuestionEdit = () => {
       }),
     {
       onSuccess: (data) => {
+        reset({ list: data.content })
       },
     },
   )

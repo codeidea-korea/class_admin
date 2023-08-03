@@ -89,12 +89,12 @@ const CompetQuestion = () => {
               competQuestion?.content?.map((item, index) => (
                 <tr className='text-center' key={index}>
                   <td>{competQuestion?.content?.length - index}</td>
-                  <td>{item.schoolName}</td>
+                  <td>{item.content}</td>
                   <td>
                     <div className='flex justify-center'>
-                      {item.fileId && item.fileId > 0 && (
+                      {item.questionFileId && item.questionFileId > 0 && (
                         <a
-                          href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.questionFileId}`}
                         >
                           <button
                             type={'button'}
@@ -109,9 +109,9 @@ const CompetQuestion = () => {
                   </td>
                   <td>
                     <div className='flex justify-center'>
-                      {item.fileId && item.fileId > 0 && (
+                      {item.analyzeFileId && item.analyzeFileId > 0 && (
                         <a
-                          href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.analyzeFileId}`}
                         >
                           <button
                             type={'button'}

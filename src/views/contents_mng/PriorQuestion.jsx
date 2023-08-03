@@ -77,7 +77,7 @@ const PriorQuestion = () => {
             {priorQuestion?.content?.length > 0 ? (
               priorQuestion?.content?.map((item, index) => (
                 <tr className="text-center" key={index}>
-                  <td>{item.id}</td>
+                  <td>{priorQuestion?.content?.length - index}</td>
                   <td>{item.year}</td>
                   <td>{item.schoolName}</td>
                   <td>
