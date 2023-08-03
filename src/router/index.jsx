@@ -70,6 +70,8 @@ import MentoTabMng from '../views/feed_mng/mentoTabMng'
 import ReviewTestView from '../views/feed_mng/review_test_view'
 import ReviewTestEdit from '../views/feed_mng/review_test_edit'
 import FeedTabMng from '../views/feed_mng/feedTabMng'
+import CompetQuestion from '../views/contents_mng/CompetQuestion'
+import CompetQuestionEdit from '../views/contents_mng/CompetQuestionEdit'
 
 function Router() {
   const routes = [
@@ -476,6 +478,26 @@ function Router() {
           element: (
             <PrivateRoute
               element={<PriorQuestionEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 각종대회 문제 풀이
+        {
+          path: '/compet_question',
+          element: (
+            <PrivateRoute
+              element={<CompetQuestion />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/compet_question/edit',
+          element: (
+            <PrivateRoute
+              element={<CompetQuestionEdit />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
