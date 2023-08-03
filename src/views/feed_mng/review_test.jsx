@@ -154,20 +154,24 @@ const ReviewTest = () => {
         <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
           <div className='ml-auto'>
             <div className='flex flex-middle gap-3'>
-              <button
-                className='btn btn-outline-primary border-dotted'
-                onClick={() => {
-                  setTxtSearchWord({
-                    searchStudentWord: '',
-                    searchTeacherWord: '',
-                    serachField: '',
-                  })
-                  setAddMentorPop(true)
-                }}
-              >
-                <Lucide icon='Plus' className='w-4 h-4 mr-2'></Lucide>멘토
-                추가하기
-              </button>
+              {user.authority === 'ADMIN' ? (
+                <button
+                  className='btn btn-outline-primary border-dotted'
+                  onClick={() => {
+                    setTxtSearchWord({
+                      searchStudentWord: '',
+                      searchTeacherWord: '',
+                      serachField: '',
+                    })
+                    setAddMentorPop(true)
+                  }}
+                >
+                  <Lucide icon='Plus' className='w-4 h-4 mr-2'></Lucide>멘토
+                  추가하기
+                </button>
+              ) : (
+                <></>
+              )}
               <input
                 type='text'
                 name=''
@@ -196,19 +200,23 @@ const ReviewTest = () => {
                       </button>
                     </div>
                     <div className='font-medium'>담당선생님 : {item.teacherName}</div>
-                    <div className='flex items-center gap-2 font-medium'>
-                      담당학생
-                      <button
-                        className='btn btn-outline-primary btn-sm'
-                        onClick={() => {
-                          setPopSearchStrudentSelMentorId(item.id)
-                          setAddStudentPop(true)
-                        }}
-                      >
-                        <Lucide icon='Plus' className='w-4 h-4 mr-1'></Lucide>
-                        학생 추가하기
-                      </button>
-                    </div>
+                    {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
+                      <div className='flex items-center gap-2 font-medium'>
+                        담당학생
+                        <button
+                          className='btn btn-outline-primary btn-sm'
+                          onClick={() => {
+                            setPopSearchStrudentSelMentorId(item.id)
+                            setAddStudentPop(true)
+                          }}
+                        >
+                          <Lucide icon='Plus' className='w-4 h-4 mr-1'></Lucide>
+                          학생 추가하기
+                        </button>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                   <div className='overflow-x-auto mt-5'>
                     <table className='table table-hover'>
@@ -222,9 +230,13 @@ const ReviewTest = () => {
                         <td>학생 등록일</td>
                         <td>테스트</td>
                         <td>
-                          <button className='btn btn-outline-danger bg-white btn-sm'>
-                            삭제
-                          </button>
+                          {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
+                            <button className='btn btn-outline-danger bg-white btn-sm'>
+                              삭제
+                            </button>
+                          ) : (
+                            '-'
+                          )}
                         </td>
                       </tr>
                       {item.studentList?.map((child, index) => (
@@ -236,18 +248,26 @@ const ReviewTest = () => {
                           <td>{child.grade}</td>
                           <td>{child.creDate}</td>
                           <td>
-                            <Link
-                              to={`/mento_mng/view?id=${child.id}&teacher-id=${item.id}&name=${child.name}&teacher-name=${item.teacherName}`}
-                              className='btn btn-outline-primary btn-sm'
-                            >
-                              복습테스트
-                            </Link>
+                            {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
+                              <Link
+                                to={`/mento_mng/view?id=${child.id}&teacher-id=${item.id}&name=${child.name}&teacher-name=${item.teacherName}`}
+                                className='btn btn-outline-primary btn-sm'
+                              >
+                                복습테스트
+                              </Link>
+                            ) : (
+                              '-'
+                            )}
                           </td>
                           <td>
-                            <input
-                              type='checkbox'
-                              className='form-check-input chk1 custom-cursor-on-hover'
-                            />
+                            {(user.authority === 'TEACHER' && user.userId === item.teacherUserId) || user.authority === 'ADMIN' ? (
+                              <input
+                                type='checkbox'
+                                className='form-check-input chk1 custom-cursor-on-hover'
+                              />
+                            ) : (
+                              '-'
+                            )}
                           </td>
                         </tr>
                       ))}
