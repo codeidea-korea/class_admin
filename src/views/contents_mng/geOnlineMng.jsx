@@ -1,33 +1,36 @@
 import { useEffect, useState } from 'react'
 import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
-import {Link, useNavigate, useLocation} from 'react-router-dom'
-import ReactPaginate from 'react-paginate'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery } from 'react-query'
 import { useForm } from 'react-hook-form'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 
 const GeOnlineMng = () => {
-  const url = useLocation().search;
-  const params = new URLSearchParams(location.search);
+  const url = useLocation().search
+  const params = new URLSearchParams(location.search)
   let [menuData, setMenuData] = useState({
     curTab: 'MATH',
     stuTab: 'ELEMENTARY',
-    subId: 0
-  });
+    subId: 0,
+  })
 
-  const search = sessionStorage.getItem('search') == null ? null : JSON.parse(sessionStorage.getItem('search'));
-  if(search !== null && search.readOnline !== null) {
-    setMenuData({ ...menuData, curTab: search.readOnline.curTab, stuTab: search.readOnline.stuTab, subId: search.readOnline.subId})
+  const search = sessionStorage.getItem('search') == null ? null : JSON.parse(sessionStorage.getItem('search'))
+  if (search !== null && search.readOnline !== null) {
+    setMenuData({
+      ...menuData,
+      curTab: search.readOnline.curTab,
+      stuTab: search.readOnline.stuTab,
+      subId: search.readOnline.subId,
+    })
   }
 
   const setSearchData = (key, value) => {
-    search.readOnline[key] = value;
+    search.readOnline[key] = value
     sessionStorage.setItem('search', JSON.stringify(search))
   }
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // 과목추가 모달
   const [subject, setSubject] = useState(false)
@@ -62,7 +65,7 @@ const GeOnlineMng = () => {
     isLoading: isBasicClassSubject,
     refetch: refetchBasicClassSubject,
   } = useQuery(
-    ['getBasicClassSubject',curTab,stuTab],
+    ['getBasicClassSubject', curTab, stuTab],
     () =>
       request.get(`/admin/content-management/onlineSubjectUnit`, {
         params: {
@@ -75,7 +78,7 @@ const GeOnlineMng = () => {
         if (data[0]) {
           setSubId(data[0].row_id)
           setSubName(data[0].title)
-        }else {
+        } else {
           setSubId(0)
           refetchBasicClass()
         }
@@ -136,50 +139,50 @@ const GeOnlineMng = () => {
     )
 
   const goEdit = () => {
-    if(subId > 0) {
-      navigate(`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}&curTab=${curTab}`);
-    }else {
-      alert('과목을 추가해주세요.');
+    if (subId > 0) {
+      navigate(`/ge_online_mng/edit?student=${stuTab}&subject=${subName}&id=${subId}&curTab=${curTab}`)
+    } else {
+      alert('과목을 추가해주세요.')
     }
   }
 
-  useEffect(()=>{
-    if(params.get('tab') == 'SCIENCE'){
-      setCurTab("SCIENCE")
-    }else{
-      setCurTab("MATH")
+  useEffect(() => {
+    if (params.get('tab') == 'SCIENCE') {
+      setCurTab('SCIENCE')
+    } else {
+      setCurTab('MATH')
     }
 
-    if(basicClassSubject){
-      if(params.get('stu')){
-        setTimeout(function(){
+    if (basicClassSubject) {
+      if (params.get('stu')) {
+        setTimeout(function() {
           setStuTab(params.get('stu'))
-          setMenuData({ ...menuData, stuTab: params.get('stu')})
-        },100)
-      }else{
+          setMenuData({ ...menuData, stuTab: params.get('stu') })
+        }, 100)
+      } else {
         setStuTab('ELEMENTARY')
-        setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
+        setMenuData({ ...menuData, stuTab: 'ELEMENTARY' })
       }
 
-      if(params.get('sub')){
-        setTimeout(function(){
+      if (params.get('sub')) {
+        setTimeout(function() {
           const select = document.querySelector('.subject_search')
           setSubId(params.get('sub'))
           // setSubName(select.selectedOptions[0].innerText)
-          setMenuData({ ...menuData, subId: params.get('sub')})
+          setMenuData({ ...menuData, subId: params.get('sub') })
           console.log(select.option)
-        },100)
-      }else{
+        }, 100)
+      } else {
         const select = document.querySelector('.subject_search2 option')
-        if(select){
+        if (select) {
           setSubId(select.value)
-          setMenuData({ ...menuData, subId: select.value})
+          setMenuData({ ...menuData, subId: select.value })
         }
       }
     }
 
 
-  },[url,basicClassSubject])
+  }, [url, basicClassSubject])
 
   return (
     <>
@@ -189,10 +192,10 @@ const GeOnlineMng = () => {
             'btn w-32 ' + (curTab === 'MATH' ? 'btn-primary' : 'bg-white')
           }
           onClick={() => {
-            setStuTab('ELEMENTARY');
-            setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
-            setCurTab('MATH');
-            setMenuData({ ...menuData, curTab: 'MATH'})
+            setStuTab('ELEMENTARY')
+            setMenuData({ ...menuData, stuTab: 'ELEMENTARY' })
+            setCurTab('MATH')
+            setMenuData({ ...menuData, curTab: 'MATH' })
             navigate('?tab=MATH')
           }}
         >
@@ -203,10 +206,10 @@ const GeOnlineMng = () => {
             'btn w-32 ' + (curTab === 'SCIENCE' ? 'btn-primary' : 'bg-white')
           }
           onClick={() => {
-            setStuTab('ELEMENTARY');
-            setMenuData({ ...menuData, stuTab: 'ELEMENTARY'})
-            setCurTab('SCIENCE');
-            setMenuData({ ...menuData, curTab: 'SCIENCE'})
+            setStuTab('ELEMENTARY')
+            setMenuData({ ...menuData, stuTab: 'ELEMENTARY' })
+            setCurTab('SCIENCE')
+            setMenuData({ ...menuData, curTab: 'SCIENCE' })
             navigate('?tab=SCIENCE')
           }}
         >
@@ -223,7 +226,7 @@ const GeOnlineMng = () => {
               className='form-control w-40'
               onChange={(e) => {
                 setStuTab(e.target.value)
-                setMenuData({ ...menuData, stuTab: e.target.value})
+                setMenuData({ ...menuData, stuTab: e.target.value })
                 navigate(`?tab=${curTab}&stu=${e.target.value}`)
               }}
               value={stuTab}
@@ -236,7 +239,7 @@ const GeOnlineMng = () => {
               onChange={(e) => {
                 setSubId(e.target.value)
                 setSubName(e.target.selectedOptions[0].innerText)
-                setMenuData({ ...menuData, subId: e.target.value})
+                setMenuData({ ...menuData, subId: e.target.value })
                 navigate(`?tab=${curTab}&stu=${stuTab}&sub=${e.target.value}`)
               }}
               value={subId}
@@ -359,14 +362,14 @@ const GeOnlineMng = () => {
             type='button'
             className='btn btn-sky w-24'
             onClick={() => {
-              if(getValues('subjectUnit')) {
+              if (getValues('subjectUnit')) {
                 addClassSubject({
                   title: getValues('subjectUnit'),
                   subjectType: curTab,
                   studentType: stuTab,
                 })
-              }else {
-                alert('과목을 입력하세요.');
+              } else {
+                alert('과목을 입력하세요.')
               }
             }}
           >
