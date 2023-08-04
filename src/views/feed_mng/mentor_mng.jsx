@@ -1,17 +1,10 @@
-import {
-  Lucide,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-} from '@/base-components'
-import React, { useState, useReducer, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
+import React, { useReducer, useState } from 'react'
 import useAxios from '@/hooks/useAxios'
 import { useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
 import { userSchoolYear } from '@/components/helpers'
-import { useQuery, useMutation } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
 import Loading from '@/components/loading'
 
@@ -224,12 +217,12 @@ function MentoMng() {
           복습테스트
         </button>
       </div> */}
-      <div className="intro-y box mt-5">
-        <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
-          <div className="ml-auto">
-            <div className="flex flex-middle gap-3">
+      <div className='intro-y box mt-5'>
+        <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
+          <div className='ml-auto'>
+            <div className='flex flex-middle gap-3'>
               <button
-                className="btn btn-outline-primary border-dotted"
+                className='btn btn-outline-primary border-dotted'
                 onClick={() => {
                   setAddStudentIds([])
                   setTxtSearchWord({
@@ -240,91 +233,91 @@ function MentoMng() {
                   setAddMentorPop(true)
                 }}
               >
-                <Lucide icon="Plus" className="w-4 h-4 mr-2"></Lucide>멘토
+                <Lucide icon='Plus' className='w-4 h-4 mr-2'></Lucide>멘토
                 추가하기
               </button>
               <input
-                type="text"
-                name=""
-                className="form-control w-60"
-                placeholder="검색어 입력"
+                type='text'
+                name=''
+                className='form-control w-60'
+                placeholder='검색어 입력'
               />
               <button
-                type="button"
-                className="btn btn-primary flex items-center"
+                type='button'
+                className='btn btn-primary flex items-center'
               >
-                <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>검색
+                <Lucide icon='Search' className='w-4 h-4 mr-2'></Lucide>검색
               </button>
             </div>
           </div>
         </div>
 
         {mentorList?.map((item) => (
-          <div className="intro-y p-5" key={`mentor-${item.id}`}>
-            <div className=" border p-5 rounded-md border-dotted">
-              <div className="flex flex-col gap-2">
-                <div className="text-lg font-medium flex items-center">
+          <div className='intro-y p-5' key={`mentor-${item.id}`}>
+            <div className=' border p-5 rounded-md border-dotted'>
+              <div className='flex flex-col gap-2'>
+                <div className='text-lg font-medium flex items-center'>
                   {item.fieldName}
                   <button
-                    className="ml-auto"
+                    className='ml-auto'
                     onClick={() => {
                       removeTeacherProc(item.id)
                     }}
                   >
-                    <Lucide icon="X" className="w-6 h-6" />
+                    <Lucide icon='X' className='w-6 h-6' />
                   </button>
                 </div>
-                <div className="font-medium">
+                <div className='font-medium'>
                   담당선생님 : {item.teacherName} 선생님
                 </div>
-                <div className="flex items-center gap-2 font-medium">
+                <div className='flex items-center gap-2 font-medium'>
                   담당학생
                   <button
-                    className="btn btn-outline-primary btn-sm"
+                    className='btn btn-outline-primary btn-sm'
                     onClick={() => {
                       setPopSearchStrudentSelMentorId(item.id)
                       setAddStudentPop(true)
                     }}
                   >
-                    <Lucide icon="Plus" className="w-4 h-4 mr-1"></Lucide>
+                    <Lucide icon='Plus' className='w-4 h-4 mr-1'></Lucide>
                     추가하기
                   </button>
                 </div>
               </div>
-              <div className="overflow-x-auto mt-5">
-                <table className="table table-hover">
+              <div className='overflow-x-auto mt-5'>
+                <table className='table table-hover'>
                   <tbody>
-                    <tr className="text-center bg-slate-100 font-medium">
-                      <td>번호</td>
-                      <td>아이디</td>
-                      <td>이름</td>
-                      <td>학교</td>
-                      <td>학년</td>
-                      <td>학생 등록일</td>
-                      <td>전형</td>
-                      <td>삭제</td>
+                  <tr className='text-center bg-slate-100 font-medium'>
+                    <td>번호</td>
+                    <td>아이디</td>
+                    <td>이름</td>
+                    <td>학교</td>
+                    <td>학년</td>
+                    <td>학생 등록일</td>
+                    <td>전형</td>
+                    <td>삭제</td>
+                  </tr>
+                  {item.mentorApplicationList?.map((child, index) => (
+                    <tr className='text-center' key={`student-${child.id}`}>
+                      <td>{index + 1}</td>
+                      <td>{child.userId}</td>
+                      <td>{child.name}</td>
+                      <td>{child.schoolName}</td>
+                      <td>{userSchoolYear(child.schoolYear)}</td>
+                      <td>{child.creDate}</td>
+                      <td>{child.applicationTypeName}</td>
+                      <td>
+                        <button
+                          className='btn btn-outline-danger btn-sm'
+                          onClick={() => {
+                            removeStudentProc(child.id)
+                          }}
+                        >
+                          담당 학생 삭제
+                        </button>
+                      </td>
                     </tr>
-                    {item.mentorApplicationList?.map((child, index) => (
-                      <tr className="text-center" key={`student-${child.id}`}>
-                        <td>{index + 1}</td>
-                        <td>{child.userId}</td>
-                        <td>{child.name}</td>
-                        <td>{child.schoolName}</td>
-                        <td>{userSchoolYear(child.schoolYear)}</td>
-                        <td>{child.creDate}</td>
-                        <td>{child.applicationTypeName}</td>
-                        <td>
-                          <button
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={() => {
-                              removeStudentProc(child.id)
-                            }}
-                          >
-                            담당 학생 삭제
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                  ))}
                   </tbody>
                 </table>
               </div>
@@ -332,42 +325,42 @@ function MentoMng() {
           </div>
         ))}
 
-        <div className="flex justify-center mt-5 pb-5">
+        <div className='flex justify-center mt-5 pb-5'>
           <button
-            className="btn btn-outline-primary border-dotted"
+            className='btn btn-outline-primary border-dotted'
             onClick={() => {
               setAddMentorPop(true)
             }}
           >
-            <Lucide icon="Plus" className="w-6 h-6"></Lucide>
+            <Lucide icon='Plus' className='w-6 h-6'></Lucide>
           </button>
         </div>
       </div>
 
       {/* BEGIN: Modal 멘토 추가하기*/}
       <Modal
-        size="modal-lg"
+        size='modal-lg'
         show={addMentorPop}
         onHidden={() => {
           setAddMentorPop(false)
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">멘토 추가하기</h2>
+          <h2 className='font-medium text-base mr-auto'>멘토 추가하기</h2>
           <button
-            className="btn btn-rounded-secondary hidden sm:flex p-1"
+            className='btn btn-rounded-secondary hidden sm:flex p-1'
             onClick={() => {
               setAddMentorPop(false)
             }}
           >
-            <Lucide icon="X" className="w-4 h-4" />
+            <Lucide icon='X' className='w-4 h-4' />
           </button>
         </ModalHeader>
-        <ModalBody className="p-5">
-          <div className="flex items-center">
-            <div className="w-24 shrink-0 mr-3">담당 영역</div>
+        <ModalBody className='p-5'>
+          <div className='flex items-center'>
+            <div className='w-24 shrink-0 mr-3'>담당 영역</div>
             <select
-              className="form-select small"
+              className='form-select small'
               value={addTeacherParams.fieldId}
               onChange={(event) => {
                 setAddTeacherParams({
@@ -375,7 +368,7 @@ function MentoMng() {
                 })
               }}
             >
-              <option value="">담당영역을 선택해주세요.</option>
+              <option value=''>담당영역을 선택해주세요.</option>
               {fieldList?.map((item) => (
                 <option value={item.id} key={item.id}>
                   {item.name}
@@ -383,64 +376,64 @@ function MentoMng() {
               ))}
             </select>
           </div>
-          <div className="mt-5">
-            <form onSubmit={searchTeacher} className="flex gap-3 justify-end">
+          <div className='mt-5'>
+            <form onSubmit={searchTeacher} className='flex gap-3 justify-end'>
               <input
-                type="text"
+                type='text'
                 name={'searchTeacherWord'}
-                className="form-control w-52"
-                placeholder="아이디/전화번호/이름"
+                className='form-control w-52'
+                placeholder='아이디/전화번호/이름'
                 onChange={(e) =>
                   setTxtSearchWord({ searchTeacherWord: e.target.value })
                 }
               />
               <button
-                className="btn btn-primary shrink-0"
+                className='btn btn-primary shrink-0'
                 onClick={searchTeacher}
               >
-                <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>검색
+                <Lucide icon='Search' className='w-4 h-4 mr-2'></Lucide>검색
               </button>
             </form>
-            <div className="relative">
+            <div className='relative'>
               {isGetTeacherList && <Loading />}
-              <table className="table table-hover mt-3">
+              <table className='table table-hover mt-3'>
                 <tbody>
-                  <tr className="bg-slate-100 font-medium text-center">
-                    <td></td>
-                    <td>이름</td>
-                    <td>전화번호</td>
-                    <td>아이디</td>
+                <tr className='bg-slate-100 font-medium text-center'>
+                  <td></td>
+                  <td>이름</td>
+                  <td>전화번호</td>
+                  <td>아이디</td>
+                </tr>
+                {!teacherList?.teacherList.length && (
+                  <tr className='text-center'>
+                    <td colSpan={4}>검색된 선생님이 없습니다.</td>
                   </tr>
-                  {!teacherList?.teacherList.length && (
-                    <tr className="text-center">
-                      <td colSpan={4}>검색된 선생님이 없습니다.</td>
-                    </tr>
-                  )}
-                  {teacherList?.teacherList.map((item) => (
-                    <tr className="text-center" key={item.id}>
-                      <td>
-                        <input
-                          type="radio"
-                          className="form-check-input"
-                          checked={addTeacherParams.teacherId === item.id}
-                          onChange={() => {
-                            setAddTeacherParams({
-                              teacherId: item.id,
-                            })
-                          }}
-                        />
-                      </td>
-                      <td>
-                        <label htmlFor={`tl_${item.id}`}>{item.name}</label>
-                      </td>
-                      <td>
-                        <label htmlFor={`tl_${item.id}`}>{item.phone}</label>
-                      </td>
-                      <td>
-                        <label htmlFor={`tl_${item.id}`}>{item.userId}</label>
-                      </td>
-                    </tr>
-                  ))}
+                )}
+                {teacherList?.teacherList.map((item) => (
+                  <tr className='text-center' key={item.id}>
+                    <td>
+                      <input
+                        type='radio'
+                        className='form-check-input'
+                        checked={addTeacherParams.teacherId === item.id}
+                        onChange={() => {
+                          setAddTeacherParams({
+                            teacherId: item.id,
+                          })
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <label htmlFor={`tl_${item.id}`}>{item.name}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`tl_${item.id}`}>{item.phone}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`tl_${item.id}`}>{item.userId}</label>
+                    </td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
             </div>
@@ -448,8 +441,8 @@ function MentoMng() {
         </ModalBody>
         <ModalFooter>
           <button
-            type="button"
-            className="btn btn-ouline-secondary w-24 mr-2"
+            type='button'
+            className='btn btn-ouline-secondary w-24 mr-2'
             onClick={() => {
               setAddMentorPop(false)
             }}
@@ -457,8 +450,8 @@ function MentoMng() {
             취소
           </button>
           <button
-            type="button"
-            className="btn btn-sky w-24"
+            type='button'
+            className='btn btn-sky w-24'
             onClick={addTeacherProc}
           >
             확인
@@ -469,7 +462,7 @@ function MentoMng() {
 
       {/* BEGIN: Modal 학생 추가하기*/}
       <Modal
-        size="modal-lg"
+        size='modal-xl'
         show={addStudentPop}
         onHidden={() => {
           setPopSearchStrudentSelMentorId(0)
@@ -484,9 +477,9 @@ function MentoMng() {
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">학생 추가하기</h2>
+          <h2 className='font-medium text-base mr-auto'>학생 추가하기</h2>
           <button
-            className="btn btn-rounded-secondary hidden sm:flex p-1"
+            className='btn btn-rounded-secondary hidden sm:flex p-1'
             onClick={() => {
               setPopSearchStrudentSelMentorId(0)
               setAddStudentPop(false)
@@ -499,71 +492,87 @@ function MentoMng() {
               setAddStudentIds([])
             }}
           >
-            <Lucide icon="X" className="w-4 h-4" />
+            <Lucide icon='X' className='w-4 h-4' />
           </button>
         </ModalHeader>
-        <ModalBody className="p-5">
-          <div className="mt-5">
-            <div className="flex gap-3 justify-end">
+        <ModalBody className='p-5'>
+          <div className='mt-5'>
+            <div className='flex gap-3 justify-end'>
               <input
-                type="text"
+                type='text'
                 name={'searchStudentWord'}
-                className="form-control w-52"
-                placeholder="아이디/전화번호/이름"
+                className='form-control w-52'
+                placeholder='아이디/전화번호/이름'
                 value={txtSearchWord.searchStudentWord}
                 onChange={handleTxtSearchWord}
               />
               <button
-                className="btn btn-primary shrink-0"
+                className='btn btn-primary shrink-0'
                 onClick={searchStudent}
               >
-                <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>검색
+                <Lucide icon='Search' className='w-4 h-4 mr-2'></Lucide>검색
               </button>
             </div>
             <div>
-              <table className="table table-hover mt-3">
+              <table className='table table-hover mt-3'>
+                <colgroup>
+                  <col width={'5%'} />
+                  <col width={'10%'} />
+                  <col width={'17%'} />
+                  <col width={'17%'} />
+                  <col width={'20%'} />
+                  <col width={'31%'} />
+                </colgroup>
                 <tbody>
-                  <tr className="bg-slate-100 font-medium text-center">
-                    <td></td>
-                    <td>이름</td>
-                    <td>전화번호</td>
-                    <td>아이디</td>
+                <tr className='bg-slate-100 font-medium text-center'>
+                  <td></td>
+                  <td>이름</td>
+                  <td>전화번호</td>
+                  <td>아이디</td>
+                  <td>학교</td>
+                  <td>전형</td>
+                </tr>
+                {searchedStudentList?.map((sitem, sindex) => (
+                  <tr className='text-center' key={sitem.id}>
+                    <td>
+                      <input
+                        name='student[]'
+                        id={`sl_${sindex}`}
+                        className='form-check-input stu'
+                        type='checkbox'
+                        value={sitem.applicationId}
+                        onChange={(event) => {
+                          event.currentTarget.checked
+                            ? setAddStudentIds([
+                              ...addStudentIds,
+                              event.currentTarget.value,
+                            ])
+                            : setAddStudentIds(
+                              addStudentIds.filter(
+                                (choice) =>
+                                  choice !== event.currentTarget.value,
+                              ),
+                            )
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <label htmlFor={`sl_${sindex}`}>{sitem.name}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`sl_${sindex}`}>{sitem.phone}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`sl_${sindex}`}>{sitem.userId}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`sl_${sindex}`}>{sitem.schoolName}</label>
+                    </td>
+                    <td>
+                      <label htmlFor={`sl_${sindex}`}>{sitem.typeName}</label>
+                    </td>
                   </tr>
-                  {searchedStudentList?.map((sitem, sindex) => (
-                    <tr className="text-center" key={sitem.id}>
-                      <td>
-                        <input
-                          name="student[]"
-                          id={`sl_${sindex}`}
-                          className="form-check-input stu"
-                          type="checkbox"
-                          value={sitem.applicationId}
-                          onChange={(event) => {
-                            event.currentTarget.checked
-                              ? setAddStudentIds([
-                                  ...addStudentIds,
-                                  event.currentTarget.value,
-                                ])
-                              : setAddStudentIds(
-                                  addStudentIds.filter(
-                                    (choice) =>
-                                      choice != event.currentTarget.navalueme,
-                                  ),
-                                )
-                          }}
-                        />
-                      </td>
-                      <td>
-                        <label htmlFor={`sl_${sindex}`}>{sitem.name}</label>
-                      </td>
-                      <td>
-                        <label htmlFor={`sl_${sindex}`}>{sitem.phone}</label>
-                      </td>
-                      <td>
-                        <label htmlFor={`sl_${sindex}`}>{sitem.userId}</label>
-                      </td>
-                    </tr>
-                  ))}
+                ))}
                 </tbody>
               </table>
             </div>
@@ -571,8 +580,8 @@ function MentoMng() {
         </ModalBody>
         <ModalFooter>
           <button
-            type="button"
-            className="btn btn-ouline-secondary w-24 mr-2"
+            type='button'
+            className='btn btn-ouline-secondary w-24 mr-2'
             onClick={() => {
               setPopSearchStrudentSelMentorId(0)
               setAddStudentPop(false)
@@ -588,8 +597,8 @@ function MentoMng() {
             취소
           </button>
           <button
-            type="button"
-            className="btn btn-sky w-24"
+            type='button'
+            className='btn btn-sky w-24'
             onClick={addStudentProc}
           >
             확인
