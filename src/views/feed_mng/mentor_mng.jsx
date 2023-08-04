@@ -462,7 +462,7 @@ function MentoMng() {
 
       {/* BEGIN: Modal 학생 추가하기*/}
       <Modal
-        size='modal-xl'
+        size='modal-2xl'
         show={addStudentPop}
         onHidden={() => {
           setPopSearchStrudentSelMentorId(0)
@@ -518,10 +518,10 @@ function MentoMng() {
                 <colgroup>
                   <col width={'5%'} />
                   <col width={'10%'} />
-                  <col width={'17%'} />
-                  <col width={'17%'} />
                   <col width={'20%'} />
-                  <col width={'31%'} />
+                  <col width={'25%'} />
+                  <col width={'15%'} />
+                  <col width={'25%'} />
                 </colgroup>
                 <tbody>
                 <tr className='bg-slate-100 font-medium text-center'>
