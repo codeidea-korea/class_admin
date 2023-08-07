@@ -121,6 +121,7 @@ function CurriculumCreate({ isCreate }) {
     // 주중 수업 삭제
     delDataWeekList.map((item) => {
       formData.append('week_id', item.id)
+      formData.append('week_year', '')
       formData.append('week_month', '')
       formData.append('week_order_number', '')
       formData.append('week_textbook', '')
@@ -132,6 +133,7 @@ function CurriculumCreate({ isCreate }) {
     // 주말 수업 삭제
     delDataWeekendList.map((item) => {
       formData.append('weekend_id', item.id)
+      formData.append('weekend_year', '')
       formData.append('weekend_month', '')
       formData.append('weekend_order_number', '')
       formData.append('weekend_textbook', '')
@@ -143,6 +145,7 @@ function CurriculumCreate({ isCreate }) {
     // 주중 수업 상세 커리큘럼
     data.scheduleWeeks.map((item) => {
       formData.append('week_id', item.id ?? 0)
+      formData.append('week_year', item.year)
       formData.append('week_month', item.month)
       formData.append('week_order_number', item.order_number)
       formData.append('week_textbook', item.textbook)
@@ -154,6 +157,7 @@ function CurriculumCreate({ isCreate }) {
     // 주말 수업 상세 커리큘럼
     data.scheduleWeekends.map((item) => {
       formData.append('weekend_id', item.id ?? 0)
+      formData.append('weekend_year', item.year)
       formData.append('weekend_month', item.month)
       formData.append('weekend_order_number', item.order_number)
       formData.append('weekend_textbook', item.textbook)
@@ -169,6 +173,7 @@ function CurriculumCreate({ isCreate }) {
   const handleAddSchedule = (type) => {
     const newSchedule = {
       key: getValues(type).length,
+      year: '',
       month: '',
       order_number: '',
       textbook: '',
@@ -320,12 +325,13 @@ function CurriculumCreate({ isCreate }) {
                 <table className="table table-hover">
                   <thead>
                   <tr className="bg-slate-100 text-center">
+                    <td>년도</td>
                     <td>월</td>
                     <td>차시</td>
                     <td>교재</td>
                     <td>학습목표</td>
                     <td>학습 단원 및 내용</td>
-                    <td>삭제</td>
+                    <td className={'w-20'}>삭제</td>
                   </tr>
                   </thead>
                   <tbody>
@@ -334,6 +340,23 @@ function CurriculumCreate({ isCreate }) {
                       className="text-center"
                       key={`scheduleWeeks-${index}`}
                     >
+                      <td>
+                        <div className="input-group w-32">
+                          <input
+                            type="number"
+                            className="form-control"
+                            {...register(
+                              `scheduleWeeks.${index}.year`, { required: true }
+                            )}
+                          />
+                          <div
+                            id="input-group-price"
+                            className="input-group-text"
+                          >
+                            년
+                          </div>
+                        </div>
+                      </td>
                       <td>
                         <div className="input-group w-24">
                           <input
@@ -409,7 +432,7 @@ function CurriculumCreate({ isCreate }) {
                     </tr>
                   ))}
                   <tr>
-                    <td colSpan={6} className="text-center">
+                    <td colSpan={7} className="text-center">
                       <button
                         className="btn btn-outline-primary border-dotted"
                         type="button"
@@ -426,12 +449,13 @@ function CurriculumCreate({ isCreate }) {
                 <table className="table table-hover">
                   <thead>
                   <tr className="bg-slate-100 text-center">
+                    <td>년도</td>
                     <td>월</td>
                     <td>차시</td>
                     <td>교재</td>
                     <td>학습목표</td>
                     <td>학습 단원 및 내용</td>
-                    <td>삭제</td>
+                    <td className={'w-20'}>삭제</td>
                   </tr>
                   </thead>
                   <tbody>
@@ -440,6 +464,23 @@ function CurriculumCreate({ isCreate }) {
                       className="text-center"
                       key={`scheduleWeekends-${index}`}
                     >
+                      <td>
+                        <div className="input-group w-32">
+                          <input
+                            type="number"
+                            className="form-control"
+                            {...register(
+                              `scheduleWeekends.${index}.year`,{ required: true }
+                            )}
+                          />
+                          <div
+                            id="input-group-price"
+                            className="input-group-text"
+                          >
+                            년
+                          </div>
+                        </div>
+                      </td>
                       <td>
                         <div className="input-group w-24">
                           <input
@@ -515,7 +556,7 @@ function CurriculumCreate({ isCreate }) {
                     </tr>
                   ))}
                   <tr>
-                    <td colSpan={6} className="text-center">
+                    <td colSpan={7} className="text-center">
                       <button
                         className="btn btn-outline-primary border-dotted"
                         type="button"
