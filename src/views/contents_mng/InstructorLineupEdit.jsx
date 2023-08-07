@@ -222,6 +222,7 @@ const InstructorLineupEdit = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>과목</td>
+              <td>과목 글씨 색상</td>
               <td>이름</td>
               <td>강사유형</td>
               <td>프로필 이미지</td>
