@@ -177,33 +177,6 @@ const InstructorLineupEdit = () => {
         }
       }
     })
-
-    delDataList.map((item) => {
-      if (item.profileId > 0) { // 기존에 등록된 파일이 있으면
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          newFileDelYN.push('Y')
-          formData.append('file', item.file[0])
-
-        } else { // 새로 등록할 파일이 없으면
-          if (item.profileName) { // 기존 파일을 유지하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('N')
-          } else { // 기존 파일을 삭제하는 경우
-            formData.append('file', null_file)
-            newFileDelYN.push('Y')
-          }
-        }
-
-      } else { // 기존에 등록된 파일이 없으면
-        newFileDelYN.push('N')
-
-        if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
-          formData.append('file', item.file[0])
-        } else {
-          formData.append('file', null_file)
-        }
-      }
-    })
     formData.append('savedFileDelYN', newFileDelYN.join(','))
 
     saveData(formData)
@@ -320,7 +293,7 @@ const InstructorLineupEdit = () => {
                   {index >= 0 && (
                     <button
                       className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
-                      onClick={() => deleteHandle(item.id, index)}
+                      onClick={() => deleteHandle(item, index)}
                     >
                       삭제
                     </button>
@@ -342,7 +315,7 @@ const InstructorLineupEdit = () => {
           </table>
           <div className='flex mt-3 justify-center'>
             <div className='flex gap-2'>
-              <Link to='/prior_question'>
+              <Link to='/instructor_lineup'>
                 <button className='btn bg-white w-24'>취소</button>
               </Link>
               <button className='btn btn-sky w-24' onClick={handleSave}>저장하기</button>

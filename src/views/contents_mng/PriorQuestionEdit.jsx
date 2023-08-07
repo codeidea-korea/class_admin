@@ -297,7 +297,7 @@ const PriorQuestionEdit = () => {
                   {index >= 0 && (
                     <button
                       className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
-                      onClick={() => deleteHandle(item.id, index)}
+                      onClick={() => deleteHandle(item, index)}
                     >
                       삭제
                     </button>

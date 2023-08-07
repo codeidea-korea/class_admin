@@ -315,7 +315,7 @@ const CompetQuestionEdit = () => {
                   {getValues('list')?.length > 0 && (
                     <button
                       className='btn btn-outline-danger bg-white btn-sm whitespace-nowrap'
-                      onClick={() => deleteHandle(item.id)}
+                      onClick={() => deleteHandle(item)}
                     >
                       삭제
                     </button>
