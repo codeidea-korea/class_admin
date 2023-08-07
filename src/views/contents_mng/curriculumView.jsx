@@ -136,7 +136,8 @@ function CurriCulumView() {
               <table className="table table-hover">
                 <thead>
                 <tr className="bg-slate-100 text-center">
-                  <td className=" w-16">월</td>
+                  <td className="w-20">년도</td>
+                  <td className="w-16">월</td>
                   <td>차시</td>
                   <td>교재</td>
                   <td>학습목표</td>
@@ -152,6 +153,7 @@ function CurriCulumView() {
                           className="text-center"
                           key={`scheduleWeeks-${item.id}`}
                         >
+                          <td>{item.year}년</td>
                           <td>{item.month}월</td>
                           <td>{item.order_number}차시</td>
                           <td>{item.textbook}</td>
@@ -162,10 +164,9 @@ function CurriCulumView() {
                     </>
                     :
                     <tr className="text-center">
-                      <td colSpan={5}>데이터가 존재하지 않습니다.</td>
+                      <td colSpan={6}>데이터가 존재하지 않습니다.</td>
                     </tr>
                 }
-
                 </tbody>
               </table>
               {
@@ -175,7 +176,6 @@ function CurriCulumView() {
                 </div>
               }
             </div>
-            
 
           </TabPanel>
           <TabPanel className="leading-relaxed">
@@ -183,7 +183,8 @@ function CurriCulumView() {
               <table className="table table-hover">
                 <thead>
                 <tr className="bg-slate-100 text-center">
-                  <td className=" w-16">월</td>
+                  <td className="w-20">년도</td>
+                  <td className="w-16">월</td>
                   <td>차시</td>
                   <td>교재</td>
                   <td>학습목표</td>
@@ -199,6 +200,7 @@ function CurriCulumView() {
                           className="text-center"
                           key={`scheduleWeeks-${item.id}`}
                         >
+                          <td>{item.year}년</td>
                           <td>{item.month}월</td>
                           <td>{item.order_number}차시</td>
                           <td>{item.textbook}</td>
@@ -209,7 +211,7 @@ function CurriCulumView() {
                     </>
                     :
                     <tr className="text-center">
-                      <td colSpan={5}>데이터가 존재하지 않습니다.</td>
+                      <td colSpan={6}>데이터가 존재하지 않습니다.</td>
                     </tr>
                 }
 
@@ -226,9 +228,9 @@ function CurriCulumView() {
         </TabPanels>
       </TabGroup>
 
-      <div class="box p-5 mt-5">
-        <div class="flex">
-          <div class="flex gap-2 ml-auto">
+      <div className="box p-5 mt-5">
+        <div className="flex">
+          <div className="flex gap-2 ml-auto">
             <Link to={`/curriculum?${searchParams.get('tab')=="과학고"?"sch":""}`}>
               <button className="btn bg-white w-24">목록</button>
             </Link>
