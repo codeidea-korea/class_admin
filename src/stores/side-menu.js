@@ -114,6 +114,11 @@ const sideMenu = atom({
             pathname: '/contents',
             title: '컨텐츠 URL 및 다운로드',
           },
+          {
+            icon: '',
+            pathname: '/instructor_lineup',
+            title: '영재관 강사 라인업',
+          },
         ],
       },
 

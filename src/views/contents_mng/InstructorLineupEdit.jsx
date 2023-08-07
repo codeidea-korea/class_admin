@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { Lucide } from '@/base-components'
 import { Link, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { useMutation, useQuery } from 'react-query'
 import request from '@/utils/request'
+import { useForm } from 'react-hook-form'
 
-const PriorQuestionEdit = () => {
+const InstructorLineupEdit = () => {
   const navigate = useNavigate()
-  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const [pageParams, setPageParams] = useState({
     totalPages: 0,
     totalElements: 0,
@@ -25,11 +24,12 @@ const PriorQuestionEdit = () => {
   const handleAddList = () => {
     const addData = {
       id: 0,
-      year: '',
-      schoolName: '',
-      linkUrl: '',
-      fileId: '',
-      fileName: '',
+      subject: '',
+      name: '',
+      type: '',
+      delYn: 'N',
+      profileId: '',
+      profileName: '',
     }
     setValue('list', [...getValues('list'), addData])
   }
@@ -46,15 +46,10 @@ const PriorQuestionEdit = () => {
     }
   }
 
-  // 리스트 가져오기
-  const {
-    data: priorQuestion,
-    isLoading: isPriorQuestion,
-    refetch: refetchPriorQuestion,
-  } = useQuery(
+  useQuery(
     'getPriorQuestion',
     () =>
-      request.get(`/admin/content-management/prior-question`, {
+      request.get(`/admin/content-management/instructor-lineup`, {
         params: {
           page: pageParams.currentPage,
           limit: pageParams.pageRangeDisplayed,
@@ -62,7 +57,7 @@ const PriorQuestionEdit = () => {
       }),
     {
       onSuccess: (data) => {
-        reset({ list: data.content })
+        reset({ list: data })
       },
     },
   )
@@ -70,7 +65,7 @@ const PriorQuestionEdit = () => {
   // 저장
   const { mutate: saveData } = useMutation(
     (data) =>
-      request.put(`/admin/content-management/prior-question`, data),
+      request.put(`/admin/content-management/instructor-lineup`, data),
     {
       onSuccess: () => {
         alert('저장되었습니다.')
@@ -90,28 +85,33 @@ const PriorQuestionEdit = () => {
     }
 
     let temp = true
-    let idList = [], yearList = [], schoolNameList = [], linkUrlList = [], delYnList = []
+    let idList = [], subjectList = [], nameList = [], typeList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
 
-      // 제목, 링크는 필수값
-      if (!item?.schoolName) {
-        alert('제목을 입력하세요.')
+      if (!item?.subject) {
+        alert('과목을 입력하세요.')
         temp = false
         return temp
       }
 
-      if (!item?.linkUrl) {
-        alert('링크를 입력하세요.')
+      if (!item?.name) {
+        alert('이름을 입력하세요.')
+        temp = false
+        return temp
+      }
+
+      if (!item?.type) {
+        alert('강사 유형을 입력하세요.')
         temp = false
         return temp
       }
 
       idList.push(item.id ? item.id : 0)
-      yearList.push(item.year ? item.year : '')
-      schoolNameList.push(item.schoolName ? item.schoolName : '')
-      linkUrlList.push(item.linkUrl ? item.linkUrl : '')
+      subjectList.push(item.subject ? item.subject : '')
+      nameList.push(item.name ? item.name : '')
+      typeList.push(item.type ? item.type : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
     })
 
@@ -120,17 +120,17 @@ const PriorQuestionEdit = () => {
     // 삭제할 데이터 리스트 셋팅
     delDataList.forEach((item) => {
       idList.push(item.id)
-      yearList.push('')
-      schoolNameList.push('')
-      linkUrlList.push('')
+      subjectList.push('')
+      nameList.push('')
+      typeList.push('')
       delYnList.push('Y')
     })
 
     const formData = new FormData()
     formData.append('id', idList.length > 1 ? idList.join(',') : idList)
-    formData.append('year', yearList.length > 1 ? yearList.join(',') : yearList)
-    formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
-    formData.append('linkUrl', linkUrlList.length > 1 ? linkUrlList.join(',') : linkUrlList)
+    formData.append('subject', subjectList.length > 1 ? subjectList.join(',') : subjectList)
+    formData.append('name', nameList.length > 1 ? nameList.join(',') : nameList)
+    formData.append('type', typeList.length > 1 ? typeList.join(',') : typeList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
 
     const newFileDelYN = []
@@ -142,13 +142,13 @@ const PriorQuestionEdit = () => {
     })
 
     getValues('list').map((item) => {
-      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
+      if (item.profileId > 0) { // 기존에 등록된 파일이 있으면
         if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
           newFileDelYN.push('Y')
           formData.append('file', item.file[0])
 
         } else { // 새로 등록할 파일이 없으면
-          if (item.fileName) { // 기존 파일을 유지하는 경우
+          if (item.profileName) { // 기존 파일을 유지하는 경우
             formData.append('file', null_file)
             newFileDelYN.push('N')
           } else { // 기존 파일을 삭제하는 경우
@@ -169,13 +169,13 @@ const PriorQuestionEdit = () => {
     })
 
     delDataList.map((item) => {
-      if (item.fileId > 0) { // 기존에 등록된 파일이 있으면
+      if (item.profileId > 0) { // 기존에 등록된 파일이 있으면
         if (item.file && item.file.length) { // 새로 등록할 파일이 있으면
           newFileDelYN.push('Y')
           formData.append('file', item.file[0])
 
         } else { // 새로 등록할 파일이 없으면
-          if (item.fileName) { // 기존 파일을 유지하는 경우
+          if (item.profileName) { // 기존 파일을 유지하는 경우
             formData.append('file', null_file)
             newFileDelYN.push('N')
           } else { // 기존 파일을 삭제하는 경우
@@ -199,6 +199,7 @@ const PriorQuestionEdit = () => {
     saveData(formData)
   }
 
+
   return (
     <>
       <div className='intro-y box mt-5'>
@@ -210,10 +211,10 @@ const PriorQuestionEdit = () => {
             <thead>
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
-              <td>년도</td>
-              <td>과학고등학교</td>
-              <td>기출문제</td>
-              <td>풀이영상</td>
+              <td>과목</td>
+              <td>이름</td>
+              <td>강사유형</td>
+              <td>프로필 이미지</td>
               <td>삭제</td>
             </tr>
             </thead>
@@ -225,36 +226,45 @@ const PriorQuestionEdit = () => {
                   <input
                     type='text'
                     className='form-control w-28'
-                    defaultValue={item.year}
-                    key={item.year}
-                    {...register(`list[${index}].year`)}
+                    defaultValue={item.subject}
+                    key={item.subject}
+                    {...register(`list[${index}].subject`)}
                   />
                 </td>
                 <td>
                   <input
                     type='text'
                     className='form-control'
-                    defaultValue={item.schoolName}
-                    key={item.schoolName}
-                    {...register(`list[${index}].schoolName`)}
+                    defaultValue={item.name}
+                    key={item.name}
+                    {...register(`list[${index}].name`)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type='text'
+                    className='form-control'
+                    defaultValue={item.type}
+                    key={item.type}
+                    {...register(`list[${index}].type`)}
                   />
                 </td>
                 <td>
                   <div className='input-group justify-center'>
-                    {watch(`list.${index}.fileName`) ? (
+                    {watch(`list.${index}.profileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`${baseUrl}/v1/contents-data/file-download/${watch('fileId')}`}
+                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('profileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
-                          {watch(`list.${index}.fileName`)}
+                          {watch(`list.${index}.profileName`)}
                         </a>
                         <Lucide
                           icon='X'
                           className='w-4 h-4 text-danger cursor-pointer'
                           onClick={() => {
                             let list = getValues('list')
-                            list[index].fileName = ''
+                            list[index].profileName = ''
 
                             setValue('list', list)
                           }}
@@ -283,15 +293,6 @@ const PriorQuestionEdit = () => {
                       </>
                     )}
                   </div>
-                </td>
-                <td>
-                  <input
-                    type='text'
-                    className='form-control'
-                    defaultValue={item.linkUrl}
-                    key={item.linkUrl}
-                    {...register(`list[${index}].linkUrl`)}
-                  />
                 </td>
                 <td>
                   {index >= 0 && (
@@ -330,4 +331,4 @@ const PriorQuestionEdit = () => {
     </>
   )
 }
-export default PriorQuestionEdit
+export default InstructorLineupEdit

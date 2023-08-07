@@ -5,7 +5,6 @@ import AdminMng from '../views/member_mng/admin_mng'
 
 import MemberMng from '../views/member_mng/member_mng'
 import MemberView from '../views/member_mng/member_view'
-import MemberView2 from '../views/member_mng/member_view2'
 import MemberEdit from '../views/member_mng/member_edit'
 import MemberEdit2 from '../views/member_mng/member_edit2'
 
@@ -14,11 +13,7 @@ import CoverletterMng from '../views/coverletter_mng/coverletter_mng'
 import LifeRecord from '../views/life_record/life_record'
 import LifeRecordView from '../views/life_record/life_record_view'
 import LifeRecordEdit from '../views/life_record/life_record_edit'
-
-import FeedMng from '../views/feed_mng/feed_mng'
 import FeedView from '../views/feed_mng/feed_view'
-
-import MentoMng from '../views/feed_mng/mentor_mng'
 
 import Notice from '../views/contents_mng/notice'
 import NoticeCreate from '../views/contents_mng/noticeCreate'
@@ -51,7 +46,6 @@ import JoinResult from '../views/login/join_result'
 import FindId from '../views/login/id_find'
 import FindIdResult from '../views/login/id_find_result'
 import PwFindstep1 from '../views/login/pw_find_step1'
-import FindIdResult2 from '../views/login/id_find_result2'
 import PwFindstep2 from '../views/login/pw_find_step2'
 import PwFindResult from '../views/login/pw_find_reslut'
 import ReservationList from '../views/reservation/ReservationList'
@@ -65,13 +59,14 @@ import PwChange from '../views/login/pw_change'
 import ReadOnlineEdit from '../views/contents_mng/readOnlineEdit'
 import PriorQuestion from '../views/contents_mng/PriorQuestion'
 import PriorQuestionEdit from '../views/contents_mng/PriorQuestionEdit'
-import ReviewTest from '../views/feed_mng/review_test'
 import MentoTabMng from '../views/feed_mng/mentoTabMng'
 import ReviewTestView from '../views/feed_mng/review_test_view'
 import ReviewTestEdit from '../views/feed_mng/review_test_edit'
 import FeedTabMng from '../views/feed_mng/feedTabMng'
 import CompetQuestion from '../views/contents_mng/CompetQuestion'
 import CompetQuestionEdit from '../views/contents_mng/CompetQuestionEdit'
+import InstructorLineup from '@/views/contents_mng/InstructorLineup'
+import InstructorLineupEdit from '@/views/contents_mng/InstructorLineupEdit'
 
 function Router() {
   const routes = [
@@ -528,6 +523,26 @@ function Router() {
           path: '/pw_change',
           element: (
             <PrivateRoute element={<PwChange />} role={['ADMIN', 'DIRECTOR']} />
+          ),
+        },
+
+        // 영재관 강사 라인업
+        {
+          path: '/instructor_lineup',
+          element: (
+            <PrivateRoute
+              element={<InstructorLineup />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/instructor_lineup/edit',
+          element: (
+            <PrivateRoute
+              element={<InstructorLineupEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
           ),
         },
       ],
