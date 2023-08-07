@@ -69,7 +69,7 @@ const InstructorLineupEdit = () => {
     {
       onSuccess: () => {
         alert('저장되었습니다.')
-        navigate('/prior_question')
+        navigate('/instructor_lineup')
       },
       onError: (e) => {
         console.log(e)
