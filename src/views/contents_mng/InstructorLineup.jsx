@@ -66,6 +66,7 @@ const InstructorLineup = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>과목</td>
+              <td>과목 글씨 색상</td>
               <td>이름</td>
               <td>강사 유형</td>
               <td>프로필 이미지</td>
@@ -77,6 +78,7 @@ const InstructorLineup = () => {
                 <tr className='text-center' key={index}>
                   <td>{instructorLineup?.length - index}</td>
                   <td>{item.subject}</td>
+                  <td>{item.subjectColor}</td>
                   <td>{item.name}</td>
                   <td>{item.type}</td>
                   <td>

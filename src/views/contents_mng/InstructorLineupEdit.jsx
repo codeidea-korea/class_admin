@@ -25,6 +25,7 @@ const InstructorLineupEdit = () => {
     const addData = {
       id: 0,
       subject: '',
+      subjectColor: '',
       name: '',
       type: '',
       delYn: 'N',
@@ -85,7 +86,7 @@ const InstructorLineupEdit = () => {
     }
 
     let temp = true
-    let idList = [], subjectList = [], nameList = [], typeList = [], delYnList = []
+    let idList = [], subjectList = [], nameList = [], typeList = [], subjectColorList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
@@ -96,6 +97,12 @@ const InstructorLineupEdit = () => {
         return temp
       }
 
+      if (!item?.subjectColor) {
+        alert('과목 글씨 색상을 선택하세요.')
+        temp = false
+        return temp
+      }
+      
       if (!item?.name) {
         alert('이름을 입력하세요.')
         temp = false
@@ -110,6 +117,7 @@ const InstructorLineupEdit = () => {
 
       idList.push(item.id ? item.id : 0)
       subjectList.push(item.subject ? item.subject : '')
+      subjectColorList.push(item.subjectColor ? item.subjectColor : '')
       nameList.push(item.name ? item.name : '')
       typeList.push(item.type ? item.type : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
@@ -121,6 +129,7 @@ const InstructorLineupEdit = () => {
     delDataList.forEach((item) => {
       idList.push(item.id)
       subjectList.push('')
+      subjectColorList.push('')
       nameList.push('')
       typeList.push('')
       delYnList.push('Y')
@@ -129,6 +138,7 @@ const InstructorLineupEdit = () => {
     const formData = new FormData()
     formData.append('id', idList.length > 1 ? idList.join(',') : idList)
     formData.append('subject', subjectList.length > 1 ? subjectList.join(',') : subjectList)
+    formData.append('subjectColor', subjectColorList.length > 1 ? subjectColorList.join(',') : subjectColorList)
     formData.append('name', nameList.length > 1 ? nameList.join(',') : nameList)
     formData.append('type', typeList.length > 1 ? typeList.join(',') : typeList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
@@ -230,6 +240,17 @@ const InstructorLineupEdit = () => {
                     key={item.subject}
                     {...register(`list[${index}].subject`)}
                   />
+                </td>
+                <td>
+                  <select
+                    className='form-control'
+                    defaultValue={item.subjectColor}
+                    {...register(`list.${index}.subjectColor`)}
+                  >
+                    <option value='pink'>pink</option>
+                    <option value='blue'>blue</option>
+                    <option value='purple'>purple</option>
+                  </select>
                 </td>
                 <td>
                   <input
