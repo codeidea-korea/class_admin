@@ -5,19 +5,60 @@ import {
   ModalHeader,
   ModalFooter,
 } from "@/base-components";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import useAxios from "../../hooks/useAxios";
+import {useRecoilValue} from "recoil";
+import {userState} from "../../states/userState";
+import {forEach} from "lodash";
 
 function LifeRecord() {
   // 선택삭제 모달
   const [selDelete, selDeleteDetail] = useState(false);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(2);
+  const [htmlList, setHtmlList] = useState([]);
+  const [pageInfo, setPageInfo] = useState({});
+
+  const user = useRecoilValue(userState);
+  const api = useAxios();
+  const navigate = useNavigate();
+
+  const getStudentLifeRecordList = async () => {
+    let result = [];
+    await api.get(`/admin/life-record/list`,
+        {headers: {Authorization: `Bearer ${user.token}`},
+          params: {currentPage:`${currentPage}`, pageLimit:`${pageLimit}`, search:`${search}`}})
+        .then((res) => {
+          console.log(res)
+          if (res.status === 200) {
+            //alert('성공');
+            result = res;
+          }
+        }).catch((err) => {
+          console.log(err);
+          if (err.response.status === 401) { alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); navigate('/'); }
+        });
+
+    return result;
+  };
+
+  useEffect(() => {
+    let array = [];
+    getStudentLifeRecordList(currentPage, pageLimit, search).then((res) => {
+      console.log('res > ', res);
+      setHtmlList({...res.data.rows});
+      setPageInfo({totalCount:res.data.totalCount, totalPage:res.data.totalPage, 'currentPage':currentPage});
+    });
+  },[currentPage]);
 
   return (
     <>
       <div className="intro-y box mt-5">
         <div className="p-3 px-5 flex items-center border-b border-slate-200/60">
           <div className="text-lg font-medium">
-            목록 <span className="color-blue">25</span>건
+            목록 <span className="color-blue">{pageInfo.totalCount}</span>건
           </div>
           <button type="button" className="btn ml-2" title="초기화">
             <Lucide icon="RotateCcw" className="w-4 h-4"></Lucide>
@@ -40,7 +81,7 @@ function LifeRecord() {
               </button>
             </div>
           </div>
-          <button
+          {/*<button
             href="#"
             className="btn btn-green ml-3 flex items-center"
             onClick={() => {
@@ -48,7 +89,7 @@ function LifeRecord() {
             }}
           >
             <Lucide icon="Save" className="w-4 h-4 mr-2"></Lucide>엑셀 다운로드
-          </button>
+          </button>*/}
         </div>
         <div className="intro-y p-5">
           <div className="overflow-x-auto">
@@ -64,7 +105,20 @@ function LifeRecord() {
                 <td>전화번호</td>
                 <td>업로드일</td>
               </tr>
-              <tr className="text-center">
+              {
+                Object.keys(htmlList).map((data, index) => (
+                  <tr className="text-center">
+                    <td><input className="form-check-input chk1" user_id={htmlList[data].userId} type="checkbox" /></td>
+                    <td>{htmlList[data].no}</td>
+                    <td><Link to="/life_record_view" state={htmlList[data].userId} className="underline text-primary">{htmlList[data].name}</Link></td>
+                    <td>{htmlList[data].schoolYear}</td>
+                    <td>{htmlList[data].schoolName}</td>
+                    <td>{htmlList[data].phone}</td>
+                    <td>{htmlList[data].udtDate === undefined ? htmlList[data].insDate.substring(0,16) : htmlList[data].udtDate.substring(0,16)}</td>
+                  </tr>
+                ))
+              }
+              {/*<tr className="text-center">
                 <td>
                   <input className="form-check-input chk1" type="checkbox" />
                 </td>
@@ -81,7 +135,7 @@ function LifeRecord() {
                 <td>서울중학교</td>
                 <td>010-0000-0000</td>
                 <td>2022-10-11</td>
-              </tr>
+              </tr>*/}
             </table>
           </div>
           <div className="flex mt-3">
@@ -106,22 +160,51 @@ function LifeRecord() {
         <div className="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
           <nav className="w-full sm:w-auto sm:mr-auto">
             <ul className="pagination">
-              <li className="page-item">
+              <li className="page-item" onClick={() => {
+                setCurrentPage(1);
+              }}>
                 <Link className="page-link" to="">
                   <Lucide icon="ChevronsLeft" className="w-4 h-4" />
                 </Link>
               </li>
-              <li className="page-item">
+              <li className="page-item" onClick={() => {
+                if(currentPage <= 10) {
+                  setCurrentPage(1);
+                } else {
+                  setCurrentPage(currentPage-10);
+                }
+              }}>
                 <Link className="page-link" to="">
                   <Lucide icon="ChevronLeft" className="w-4 h-4" />
                 </Link>
               </li>
-              <li className="page-item">
+              {/*<li className="page-item">
                 <Link className="page-link" to="">
                   ...
                 </Link>
-              </li>
-              <li className="page-item">
+              </li>*/}
+              {
+                Array.from({length:pageInfo.totalPage}).map((_, index) => {
+                  let className = '';
+                  let startNumber = 1;
+                  if((index+1) === currentPage) {
+                    className = 'page-item active';
+                  } else {
+                    className = 'page-item';
+                  }
+
+                  if(Math.floor(currentPage/10)*10 < index+1 && (Math.floor(currentPage/10)*10)+10 > index) {
+                    return (
+                        <li className={className} onClick={() => {setCurrentPage(index+1)}}>
+                          <Link className="page-link" to="">
+                            {index+1}
+                          </Link>
+                        </li>
+                    )
+                  }
+                })
+              }
+              {/*<li className="page-item">
                 <Link className="page-link" to="">
                   1
                 </Link>
@@ -135,18 +218,26 @@ function LifeRecord() {
                 <Link className="page-link" to="">
                   3
                 </Link>
-              </li>
-              <li className="page-item">
+              </li>*/}
+              {/*<li className="page-item">
                 <Link className="page-link" to="">
                   ...
                 </Link>
-              </li>
-              <li className="page-item">
+              </li>*/}
+              <li className="page-item" onClick={() => {
+                if(currentPage+10 >= pageInfo.totalPage) {
+                  setCurrentPage(pageInfo.totalPage);
+                } else {
+                  setCurrentPage(currentPage+10);
+                }
+              }}>
                 <Link className="page-link" to="">
                   <Lucide icon="ChevronRight" className="w-4 h-4" />
                 </Link>
               </li>
-              <li className="page-item">
+              <li className="page-item" onClick={() => {
+                setCurrentPage(pageInfo.totalPage);
+              }}>
                 <Link className="page-link" to="">
                   <Lucide icon="ChevronsRight" className="w-4 h-4" />
                 </Link>
