@@ -54,7 +54,7 @@ function CurriCulumView() {
     {
       onSuccess: () => {
         alert('삭제되었습니다.');
-        navigate('/curriculum');
+        navigate(`/curriculum?${searchParams.get('tab')=="과학고"?"sch":""}`);
       },
     },
   )
@@ -234,7 +234,7 @@ function CurriCulumView() {
             <Link to={`/curriculum?${searchParams.get('tab')=="과학고"?"sch":""}`}>
               <button className="btn bg-white w-24">목록</button>
             </Link>
-            <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}`}>
+            <Link to={`/curriculum/edit/${id}?subject=${searchParams.get('subject')}&tab=${searchParams.get('tab')}`}>
               <button className="btn btn-sky w-24">수정하기</button>
             </Link>
             <button onClick={handleDeleteTeacher} className="btn btn-danger w-32">선생님 삭제</button>

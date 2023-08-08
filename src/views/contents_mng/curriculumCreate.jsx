@@ -75,7 +75,7 @@ function CurriculumCreate({ isCreate }) {
     {
       onSuccess: (data) => {
         alert(isCreate ? '등록되었습니다.' : '수정되었습니다.');
-        navigate('/curriculum');
+        navigate(`/curriculum?${searchParams.get('tab') == "과학고" ? "sch" : ""}`);
       },
     },
   )
@@ -573,7 +573,7 @@ function CurriculumCreate({ isCreate }) {
           </TabGroup>
           <div className="flex mt-3 justify-center">
             <div className="flex gap-2">
-              <Link to="/curriculum">
+              <Link to={`/curriculum?${searchParams.get('tab')=="과학고"?"sch":""}`}>
                 <button className="btn bg-white w-24" type="button">
                   취소
                 </button>
