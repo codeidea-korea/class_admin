@@ -20,6 +20,8 @@ function LifeRecord() {
   const [pageLimit, setPageLimit] = useState(2);
   const [htmlList, setHtmlList] = useState([]);
   const [pageInfo, setPageInfo] = useState({});
+  const [pageLength, setPageLength] = useState(10);
+  let pageLengthCount = 0;
 
   const user = useRecoilValue(userState);
   const api = useAxios();
@@ -44,12 +46,57 @@ function LifeRecord() {
     return result;
   };
 
+  const checkedAll = () => {
+    const checkBox = document.getElementsByClassName('form-check-input');
+    const isChecked = checkBox[0].checked;
+    Array.from(checkBox).map((data, index) => {
+      data.checked = isChecked;
+    });
+  };
+
+  const checkedAllManual = (isBoolean) => {
+    const checkBox = document.getElementsByClassName('form-check-input');
+    Array.from(checkBox).map((data, index) => {
+      data.checked = isBoolean;
+    });
+  };
+
+  const makeDelArray = () => {
+    let array = [];
+    const checkBox = document.getElementsByClassName('form-check-input');
+    Array.from(checkBox).map((data, index) => {
+      if(data.checked && index > 0) {
+        array.push(data.getAttribute('user_id'));
+      }
+    });
+    return array;
+  };
+
+  const delLifeRecord = async (array) => {
+    let result = {};
+    await api.delete(`/admin/life-record/list`,
+        {headers: {Authorization: `Bearer ${user.token}`},
+        params:{userIds:array.toString(), pageLimit:`${pageLimit}`, currentPage:`${currentPage}`, search:`${search}`}})
+        .then((res) => {
+          console.log(res)
+          if (res.status === 200) {
+            //alert('성공');
+            result = res.data;
+          }
+        }).catch((err) => {
+          console.log(err);
+          if (err.response.status === 401) { alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); navigate('/'); }
+        });
+    return result;
+  };
+
   useEffect(() => {
     let array = [];
     getStudentLifeRecordList(currentPage, pageLimit, search).then((res) => {
       console.log('res > ', res);
       setHtmlList({...res.data.rows});
       setPageInfo({totalCount:res.data.totalCount, totalPage:res.data.totalPage, 'currentPage':currentPage});
+      checkedAllManual(false);
     });
   },[currentPage]);
 
@@ -60,7 +107,9 @@ function LifeRecord() {
           <div className="text-lg font-medium">
             목록 <span className="color-blue">{pageInfo.totalCount}</span>건
           </div>
-          <button type="button" className="btn ml-2" title="초기화">
+          <button type="button" className="btn ml-2" title="초기화" onClick={() => {
+            setCurrentPage(1);
+          }}>
             <Lucide icon="RotateCcw" className="w-4 h-4"></Lucide>
           </button>
           <div className="ml-auto">
@@ -96,7 +145,7 @@ function LifeRecord() {
             <table className="table">
               <tr className="text-center bg-slate-100">
                 <td className="w-10">
-                  <input className="form-check-input" type="checkbox" />
+                  <input className="form-check-input" type="checkbox" onClick={checkedAll} />
                 </td>
                 <td className="w-20">번호</td>
                 <td>이름</td>
@@ -108,7 +157,7 @@ function LifeRecord() {
               {
                 Object.keys(htmlList).map((data, index) => (
                   <tr className="text-center">
-                    <td><input className="form-check-input chk1" user_id={htmlList[data].userId} type="checkbox" /></td>
+                    <td><input className={`form-check-input chk${index+1}`} user_id={htmlList[data].userId} type="checkbox" /></td>
                     <td>{htmlList[data].no}</td>
                     <td><Link to="/life_record_view" state={htmlList[data].userId} className="underline text-primary">{htmlList[data].name}</Link></td>
                     <td>{htmlList[data].schoolYear}</td>
@@ -186,14 +235,15 @@ function LifeRecord() {
               {
                 Array.from({length:pageInfo.totalPage}).map((_, index) => {
                   let className = '';
-                  let startNumber = 1;
                   if((index+1) === currentPage) {
                     className = 'page-item active';
                   } else {
                     className = 'page-item';
                   }
 
-                  if(Math.floor(currentPage/10)*10 < index+1 && (Math.floor(currentPage/10)*10)+10 > index) {
+                  if((Math.floor(currentPage/10)*10 < index+1 || currentPage%10 === 0) && (Math.floor(currentPage/10)*10)+10 > index
+                  && pageLengthCount < pageLength) {
+                    ++pageLengthCount;
                     return (
                         <li className={className} onClick={() => {setCurrentPage(index+1)}}>
                           <Link className="page-link" to="">
@@ -282,7 +332,13 @@ function LifeRecord() {
           >
             취소
           </button>
-          <button type="button" className="btn btn-danger w-24">
+          <button type="button" className="btn btn-danger w-24" onClick={() => {
+            const resultArray = makeDelArray();
+            delLifeRecord(resultArray).then((resultJo) => {
+              setCurrentPage(resultJo.currentPage);
+            });
+            selDeleteDetail(false);
+          }}>
             삭제
           </button>
         </ModalFooter>
