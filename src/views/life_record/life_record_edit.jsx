@@ -1,4 +1,10 @@
-import { Lucide } from '@/base-components'
+import { 
+    Lucide,
+    Modal,
+    ModalBody,
+    ModalHeader,
+    ModalFooter,
+ } from '@/base-components'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -29,9 +35,19 @@ function LifeRecordEdit() {
       setAward2(result)
     }
   }
+
+  const [recordSearch, recordSearchDetail] = useState(false);
   return (
     <>
       <div className="flex justify-end gap-2 intro-x">
+        <button className='btn btn-dark'
+            onClick={() => {
+                recordSearchDetail(true);
+            }}
+        >
+          <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>
+           학생 검색
+        </button>
         <button className="btn btn-sky flex items-center">
           <Lucide icon="Edit" className="w-4 h-4 mr-2"></Lucide>
           저장하기
@@ -1272,6 +1288,77 @@ function LifeRecordEdit() {
           <button className="btn w-24 btn-sky">저장하기</button>
         </Link>
       </div>
+
+      {/* BEGIN: 검색  */}
+      <Modal
+        size="modal-lg"
+        backdrop=""
+        show={recordSearch}
+        onHidden={() => {
+        recordSearchDetail(false);
+        }}
+      >
+        <ModalHeader>
+          <h2 className="font-medium text-base mr-auto">검색</h2>
+          <button
+            className="btn btn-rounded-secondary hidden sm:flex p-1"
+            onClick={() => {
+            recordSearchDetail(false);
+            }}
+          >
+            <Lucide icon="X" className="w-4 h-4" />
+          </button>
+        </ModalHeader>
+        <ModalBody className="p-5">
+          <div className="text-lg font-medium text-center">
+            <div className='flex items-center gap-3'>
+                <input type="text" className='form-control' placeholder='검색어를 입력해주세요' />
+                <button className='btn btn-dark shrink-0 text-sm'>
+                <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>
+                    검색
+                </button>
+            </div>
+            <div className='overflow-x-scorll mt-3'>
+                <table className='table table-hover'>
+                    <thead>
+                        <tr>
+                            <th className='text-sm bg-slate-200 text-center'>이름</th>
+                            <th className='text-sm bg-slate-200 text-center'>구분</th>
+                            <th className='text-sm bg-slate-200 text-center'>학교</th>
+                            <th className='text-sm bg-slate-200 text-center'>전화번호</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className='text-sm text-center'>홍길동</td>
+                            <td className='text-sm text-center'>초등</td>
+                            <td className='text-sm text-center'>구산초등학교</td>
+                            <td className='text-sm text-center'>010-2345-1234</td>
+                        </tr>
+                        <tr>
+                            <td colSpan={4} className='text-sm text-center text-slate-400'>검색 결과가 없습니다</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button
+            type="button"
+            className="btn btn-ouline-secondary w-24 mr-2"
+            onClick={() => {
+            recordSearchDetail(false);
+            }}
+          >
+            취소
+          </button>
+          <button type="button" className="btn btn-primary w-24">
+            저장
+          </button>
+        </ModalFooter>
+      </Modal>
+      {/* END: 검색 끝 */}
     </>
   )
 }
