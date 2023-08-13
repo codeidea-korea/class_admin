@@ -165,7 +165,7 @@ function CurriCulum() {
                       <Lucide icon='ChevronRight' className='w-4 h-4'></Lucide>
                     </button>
                     <Link
-                      to={`/curriculum/${item.id}?subject=${item.subject}`}
+                      to={`/curriculum/${item.id}?subject=${item.subject}&tab=${sessionStorage.getItem('cuCurTab')}`}
                       className='w-full'
                     >
                       <button className='btn btn-secondary  w-full rounded-full'>
