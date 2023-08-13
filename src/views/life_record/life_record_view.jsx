@@ -1,15 +1,64 @@
 import { Lucide } from "@/base-components";
-import { Link } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useRecoilValue} from "recoil";
+import useAxios from "@/hooks/useAxios";
+import {userState} from "@/states/userState";
 
 function LifeRecordView() {
+    const location = useLocation();
+    const [userInfo, setUserInfo] = useState({ ...location.state });
+    const [parseHtml, setParseHtml] = useState({});
+
+    const user = useRecoilValue(userState);
+    const api = useAxios();
+    const navigate = useNavigate();
+
+    const getStudentLifeRecordList = async (id) => {
+        let result = {
+            data:{},
+        };
+        await api.get(`/admin/life-record/${id}`,
+            {headers: {Authorization: `Bearer ${user.token}`}})
+            .then((res) => {
+                console.log(res)
+                if (res.status === 200) {
+                    //alert('성공');
+                    result = res;
+                }
+            }).catch((err) => {
+                console.log(err);
+                if (err.response.status === 401) { alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); navigate('/'); }
+            });
+
+        return result;
+    };
+
+    useEffect(() => {
+        let obj = {};
+        getStudentLifeRecordList(userInfo.userId).then((res) => {
+            console.log('res > ', res);
+            obj = {...res.data};
+            obj.attendanceAbsence = JSON.parse(obj.attendanceAbsence);
+            obj.awardCareer = JSON.parse(obj.awardCareer);
+            obj.creativeExperienceActive = JSON.parse(obj.creativeExperienceActive);
+            obj.volunteerActivePerformance = JSON.parse(obj.volunteerActivePerformance);
+            obj.studentLearnDevelopStatus = JSON.parse(obj.studentLearnDevelopStatus);
+            obj.freeSemesterActiveStatus = JSON.parse(obj.freeSemesterActiveStatus);
+            obj.readActiveStatus = JSON.parse(obj.readActiveStatus);
+            obj.behaviorCharacterGeneralOpinion = JSON.parse(obj.behaviorCharacterGeneralOpinion);
+            setParseHtml({...obj});
+        });
+    },[userInfo]);
+
   return (
     <>
       <div className="flex justify-end gap-2 intro-x">
-        <button className="btn btn-green flex items-center">
+        {/*<button className="btn btn-green flex items-center">
           <Lucide icon="Download" className="w-4 h-4 mr-2"></Lucide>
           다운로드
-        </button>
-        <Link to="/life_record_edit">
+        </button>*/}
+        <Link to="/life_record_edit" state={userInfo}>
           <button className="btn btn-sky ml-auto">
             <Lucide icon="Edit" className="w-4 h-4 mr-2"></Lucide>
             수정하기
@@ -22,25 +71,25 @@ function LifeRecordView() {
             <td className="w-48">
               <span className="font-bold text-slate-400">이름</span>
             </td>
-            <td>홍길동</td>
+            <td>{userInfo.name}</td>
           </tr>
           <tr>
             <td className="w-48">
               <span className="font-bold text-slate-400">구분</span>
             </td>
-            <td>초등</td>
+            <td>{userInfo.gubun}</td>
           </tr>
           <tr>
             <td className="w-48">
               <span className="font-bold text-slate-400">학교</span>
             </td>
-            <td>서울초등학교</td>
+            <td>{userInfo.schoolName}</td>
           </tr>
           <tr>
             <td className="w-48">
               <span className="font-bold text-slate-400">전화번호</span>
             </td>
-            <td>010-1234-1234</td>
+            <td>{userInfo.phone}</td>
           </tr>
         </table>
       </div>
@@ -88,7 +137,31 @@ function LifeRecordView() {
                               </tr>
                           </thead>
                           <tbody id="gen05" className="whitespace-nowrap text-center">
-                              <tr id="wq_uuid_1155" >
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'attendanceAbsence') {
+                                  const array = item;
+                                  return array.map((data, index) => (
+                                      <tr id={`attendance_absence_tr_${index}`}>
+                                          <td><span>{data.class}</span></td>
+                                          <td><span>{data.row.school_day.school_day}</span></td>
+                                          <td><span>{data.row.absent.absent}</span></td>
+                                          <td><span>{data.row.absent.not_accept}</span></td>
+                                          <td><span>{data.row.absent.etc}</span></td>
+                                          <td><span>{data.row.late.absent}</span></td>
+                                          <td><span>{data.row.late.not_accept}</span></td>
+                                          <td><span>{data.row.late.etc}</span></td>
+                                          <td><span>{data.row.early_leave.absent}</span></td>
+                                          <td><span>{data.row.early_leave.not_accept}</span></td>
+                                          <td><span>{data.row.early_leave.etc}</span></td>
+                                          <td><span>{data.row.result.absent}</span></td>
+                                          <td><span>{data.row.result.not_accept}</span></td>
+                                          <td><span>{data.row.result.etc}</span></td>
+                                          <td><span>{data.row.special.special}</span></td>
+                                      </tr>
+                                  ))
+                              }
+                          })}
+                              {/*<tr id="wq_uuid_1155" >
                                   <td id="wq_uuid_1156"><span id="gen05_0_txbE1">1</span></td>
                                   <td id="wq_uuid_1158"><span id="gen05_0_txbE2">190</span></td>
                                   <td id="wq_uuid_1160"><span id="gen05_0_txbE3">.</span></td>
@@ -121,7 +194,7 @@ function LifeRecordView() {
                                   <td id="wq_uuid_1211" ><span id="gen05_1_txbE13">.</span></td>
                                   <td id="wq_uuid_1213" ><span id="gen05_1_txbE14">.</span></td>
                                   <td id="wq_uuid_1215" ><span id="gen05_1_txbE15">.</span></td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -159,7 +232,23 @@ function LifeRecordView() {
                               </tr>
                           </thead>
                           <tbody id="gen06" className="whitespace-nowrap text-center">
-                              <tr id="gen06_0_trMerge6" >
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'awardCareer') {
+                                  const array = item;
+                                  return array.map((data, index) => (
+                                      <tr id={`award_career_tr_${index}`}>
+                                          <td><span>{data.class}</span></td>
+                                          <td><span>{data.semester}</span></td>
+                                          <td><span>{data.award_name}</span></td>
+                                          <td><span>{data.rank}</span></td>
+                                          <td><span>{data.award_date}</span></td>
+                                          <td><span>{data.agency}</span></td>
+                                          <td><span>{data.target}</span></td>
+                                      </tr>
+                                  ))
+                              }
+                          })}
+                              {/*<tr id="gen06_0_trMerge6" >
                                   <td id="gen06_0_tdMerge6"><span id="gen06_0_txbG7">2</span></td>
                                   <td id="gen06_0_tdMerge6_1"><span id="gen06_0_txbG8">1</span></td>
                                   <td id="wq_uuid_1222"><span id="gen06_0_txbG2">교과우수상(역사, 기술·가정)</span></td>
@@ -167,7 +256,7 @@ function LifeRecordView() {
                                   <td id="wq_uuid_1226"><span id="gen06_0_txbG4">2022.07.15.</span></td>
                                   <td id="wq_uuid_1228"><span id="gen06_0_txbG5">해연중학교장</span></td>
                                   <td id="wq_uuid_1230"><span id="gen06_0_txbG6">수강자</span></td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -182,7 +271,7 @@ function LifeRecordView() {
                   <h2 id="wq_uuid_599" className='text-lg font-bold'>창의적체험활동상황</h2>
               </div>
               <div className="p-5">
-                  <p id="wq_uuid_600" className="text-danger pb-5">창의적체험활동 특기사항, 행동특성 및 종합의견, 세부능력 및 특기사항(초·교과학습발달상황) 내용은 「공공기관의 정보공개에 관한 법률」제9조 제1항 제5호에 따라 내부 검토 중인 사항으로 당해학년도에는 제공하지 않습니다.</p>
+                  {/*<p id="wq_uuid_600" className="text-danger pb-5">창의적체험활동 특기사항, 행동특성 및 종합의견, 세부능력 및 특기사항(초·교과학습발달상황) 내용은 「공공기관의 정보공개에 관한 법률」제9조 제1항 제5호에 따라 내부 검토 중인 사항으로 당해학년도에는 제공하지 않습니다.</p>*/}
                   <div className="overflow-x-auto">
                       <table id="wq_uuid_601" className="table table-bordered">
                           <caption className="dp_none" id="wq_uuid_602">창의적체험활동</caption>
@@ -201,7 +290,64 @@ function LifeRecordView() {
                               </tr>
                           </thead>
                           <tbody id="gen09" className="whitespace-nowrap text-center">
-                              <tr id="gen09_0_hope">
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'creativeExperienceActive') {
+                                  const array = item;
+                                  return array.map((data, index) => {
+                                      if (data.area === '자율활동') {
+                                          return (
+                                              <React.Fragment key={index}>
+                                                  <tr id={`creative_experience_active_tr_${index}`}>
+                                                      <td rowSpan={6} colSpan={1}><span>{data.class}</span></td>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.area}</span></td>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.time}</span></td>
+                                                  </tr>
+                                                  <tr id={`creative_experience_active_tr_${index}_sub`}>
+                                                      <td colSpan={3}>
+                                                          <p className="whitespace-normal text-left">{data.special.toString()}</p>
+                                                      </td>
+                                                  </tr>
+                                              </React.Fragment>
+                                          );
+                                      } else if (data.area === '진로활동') {
+                                          return (
+                                              <React.Fragment key={index}>
+                                                  <tr>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.area}</span></td>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.time}</span></td>
+                                                      <th className="bg-slate-100 font-medium" style={{width:'30px'}} colSpan={1}>
+                                                          <p>{data.special.special_hope_key}</p>
+                                                      </th>
+                                                      <td className="whitespace-normal text-left" colSpan={2}>
+                                                          <p>{data.special.special_hope_value}</p>
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td colSpan={3} >
+                                                          <p className="text-left">{data.special.content}</p>
+                                                      </td>
+                                                  </tr>
+                                              </React.Fragment>
+                                          );
+                                      } else {
+                                          return (
+                                              <React.Fragment key={index}>
+                                                  <tr id={`creative_experience_active_tr_${index}`}>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.area}</span></td>
+                                                      <td rowSpan={2} colSpan={1}><span>{data.time}</span></td>
+                                                  </tr>
+                                                  <tr id={`creative_experience_active_tr_${index}_sub`}>
+                                                      <td colSpan={3}>
+                                                          <p className="whitespace-normal text-left">{data.special.toString()}</p>
+                                                      </td>
+                                                  </tr>
+                                              </React.Fragment>
+                                          );
+                                      }
+                                  });
+                              }
+                          })}
+                              {/*<tr id="gen09_0_hope">
                                   <td id="gen09_0_tdMerge11" rowSpan={6} colSpan={1}><span id="gen09_0_txbJ1">1</span></td>
                                   <td id="gen09_0_tdMerge11_1" rowSpan={2} colSpan={1}><span id="gen09_0_txbJ2">자율활동</span></td>
                                   <td id="gen09_0_tdMerge11_2" rowSpan={2} colSpan={1}><span id="gen09_0_txbJ3">48</span></td>
@@ -270,7 +416,7 @@ function LifeRecordView() {
                                   <td id="gen09_5_group54" colSpan={3} >
                                       <p id="gen09_5_txbJ4" className="text-danger">해당내용은 「공공기관의 정보공개에 관한 법률」제9조 제1항 제5호에 따라 내부 검토 중인 사항으로 당해학년도에는 제공하지 않습니다.</p>
                                   </td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -307,7 +453,44 @@ function LifeRecordView() {
                               </tr>
                           </thead>
                           <tbody id="gen10" className="whitespace-nowrap text-center">
-                              <tr id="gen10_0_trMerge10" >
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'volunteerActivePerformance') {
+                                  const array = item;
+                                  let classNum = '';
+                                  return array.map((data, index) => {
+                                      if(data.class === classNum) {
+                                          return (
+                                              <tr id={`volunteer_active_performance_tr_${index}`}>
+                                                  <td><span>{data.from_to}</span></td>
+                                                  <td><span>{data.place_agency}</span></td>
+                                                  <td><span>{data.active_content}</span></td>
+                                                  <td><span>{data.time}</span></td>
+                                                  <td><span>{data.total_time}</span></td>
+                                              </tr>
+                                          );
+                                      } else {
+                                          let count = 0;
+                                          classNum = data.class;
+                                          array.map((data, index) => {
+                                              if(data.class === classNum) {
+                                                  count++;
+                                              }
+                                          });
+                                          return (
+                                              <tr id={`volunteer_active_performance__tr_${index}`}>
+                                                  <td rowSpan={count}><span>{data.class}</span></td>
+                                                  <td><span>{data.from_to}</span></td>
+                                                  <td><span>{data.place_agency}</span></td>
+                                                  <td><span>{data.active_content}</span></td>
+                                                  <td><span>{data.time}</span></td>
+                                                  <td><span>{data.total_time}</span></td>
+                                              </tr>
+                                          );
+                                      }
+                                  })
+                              }
+                          })}
+                          {/*<tr id="gen10_0_trMerge10" >
                                   <td id="gen10_0_tdMerge10" rowSpan={9}><span id="gen10_0_txbL1">1</span></td>
                                   <td id="wq_uuid_1319"><span id="gen10_0_txbL2">2021.03.02.</span></td>
                                   <td id="wq_uuid_1321"><span id="gen10_0_txbL4">(학교)해연중학교</span></td>
@@ -455,7 +638,7 @@ function LifeRecordView() {
                                   <td id="wq_uuid_1583"><span id="gen10_20_txbL5">교내 대청소</span></td>
                                   <td id="wq_uuid_1585"><span id="gen10_20_txbL6">1</span></td>
                                   <td id="wq_uuid_1587"><span id="gen10_20_txbL7">30</span></td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -470,8 +653,210 @@ function LifeRecordView() {
                   <h2 id="wq_uuid_660" className='text-lg font-bold'>교과학습발달상황</h2>
               </div>
               <div className="p-5">
-                  <p id="wq_uuid_661" className="text-danger pb-5">교과별 성취도 "A,B,C,D,E"는 지필평가 1회(중간고사), 2회(기말고사), 수행평가를 합산하여 학기 단위로 산출됩니다.<br/>석차등급란의 "A,B,C,D,E"는 성취도를 나타냅니다.</p>
-                  <h5 id="wq_uuid_663"className="pb-3">[1학년]</h5>
+                  {Object.entries(parseHtml).map(([key, item]) => {
+                      if (key === 'studentLearnDevelopStatus') {
+                          const array = item;
+                          return array.map((data, index) => {
+                              let table_1 = [];
+                              let table_2 = [];
+                              let table_3 = [];
+                              let table_4 = [];
+                              let table_5 = [];
+
+                              data.table_1.map((data_1, index_1) => {
+                                  table_1.push(
+                                      <>
+                                          <tr>
+                                              <td><span>{data_1.semester}</span></td>
+                                              <td><span>{data_1.subject_1}</span></td>
+                                              <td><span>{data_1.subject_2}</span></td>
+                                              <td><span>{data_1.ori_score_subject_average}</span></td>
+                                              <td><span>{data_1.achieve_level}</span></td>
+                                              <td><span>{data_1.note}</span></td>
+                                          </tr>
+                                      </>
+                                  );
+                              });
+
+                              data.table_2.map((data_2, index_2) => {
+                                  table_2.push(
+                                      <>
+                                          <tr>
+                                              <td className="text-center">
+                                                  <p>{data_2.subject}</p>
+                                              </td>
+                                              <td>
+                                                  <p>{data_2.detail_capability_special}</p>
+                                              </td>
+                                          </tr>
+                                      </>
+                                  );
+                              });
+
+                              data.table_3.map((data_3, index_3) => {
+                                  table_3.push(
+                                      <>
+                                          <tr className="text-center">
+                                              <td><span>{data_3.semester}</span></td>
+                                              <td><span>{data_3.subject_1}</span></td>
+                                              <td><span>{data_3.subject_2}</span></td>
+                                              <td><span>{data_3.ori_score_subject_average}</span></td>
+                                              <td><span>{data_3.achieve_leve}</span></td>
+                                          </tr>
+                                      </>
+                                  );
+                              });
+
+                              data.table_4.map((data_4, index_4) => {
+                                  table_4.push(
+                                      <>
+                                          <tr>
+                                              <td className="text-center"><span>{data_4.subject}</span></td>
+                                              <td><span>{data_4.detail_capability_special}</span></td>
+                                          </tr>
+                                      </>
+                                  );
+                              });
+
+                              data.table_5.map((data_5, index_5) => {
+                                  table_5.push(
+                                      <>
+                                          <tr className="text-center">
+                                              <td><span>{data_5.semester}</span></td>
+                                              <td><span>{data_5.subject_1}</span></td>
+                                              <td><span>{data_5.subject_2}</span></td>
+                                              <td><span>{data_5.ori_score_subject_average}</span></td>
+                                              <td><span>{data_5.achieve_level}</span></td>
+                                              <td><span>{data_5.note}</span></td>
+                                          </tr>
+                                      </>
+                                  );
+                              });
+
+                              return (
+                                  <React.Fragment key={index}>
+                                      <div className="mt-5">
+                                          <h5 className="pb-3">[{index+1}학년]</h5>
+                                          <table className="table table-bordered">
+                                              {/*<caption>{index+1}학년 교과학습발달상황 - {index+1}학년 교과,과목의 학기별 성취도 및 원점수,과목평균 등을 제공하는 표</caption>*/}
+                                              <colgroup>
+                                                  <col style={{width:'5%'}}/>
+                                                  <col style={{width:'15%'}}/>
+                                                  <col style={{width:'15%'}}/>
+                                                  <col style={{width:'16%'}}/>
+                                                  <col style={{width:'10%'}}/>
+                                                  <col style={{width:'10%'}}/>
+                                              </colgroup>
+                                              <thead id="wq_uuid_674" className="whitespace-nowrap text-center">
+                                              <tr id="wq_uuid_675">
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_676" scope="col" colSpan={1} rowSpan={2}><span id="wq_uuid_677">학기</span></th>
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_678" scope="col" colSpan={1} rowSpan={2}><span id="wq_uuid_679">교과</span></th>
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_680" scope="colgroup" colSpan={0} rowSpan={1}><span id="wq_uuid_681">과목</span></th>
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_682" scope="colgroup" colSpan={0} rowSpan={1}><span id="oneStdev">원점수/과목평균</span></th>
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_684" rowSpan={0} scope="col"><span id="wq_uuid_685">성취도(수강자수)</span></th>
+                                                  <th className="bg-slate-100 font-medium" id="wq_uuid_686" rowSpan={0} scope="col"><span id="wq_uuid_687">비고</span></th>
+                                              </tr>
+                                              </thead>
+                                              <tbody className="whitespace-nowrap text-center" style={{tableLayout:'fixed'}}>
+                                              {table_1}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                      <div className="mt-5">
+                                          <table className="table table-bordered">
+                                              {/*<caption>{index+1}학년 교과학습발달상황 - {index+1}학년 과목별 세부능력 및 특기사항을 제공하는 표</caption>*/}
+                                              <colgroup>
+                                                  <col style={{width:'20%'}}/>
+                                                  <col style={{width:'80%'}}/>
+                                              </colgroup>
+                                              <thead className="whitespace-nowrap text-center">
+                                              <tr>
+                                                  <th className="bg-slate-100 font-medium" scope="col"><span>과목</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col"><span>세부능력 및 특기사항</span></th>
+                                              </tr>
+                                              </thead>
+                                              <tbody>
+                                              {table_2}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                      <div className="mt-5">
+                                          <h5 className="text-primary pb-3">&lt; 체육ㆍ예술(음악/미술) &gt;</h5>
+                                          <table className="table table-bordered">
+                                              {/*<caption>{index+1}학년 체육,예술(음악/미술) 교과학습발달상황 - {index+1}학년체육,예술(음악,미술)에 관련된 교과 과목의 학기별 변동이름을 제공하는 표</caption>*/}
+                                              <colgroup>
+                                                  <col style={{width:'6%'}}/>
+                                                  <col style={{width:'25%'}}/>
+                                                  <col style={{width:'25%'}}/>
+                                                  <col style={{width:'26%'}}/>
+                                                  <col/>
+                                              </colgroup>
+                                              <thead className="whitespace-nowrap text-center">
+                                              <tr>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={2}><span id="wq_uuid_872">학기</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={2}><span id="wq_uuid_874">교과</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={1}><span id="wq_uuid_876">과목</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={1}><span id="wq_uuid_878">성취도</span></th>
+                                                  <th className="bg-slate-100 font-medium" rowSpan={2} scope="col"><span id="wq_uuid_880">비고</span></th>
+                                              </tr>
+                                              </thead>
+                                              <tbody className="whitespace-nowrap">
+                                              {table_3}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                      <div className="mt-5">
+                                          <table className="table table-bordered">
+                                              {/*<caption >{index+1}학년 교과학습발달상황 - {index+1}학년 과목별 특기사항 상세내용을 제공하는 표</caption>*/}
+                                              <colgroup>
+                                                  <col style={{width:'20%'}}/>
+                                                  <col style={{width:'80%'}}/>
+                                              </colgroup>
+                                              <thead className="whitespace-nowrap text-center">
+                                              <tr>
+                                                  <th className="bg-slate-100 font-medium" scope="col"><span>과목</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col"><span>세부능력 및 특기사항</span></th>
+                                              </tr>
+                                              </thead>
+                                              <tbody>
+                                              {table_4}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                      <div className="mt-5">
+                                          <h5 className="text-primary pb-3">&lt; 교양교과 &gt;</h5>
+                                          <table className="table table-bordered">
+                                              {/*<caption>1학년 교양교과 교과학습발달상황 - 1학년 교양교과에 관련된 교과,과목의 학기별이수시간,이수여부를 제공하는 표</caption>*/}
+                                              <colgroup>
+                                                  <col style={{width:'6%'}}/>
+                                                  <col style={{width:'20%'}}/>
+                                                  <col style={{width:'20%'}}/>
+                                                  <col style={{width:'15%'}}/>
+                                                  <col style={{width:'15%'}}/>
+                                                  <col style={{width:'16%'}}/>
+                                              </colgroup>
+                                              <thead className="whitespace-nowrap text-center">
+                                              <tr>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={2}><span>학기</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="col" colSpan={1} rowSpan={2}><span>교과</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="colgroup" colSpan={0} rowSpan={1}><span>과목</span></th>
+                                                  <th className="bg-slate-100 font-medium" scope="colgroup" colSpan={0} rowSpan={1}><span>이수시간</span></th>
+                                                  <th className="bg-slate-100 font-medium" rowSpan={2} scope="col"><span>이수여부</span></th>
+                                                  <th className="bg-slate-100 font-medium" rowSpan={2} scope="col"><span>비고</span></th>
+                                              </tr>
+                                              </thead>
+                                              <tbody id="gen28">
+                                              {table_5}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                  </React.Fragment>
+                              );
+                          })
+                      }
+                  })}
+                  {/*<p id="wq_uuid_661" className="text-danger pb-5">교과별 성취도 "A,B,C,D,E"는 지필평가 1회(중간고사), 2회(기말고사), 수행평가를 합산하여 학기 단위로 산출됩니다.<br/>석차등급란의 "A,B,C,D,E"는 성취도를 나타냅니다.</p>*/}
+                  {/*<h5 id="wq_uuid_663"className="pb-3">[1학년]</h5>
                   <div className="overflow-x-auto">
                       <table id="wq_uuid_665" className="table table-bordered">
                           <caption className="dp_none" id="wq_uuid_666">1학년 교과학습발달상황 - 1학년 교과,과목의 학기별 성취도 및 원점수,과목평균 등을 제공하는 표</caption>
@@ -979,7 +1364,7 @@ function LifeRecordView() {
                               </tbody>
                           </table>
                       </div>
-                  </div>
+                  </div>*/}
               </div>
           </div>
       </div>
@@ -1010,8 +1395,50 @@ function LifeRecordView() {
                                   <th className="bg-slate-100 font-medium" id="wq_uuid_1078" scope="col"><span id="wq_uuid_1079">특기사항</span></th>
                               </tr>
                           </thead>
-                          <tbody id="genNew" className="whitespace-nowrap text-center">
-                              <tr id="genNew_0_trMergeNew">
+                          <tbody id="genNew">
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'freeSemesterActiveStatus') {
+                                  const array = item;
+                                  let classNum = '';
+                                  let semesterNum = '';
+                                  return array.map((data, index) => {
+                                      if(data.class === classNum) {
+                                          if(data.semester === semesterNum) {
+                                              return (
+                                                  <tr id={`free_semester_active_status_tr_${index}`}>
+                                                      <td className="text-center"><span>{data.area}</span></td>
+                                                      <td className="text-center"><span>{data.time}</span></td>
+                                                      <td><span>{data.special}</span></td>
+                                                  </tr>
+                                              );
+                                          } else {
+                                              semesterNum = data.semester;
+                                              return (
+                                                  <tr id={`free_semester_active_status_tr_${index}`}>
+                                                      <td className="text-center" rowSpan={4}><span>{data.semester}</span></td>
+                                                      <td className="text-center"><span>{data.area}</span></td>
+                                                      <td className="text-center"><span>{data.time}</span></td>
+                                                      <td><span>{data.special}</span></td>
+                                                  </tr>
+                                              );
+                                          }
+                                      } else {
+                                          classNum = data.class;
+                                          semesterNum = data.semester;
+                                          return (
+                                              <tr id={`free_semester_active_status_tr_${index}`}>
+                                                  <td className="text-center" rowSpan={8}><span>{data.class}</span></td>
+                                                  <td className="text-center" rowSpan={4}><span>{data.semester}</span></td>
+                                                  <td className="text-center"><span>{data.area}</span></td>
+                                                  <td className="text-center"><span>{data.time}</span></td>
+                                                  <td><span>{data.special}</span></td>
+                                              </tr>
+                                          );
+                                      }
+                                  })
+                              }
+                          })}
+                              {/*<tr id="genNew_0_trMergeNew">
                                   <td id="genNew_0_tdMergeNew1" rowSpan={8}><span id="genNew_0_txbAr1">1</span></td>
                                   <td id="genNew_0_tdMergeNew2" rowSpan={4}><span id="genNew_0_txbAr2">1</span></td>
                                   <td id="wq_uuid_2044"><span id="genNew_0_txbAr3">진로탐색활동</span></td>
@@ -1081,7 +1508,7 @@ function LifeRecordView() {
                                           <br/>
                                           <br/>(카바디반)(17시간) 경기를 통해 친구들과의 배려심과 운영 능력을 보여줌.</p>
                                   </td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -1111,8 +1538,26 @@ function LifeRecordView() {
                                   <th className="bg-slate-100 font-medium" id="wq_uuid_1119" scope="col"><span id="wq_uuid_1120">독서활동상황</span></th>
                               </tr>
                           </thead>
-                          <tbody id="gen39" className="whitespace-nowrap text-center">
-                              <tr id="gen39_0_trMerge39">
+                          <tbody id="gen39">
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'readActiveStatus') {
+                                  const array = item;
+                                  return array.map((data, index) => {
+                                      return (
+                                          <>
+                                              <tr>
+                                                  <td className="text-center"><span>{data.class}</span></td>
+                                                  <td className="text-center"><span>{data.subject_area}</span></td>
+                                                  <td>
+                                                      <p>{data.active_status}</p>
+                                                  </td>
+                                              </tr>
+                                          </>
+                                      );
+                                  })
+                              }
+                          })}
+                              {/*<tr id="gen39_0_trMerge39">
                                   <td id="gen39_0_tdMerge39"><span id="gen39_0_txbY1">1</span></td>
                                   <td id="gen39_0_tdMerge39_1"><span id="gen39_0_txbY2"></span></td>
                                   <td id="wq_uuid_2132">
@@ -1125,7 +1570,7 @@ function LifeRecordView() {
                                   <td id="wq_uuid_2139">
                                       <p id="gen39_1_txbY3" className="whitespace-normal text-left"></p>
                                   </td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -1153,8 +1598,23 @@ function LifeRecordView() {
                                   <th className="bg-slate-100 font-medium" id="wq_uuid_1133" scope="col"><span id="wq_uuid_1134">행동 특성 및 종합의견</span></th>
                               </tr>
                           </thead>
-                          <tbody id="gen40" className="whitespace-nowrap text-center">
-                              <tr id="wq_uuid_2141">
+                          <tbody id="gen40">
+                          {Object.entries(parseHtml).map(([key, item]) => {
+                              if (key === 'behaviorCharacterGeneralOpinion') {
+                                  const array = item;
+                                  return array.map((data, index) => {
+                                      return (
+                                          <>
+                                              <tr>
+                                                  <td className="text-center"><span>{data.class}</span></td>
+                                                  <td><span>{data.behavior_character_general_opinion}</span></td>
+                                              </tr>
+                                          </>
+                                      );
+                                  })
+                              }
+                          })}
+                              {/*<tr id="wq_uuid_2141">
                                   <td id="wq_uuid_2142"><span id="gen40_0_txbZ1">1</span></td>
                                   <td id="wq_uuid_2144">
                                       <p id="gen40_0_txbZ2" className="whitespace-normal text-left">자신이 먼저 하고 싶은 일이 있어도 상대방을 배려하여 흔쾌히 양보하는 미덕을 가짐. 청소시간에도 자신의 활동을 마친 후 다른 학생들을 도와주는 등 급우들을 위해 배려하는 모습을 지님. 성취의욕이 높아 어려운 문제를 자신의 힘으로 풀고자 하는 의욕이 강하며 자신감을 갖고 도전하는 적극적인 자세를 지닌 학생임.</p>
@@ -1165,7 +1625,7 @@ function LifeRecordView() {
                                   <td id="wq_uuid_2149">
                                       <p id="gen40_1_txbZ2" className="whitespace-normal text-left">해당내용은 「공공기관의 정보공개에 관한 법률」제9조 제1항 제5호에 따라 내부 검토 중인 사항으로 당해학년도에는 제공하지 않습니다.</p>
                                   </td>
-                              </tr>
+                              </tr>*/}
                           </tbody>
                       </table>
                   </div>
@@ -1180,8 +1640,8 @@ function LifeRecordView() {
         <Link to="/life_record">
           <button className="btn bg-white w-24">목록</button>
         </Link>
-        <Link to="/life_record_edit">
-          <button className="btn w-24 btn-sky">수정하기</button>
+        <Link to="/life_record_edit" state={userInfo}>
+          <button className="btn w-24 btn-sky" state={userInfo}>수정하기</button>
         </Link>
       </div>
     </>

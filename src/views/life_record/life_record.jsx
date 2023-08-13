@@ -17,7 +17,7 @@ function LifeRecord() {
   const [selDelete, selDeleteDetail] = useState(false);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(2);
+  const [pageLimit, setPageLimit] = useState(10);
   const [htmlList, setHtmlList] = useState([]);
   const [pageInfo, setPageInfo] = useState({});
   const [pageLength, setPageLength] = useState(10);
@@ -27,7 +27,7 @@ function LifeRecord() {
   const api = useAxios();
   const navigate = useNavigate();
 
-  const getStudentLifeRecordList = async () => {
+  const getStudentLifeRecordList = async (currentPage, pageLimit, search) => {
     let result = [];
     await api.get(`/admin/life-record/list`,
         {headers: {Authorization: `Bearer ${user.token}`},
@@ -94,8 +94,21 @@ function LifeRecord() {
     let array = [];
     getStudentLifeRecordList(currentPage, pageLimit, search).then((res) => {
       console.log('res > ', res);
-      setHtmlList({...res.data.rows});
-      setPageInfo({totalCount:res.data.totalCount, totalPage:res.data.totalPage, 'currentPage':currentPage});
+      if(res.length === 0) {
+        setHtmlList([]);
+        setPageInfo({
+          totalCount: 0,
+          totalPage: 1,
+          'currentPage': 1
+        });
+      } else {
+        setHtmlList({...res.data.rows});
+        setPageInfo({
+          totalCount: res.data.totalCount,
+          totalPage: res.data.totalPage,
+          'currentPage': currentPage
+        });
+      }
       checkedAllManual(false);
     });
   },[currentPage]);
@@ -116,14 +129,35 @@ function LifeRecord() {
             <div className="flex flex-middle gap-3">
               <input
                 type="text"
+                id="search_text"
                 name=""
-                value=""
                 class="form-control w-60"
                 placeholder="검색어 입력"
               />
               <button
                 type="button"
                 className="btn btn-primary flex items-center"
+                onClick={() => {
+                  getStudentLifeRecordList(1, pageLimit, document.getElementById('search_text').value).then((res) => {
+                    console.log('res > ', res);
+                    if(res.length === 0) {
+                      setHtmlList([]);
+                      setPageInfo({
+                        totalCount: 0,
+                        totalPage: 1,
+                        'currentPage': 1
+                      });
+                    } else {
+                      setHtmlList({...res.data.rows});
+                      setPageInfo({
+                        totalCount: res.data.totalCount,
+                        totalPage: res.data.totalPage,
+                        'currentPage': currentPage
+                      });
+                    }
+                    checkedAllManual(false);
+                  });
+                }}
               >
                 <Lucide icon="Search" className="w-4 h-4 mr-2"></Lucide>
                 검색
@@ -159,8 +193,8 @@ function LifeRecord() {
                   <tr className="text-center">
                     <td><input className={`form-check-input chk${index+1}`} user_id={htmlList[data].userId} type="checkbox" /></td>
                     <td>{htmlList[data].no}</td>
-                    <td><Link to="/life_record_view" state={htmlList[data].userId} className="underline text-primary">{htmlList[data].name}</Link></td>
-                    <td>{htmlList[data].schoolYear}</td>
+                    <td><Link to="/life_record_view" state={{userId:htmlList[data].userId, name:htmlList[data].name, gubun:htmlList[data].gubun, schoolName:htmlList[data].schoolName, phone:htmlList[data].phone}} className="underline text-primary">{htmlList[data].name}</Link></td>
+                    <td>{htmlList[data].gubun}</td>
                     <td>{htmlList[data].schoolName}</td>
                     <td>{htmlList[data].phone}</td>
                     <td>{htmlList[data].udtDate === undefined ? htmlList[data].insDate.substring(0,16) : htmlList[data].udtDate.substring(0,16)}</td>

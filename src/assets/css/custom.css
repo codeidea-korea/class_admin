@@ -248,6 +248,14 @@ td.bg-slate-100 {
   --tw-text-opacity: 1;
   color: rgb(var(--color-slate-100) / var(--tw-text-opacity));
 }
+.btn-blue {
+  --tw-border-opacity: 1;
+  border-color: rgb(var(--color-blue) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(var(--color-blue) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(var(--color-slate-100) / var(--tw-text-opacity));
+}
 
 .table_layout01 td {
   border-bottom-width: 0px;
