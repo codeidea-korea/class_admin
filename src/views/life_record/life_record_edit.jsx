@@ -817,6 +817,7 @@ function LifeRecordEdit() {
 
               if(res.data === "") {
                   obj = JSON.parse(JSON.stringify(lifeRecord));
+                  obj.userId = selectedUserInfo.userId;
               } else {
                   obj = {...res.data};
                   obj.attendanceAbsence = JSON.parse(obj.attendanceAbsence);
@@ -842,10 +843,10 @@ function LifeRecordEdit() {
     useEffect(() => {
         setSelectedUserInfo({
             userId : userInfo.userId,
-            userName : userInfo.name,
+            name : userInfo.name,
             gubun : userInfo.gubun,
             schoolName : userInfo.schoolName,
-            userPhone : userInfo.phone
+            phone : userInfo.phone
         })
     },[userInfo]);
 
@@ -865,7 +866,7 @@ function LifeRecordEdit() {
                 alert('내용을 입력해 주세요.');
             } else {
                 insStudentLifeRecord(parseHtml).then(() => {
-                    navigate('/life_record_view', { state: userInfo });
+                    navigate('/life_record_view', { state: selectedUserInfo });
                 });
             }
         }}>
@@ -901,7 +902,7 @@ function LifeRecordEdit() {
                   type="text"
                   className="form-control w-52"
                   readOnly={true}
-                  value={selectedUserInfo.userName}
+                  value={selectedUserInfo.name || ''}
                 />
               </td>
             </tr>
@@ -914,7 +915,7 @@ function LifeRecordEdit() {
                       type="text"
                       className="form-control w-52"
                       readOnly={true}
-                      value={selectedUserInfo.gubun}
+                      value={selectedUserInfo.gubun || ''}
                   />
                 {/*<select name="" id="" className="form-select w-52" disabled={true}>
                   <option value="">초등</option>
@@ -932,7 +933,7 @@ function LifeRecordEdit() {
                   type="text"
                   className="form-control w-52"
                   readOnly={true}
-                  value={selectedUserInfo.schoolName}
+                  value={selectedUserInfo.schoolName || ''}
                 />
               </td>
             </tr>
@@ -945,7 +946,7 @@ function LifeRecordEdit() {
                   type="number"
                   className="form-control w-52"
                   readOnly={true}
-                  value={selectedUserInfo.userPhone}
+                  value={selectedUserInfo.phone || ''}
                 />
               </td>
             </tr>
@@ -2759,7 +2760,7 @@ function LifeRecordEdit() {
                   alert('내용을 입력해 주세요.');
               } else {
                   insStudentLifeRecord(parseHtml).then(() => {
-                      navigate('/life_record_view', { state: userInfo });
+                      navigate('/life_record_view', { state: selectedUserInfo });
                   });
               }
           }}>저장하기</button>
@@ -2820,10 +2821,10 @@ function LifeRecordEdit() {
                                 <tr onClick={(event) => {
                                         const obj = {
                                             userId : userList[index].userId,
-                                            userName : userList[index].name,
+                                            name : userList[index].name,
                                             gubun : userSchoolYear(userList[index].schoolYear),
                                             schoolName : userList[index].schoolName,
-                                            userPhone : userList[index].phone
+                                            phone : userList[index].phone
                                         };
                                         setSelectedUserInfo({...obj});
                                         recordSearchDetail(false);
