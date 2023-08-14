@@ -101,6 +101,8 @@ function LifeRecord() {
           totalPage: 1,
           'currentPage': 1
         });
+      } else if(res.data.rows.length === 0) {
+        setCurrentPage(resultJo.currentPage);
       } else {
         setHtmlList({...res.data.rows});
         setPageInfo({
@@ -369,7 +371,29 @@ function LifeRecord() {
           <button type="button" className="btn btn-danger w-24" onClick={() => {
             const resultArray = makeDelArray();
             delLifeRecord(resultArray).then((resultJo) => {
-              setCurrentPage(resultJo.currentPage);
+              //setCurrentPage(resultJo.currentPage);
+              //let array = [];
+              getStudentLifeRecordList(currentPage, pageLimit, search).then((res) => {
+                console.log('res > ', res);
+                if(res.length === 0) {
+                  setHtmlList([]);
+                  setPageInfo({
+                    totalCount: 0,
+                    totalPage: 1,
+                    'currentPage': 1
+                  });
+                } else if(res.data.rows.length === 0) {
+                  setCurrentPage(resultJo.currentPage);
+                } else {
+                  setHtmlList({...res.data.rows});
+                  setPageInfo({
+                    totalCount: res.data.totalCount,
+                    totalPage: res.data.totalPage,
+                    'currentPage': currentPage
+                  });
+                }
+                checkedAllManual(false);
+              });
             });
             selDeleteDetail(false);
           }}>
