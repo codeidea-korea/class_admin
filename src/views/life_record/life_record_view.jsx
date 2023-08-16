@@ -736,7 +736,7 @@ function LifeRecordView() {
                               return (
                                   <React.Fragment key={index}>
                                       <div className="mt-5">
-                                          <h5 className="pb-3">[{index+1}학년]</h5>
+                                          <h5 className="pb-3">[{data.class}학년]</h5>
                                           <table className="table table-bordered">
                                               {/*<caption>{index+1}학년 교과학습발달상황 - {index+1}학년 교과,과목의 학기별 성취도 및 원점수,과목평균 등을 제공하는 표</caption>*/}
                                               <colgroup>
