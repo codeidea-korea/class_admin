@@ -1592,8 +1592,16 @@ function LifeRecordEdit() {
       {/* 교과학습발달상황 */}
       <div className="container mt-5">
           <div className="box">
-              <div className="p-5 border-b">
+              <div className="p-5 border-b flex justify-between">
                   <h2 id="wq_uuid_660" className='text-lg font-bold'>교과학습발달상황</h2>
+                  <button
+                      className="btn btn-outline-primary border-dotted"
+                      onClick={() => {
+                          addRow(`studentLearnDevelopStatus`, JSON.parse(JSON.stringify(lifeRecord.studentLearnDevelopStatus[0])));
+                      }}
+                  >
+                      <Lucide icon="Plus" className="w-6 h-6"></Lucide>
+                  </button>
               </div>
               <div className="p-5">
                   {Object.entries(parseHtml).map(([key, item]) => {
@@ -1684,7 +1692,12 @@ function LifeRecordEdit() {
                               return (
                                   <React.Fragment key={index}>
                                       <div className="mt-5">
-                                          <h5 className="pb-3">[{index+1}학년]</h5>
+                                          <div className="flex justify-between">
+                                              <h5 className="pb-3">
+                                                  [ <input type="text" className="form-control text-center w-10" onChange={(e) => handleInputChange(e, index, `studentLearnDevelopStatus.${index}.class`)} value={data.class}/> 학년 ]
+                                              </h5>
+                                              <button className="btn btn-outline-primary border-dotted" style={{marginBottom:'10px'}} onClick={() => delRow(`studentLearnDevelopStatus`, index)}><Lucide icon="Minus" className="w-6 h-6"></Lucide></button>
+                                          </div>
                                           <table className="table table-bordered">
                                               {/*<caption>{index+1}학년 교과학습발달상황 - {index+1}학년 교과,과목의 학기별 성취도 및 원점수,과목평균 등을 제공하는 표</caption>*/}
                                               <colgroup>
