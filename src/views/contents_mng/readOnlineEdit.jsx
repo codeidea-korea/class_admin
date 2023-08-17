@@ -90,11 +90,11 @@ const ReadOnlineEdit = () => {
         temp = false
         return temp
       }
-      if (!item?.video) {
-        alert('링크를 입력하세요.')
-        temp = false
-        return temp
-      }
+      // if (!item?.video) {
+      //   alert('링크를 입력하세요.')
+      //   temp = false
+      //   return temp
+      // }
 
       idList.push(item.id ? item.id : 0)
       subjectNameList.push(item.subjectName ? item.subjectName : '')
