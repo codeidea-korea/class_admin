@@ -44,7 +44,7 @@ const ReservationList = () => {
       <React.Fragment key={index}>
         <tr className='text-center'>
           <td>{item.authority === 'PARENTS' ? '학부모' : item.authority === 'STUDENT' ? '학생' : item.authority === null ? '비회원' : item.authority}</td>
-          <td>{item.userId === '' ? '-' : item.userId}</td>
+          <td>{item.userName === '' ? '-' : item.userName}</td>
           <td>{item.creDate}</td>
           <td>
             <Link

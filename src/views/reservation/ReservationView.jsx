@@ -69,7 +69,7 @@ const ReservationView = () => {
               <td className='w-48'>
                 <span className='text-slate-400 font-bold'>계정정보</span>
               </td>
-              <td>{reservations.userId === '' ? '-' : reservations.userId}</td>
+              <td>{reservations.userName === '' ? '-' : reservations.userName}</td>
             </tr>
             <tr>
               <td className='w-48'>
