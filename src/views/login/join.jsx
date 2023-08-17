@@ -223,7 +223,7 @@ function Join() {
 													placeholder="아이디를 입력해주세요."
 													onChange={handleChange}
 												/>
-												<button className="btn btn-primary w-20 py-3 shrink-0" onClick={checkUserIdDuplication}>중복확인</button>
+												<button className="btn btn-primary w-28 py-3 shrink-0" onClick={checkUserIdDuplication}>중복확인</button>
 											</div>
 											{!!alertText.alertUserID[0] && <div className="text-sm text-danger mt-2 ml-2">{alertText.alertUserID[1]}</div>}
 										</div>
@@ -268,24 +268,24 @@ function Join() {
 											<div className="flex gap-2 items-center mt-1">
 												<input
 													type="number" name={'phone'}
-													className="intro-x login__input form-control py-3 px-4 block w-60"
+													className="intro-x login__input form-control py-3 px-4 block w-96"
 													placeholder="휴대전화번호를 입력해주세요." 
 													onChange={handleChange}
 												/>
-												<button className="btn btn-danger w-20 py-3 shrink-0" onClick={requestAuth}>인증요청</button>
+												<button className="btn btn-danger w-28 py-3 shrink-0" onClick={requestAuth}>인증요청</button>
 												{checkRequestAuth && (<div className="text-slate-400">{timeFormat(timer)}</div>)}
 											</div>
 											<div className="flex gap-2 items-center mt-3">
 												<input
 													type="text" name={'code'}
-													className="intro-x login__input form-control py-3 px-4 block w-60"
+													className="intro-x login__input form-control py-3 px-4 block w-96"
 													placeholder="인증번호를 입력해주세요." 
 													onChange={handleChange}
 												/>
 												<button 
 													className={joinParams.code !== "" 
-													? 'btn btn-green w-20 py-3 shrink-0' 
-													: 'btn btn-secondary w-20 py-3 shrink-0'} onClick={sendAuth}>
+													? 'btn btn-green w-28 py-3 shrink-0' 
+													: 'btn btn-secondary w-28 py-3 shrink-0'} onClick={sendAuth}>
 													확인
 												</button>
 											</div>
