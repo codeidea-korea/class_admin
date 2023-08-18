@@ -202,7 +202,6 @@ function Join() {
 
 
   useEffect(() => {
-    console.log(joinParams);
   }, [joinParams])
 
   // 자세히보기
