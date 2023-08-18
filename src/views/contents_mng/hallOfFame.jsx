@@ -10,7 +10,7 @@ const HallOfFame = () => {
   const url = useLocation().search
   const params = new URLSearchParams(location.search)
   let [menuData, setMenuData] = useState({
-    fieldTab: '영재관',
+    fieldTab: '영재원',
     subId: 0,
   })
 
@@ -144,7 +144,7 @@ const HallOfFame = () => {
               }}
               value={fieldTab}
             >
-              <option value='영재관'>영재관</option>
+              <option value='영재원'>영재원</option>
               <option value='영재학교'>영재학교</option>
               <option value='과학고'>과학고</option>
             </select>
@@ -192,6 +192,7 @@ const HallOfFame = () => {
               <td>번호</td>
               <td>연도</td>
               <td>학교명</td>
+              <td>학교명 배경색상</td>
               <td>입학예정자 정보</td>
             </tr>
             </thead>
@@ -202,6 +203,7 @@ const HallOfFame = () => {
                   <td>{index + 1}</td>
                   <td>{year}</td>
                   <td>{item.schoolName}</td>
+                  <td>{item.backgroundColor}</td>
                   <td>{item.studentInfo}</td>
                 </tr>
               ))

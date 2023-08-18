@@ -20,9 +20,11 @@ const hallOfFameEdit = () => {
   const handleAddList = () => {
     const addData = {
       id: 0,
-      subjectUnitId: Number(id),
-      title: '',
-      link_url: '',
+      schoolName: '',
+      backgroundColor: '',
+      studentInfo: '',
+      etc: '',
+      etcBackgroundColor: '',
       delYn: 'N',
     }
     setValue('list', [...getValues('list'), addData])
@@ -80,14 +82,19 @@ const hallOfFameEdit = () => {
     }
 
     let temp = true
-    let rowIdList = [], SchoolNameList = [], StudentInfoList = [], delYnList = []
+    let rowIdList = [], schoolNameList = [], backgroundColorList = [], studentInfoList = [], etcList = [], etcBackgroundColorList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
 
-      // 제목, 링크는 필수값
       if (!item?.schoolName) {
         alert('학교명을 입력하세요.')
+        temp = false
+        return temp
+      }
+
+      if (!item?.backgroundColor) {
+        alert('학교명 배경 색상을 선택하세요.')
         temp = false
         return temp
       }
@@ -99,8 +106,11 @@ const hallOfFameEdit = () => {
       }
 
       rowIdList.push(item.id ? item.id : 0)
-      SchoolNameList.push(item.schoolName ? item.schoolName : '')
-      StudentInfoList.push(item.studentInfo ? item.studentInfo : '')
+      schoolNameList.push(item.schoolName ? item.schoolName : '')
+      backgroundColorList.push(item.backgroundColor ? item.backgroundColor : '')
+      studentInfoList.push(item.studentInfo ? item.studentInfo : '')
+      etcList.push(item.etc ? item.etc : '')
+      etcBackgroundColorList.push(item.etcBackgroundColor ? item.etcBackgroundColor : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
     })
 
@@ -109,15 +119,21 @@ const hallOfFameEdit = () => {
     // 삭제할 데이터 리스트 셋팅
     delDataList.forEach((item) => {
       rowIdList.push(item.id)
-      SchoolNameList.push('')
-      StudentInfoList.push('')
+      schoolNameList.push('')
+      backgroundColorList.push('')
+      studentInfoList.push('')
+      etcList.push('')
+      etcBackgroundColorList.push('')
       delYnList.push('Y')
     })
 
     const formData = new FormData()
     formData.append('id', rowIdList.length > 1 ? rowIdList.join(',') : rowIdList)
-    formData.append('schoolName', SchoolNameList.length > 1 ? SchoolNameList.join(',') : SchoolNameList)
-    formData.append('studentInfo', StudentInfoList.length > 1 ? StudentInfoList.join(',') : StudentInfoList)
+    formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
+    formData.append('backgroundColor', backgroundColorList.length > 1 ? backgroundColorList.join(',') : backgroundColorList)
+    formData.append('studentInfo', studentInfoList.length > 1 ? studentInfoList.join(',') : studentInfoList)
+    formData.append('etc', etcList.length > 1 ? etcList.join(',') : etcList)
+    formData.append('etcBackgroundColor', etcBackgroundColorList.length > 1 ? etcBackgroundColorList.join(',') : etcBackgroundColorList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
 
     formData.append('yearUnitId', searchParams.get('sub'))
@@ -144,7 +160,10 @@ const hallOfFameEdit = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>학교명</td>
+              <td>학교명 배경 색상</td>
               <td>입학예정자 정보</td>
+              <td>기타사항</td>
+              <td>기타사항 배경 색상</td>
               <td>삭제</td>
             </tr>
             </thead>
@@ -162,6 +181,20 @@ const hallOfFameEdit = () => {
                   />
                 </td>
                 <td>
+                  <select
+                    className='form-control'
+                    defaultValue={item.backgroundColor}
+                    key={item.backgroundColor}
+                    {...register(`list.${index}.backgroundColor`)}
+                  >
+                    <option value='green'>green</option>
+                    <option value='yellow'>yellow</option>
+                    <option value='red'>red</option>
+                    <option value='purple'>purple</option>
+                    <option value='blue'>blue</option>
+                  </select>
+                </td>
+                <td>
                   <input
                     type='text'
                     className='form-control'
@@ -169,6 +202,29 @@ const hallOfFameEdit = () => {
                     key={item.studentInfo}
                     {...register(`list[${index}].studentInfo`)}
                   />
+                </td>
+                <td>
+                  <input
+                    type='text'
+                    className='form-control'
+                    defaultValue={item.etc}
+                    key={item.etc}
+                    {...register(`list[${index}].etc`)}
+                  />
+                </td>
+                <td>
+                  <select
+                    className='form-control'
+                    defaultValue={item.etcBackgroundColor}
+                    key={item.etcBackgroundColor}
+                    {...register(`list.${index}.etcBackgroundColor`)}
+                  >
+                    <option value='green'>green</option>
+                    <option value='yellow'>yellow</option>
+                    <option value='red'>red</option>
+                    <option value='purple'>purple</option>
+                    <option value='blue'>blue</option>
+                  </select>
                 </td>
                 <td>
                   {getValues('list')?.length > 0 &&
