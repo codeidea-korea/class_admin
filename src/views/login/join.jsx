@@ -69,6 +69,8 @@ function Join() {
       if (event.origin === window.location.origin) {
         const result = event.data.result
 
+        console.log(result);
+
         setJoinParams({ ...joinParams, phone: result.userPhone })
       }
     })
