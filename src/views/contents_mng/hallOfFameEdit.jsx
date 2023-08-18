@@ -24,7 +24,6 @@ const hallOfFameEdit = () => {
       backgroundColor: '',
       studentInfo: '',
       etc: '',
-      etcBackgroundColor: '',
       delYn: 'N',
     }
     setValue('list', [...getValues('list'), addData])
@@ -82,7 +81,7 @@ const hallOfFameEdit = () => {
     }
 
     let temp = true
-    let rowIdList = [], schoolNameList = [], backgroundColorList = [], studentInfoList = [], etcList = [], etcBackgroundColorList = [], delYnList = []
+    let rowIdList = [], schoolNameList = [], backgroundColorList = [], studentInfoList = [], etcList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
@@ -110,7 +109,6 @@ const hallOfFameEdit = () => {
       backgroundColorList.push(item.backgroundColor ? item.backgroundColor : '')
       studentInfoList.push(item.studentInfo ? item.studentInfo : '')
       etcList.push(item.etc ? item.etc : '')
-      etcBackgroundColorList.push(item.etcBackgroundColor ? item.etcBackgroundColor : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
     })
 
@@ -123,7 +121,6 @@ const hallOfFameEdit = () => {
       backgroundColorList.push('')
       studentInfoList.push('')
       etcList.push('')
-      etcBackgroundColorList.push('')
       delYnList.push('Y')
     })
 
@@ -133,7 +130,6 @@ const hallOfFameEdit = () => {
     formData.append('backgroundColor', backgroundColorList.length > 1 ? backgroundColorList.join(',') : backgroundColorList)
     formData.append('studentInfo', studentInfoList.length > 1 ? studentInfoList.join(',') : studentInfoList)
     formData.append('etc', etcList.length > 1 ? etcList.join(',') : etcList)
-    formData.append('etcBackgroundColor', etcBackgroundColorList.length > 1 ? etcBackgroundColorList.join(',') : etcBackgroundColorList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
 
     formData.append('yearUnitId', searchParams.get('sub'))
@@ -163,7 +159,6 @@ const hallOfFameEdit = () => {
               <td>학교명 배경 색상</td>
               <td>입학예정자 정보</td>
               <td>기타사항</td>
-              <td>기타사항 배경 색상</td>
               <td>삭제</td>
             </tr>
             </thead>
@@ -204,26 +199,15 @@ const hallOfFameEdit = () => {
                   />
                 </td>
                 <td>
-                  <input
-                    type='text'
+                  <select
                     className='form-control'
                     defaultValue={item.etc}
                     key={item.etc}
-                    {...register(`list[${index}].etc`)}
-                  />
-                </td>
-                <td>
-                  <select
-                    className='form-control'
-                    defaultValue={item.etcBackgroundColor}
-                    key={item.etcBackgroundColor}
-                    {...register(`list.${index}.etcBackgroundColor`)}
+                    {...register(`list.${index}.etc`)}
                   >
-                    <option value='green'>green</option>
-                    <option value='yellow'>yellow</option>
-                    <option value='red'>red</option>
-                    <option value='purple'>purple</option>
-                    <option value='blue'>blue</option>
+                    <option value=''>해당사항 없음</option>
+                    <option value='조기입학'>조기입학</option>
+                    <option value='우선선발'>우선선발</option>
                   </select>
                 </td>
                 <td>
