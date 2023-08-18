@@ -69,6 +69,7 @@ import InstructorLineup from '@/views/contents_mng/InstructorLineup'
 import InstructorLineupEdit from '@/views/contents_mng/InstructorLineupEdit'
 import HallOfFame from '@/views/contents_mng/hallOfFame'
 import HallOfFameEdit from '@/views/contents_mng/hallOfFameEdit'
+import Join_popup1 from '@/views/login/join_popup1'
 
 function Router() {
   const routes = [
@@ -577,6 +578,10 @@ function Router() {
     {
       path: '/join',
       element: <Join />,
+    },
+    {
+      path: '/join_popup1',
+      element: <Join_popup1 />,
     },
     {
       path: '/join_result', //회원가입 결과
