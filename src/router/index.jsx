@@ -67,6 +67,8 @@ import CompetQuestion from '../views/contents_mng/CompetQuestion'
 import CompetQuestionEdit from '../views/contents_mng/CompetQuestionEdit'
 import InstructorLineup from '@/views/contents_mng/InstructorLineup'
 import InstructorLineupEdit from '@/views/contents_mng/InstructorLineupEdit'
+import HallOfFame from '@/views/contents_mng/hallOfFame'
+import HallOfFameEdit from '@/views/contents_mng/hallOfFameEdit'
 
 function Router() {
   const routes = [
@@ -541,6 +543,26 @@ function Router() {
           element: (
             <PrivateRoute
               element={<InstructorLineupEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 명예의 전당 관리
+        {
+          path: '/hall_of_fame',
+          element: (
+            <PrivateRoute
+              element={<HallOfFame />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/hall_of_fame/edit',
+          element: (
+            <PrivateRoute
+              element={<HallOfFameEdit />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),

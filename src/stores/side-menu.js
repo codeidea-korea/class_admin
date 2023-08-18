@@ -119,6 +119,11 @@ const sideMenu = atom({
             pathname: '/instructor_lineup',
             title: '영재관 강사 라인업',
           },
+          {
+            icon: '',
+            pathname: '/hall_of_fame',
+            title: '명예의 전당 관리',
+          },
         ],
       },
 
