@@ -203,7 +203,6 @@ const HallOfFame = () => {
                   <td>{index + 1}</td>
                   <td>{year}</td>
                   <td>{item.schoolName}</td>
-                  <td>{item.backgroundColor}</td>
                   <td>{item.studentInfo}</td>
                 </tr>
               ))
