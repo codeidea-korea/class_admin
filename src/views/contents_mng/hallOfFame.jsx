@@ -192,7 +192,6 @@ const HallOfFame = () => {
               <td>번호</td>
               <td>연도</td>
               <td>학교명</td>
-              <td>학교명 배경색상</td>
               <td>입학예정자 정보</td>
             </tr>
             </thead>
