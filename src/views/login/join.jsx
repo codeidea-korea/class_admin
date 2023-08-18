@@ -69,9 +69,10 @@ function Join() {
       if (event.origin === window.location.origin) {
         const result = event.data.result
 
-        console.log(result);
-
-        setJoinParams({ ...joinParams, phone: result.userPhone })
+        if(result.userPhone !== null && result.userPhone !== '') {
+          setCheckAuth(true)
+          setJoinParams({ ...joinParams, phone: result.userPhone })
+        }
       }
     })
   }
@@ -200,6 +201,10 @@ function Join() {
   }, [])
 
 
+  useEffect(() => {
+    console.log(joinParams);
+  }, [joinParams])
+
   // 자세히보기
   const [isOpen, setMenu] = useState(false)
   const toggleMenu = () => {
@@ -290,6 +295,7 @@ function Join() {
                           type='number' name={'phone'}
                           className='intro-x login__input form-control py-3 px-4 block w-96'
                           placeholder='인증을 진행해 주세요.'
+                          value={joinParams.phone}
                           onChange={handleChange}
                           disabled={true}
                         />
