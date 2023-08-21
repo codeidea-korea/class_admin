@@ -21,6 +21,7 @@ const hallOfFameEdit = () => {
     const addData = {
       id: 0,
       schoolName: '',
+      subject: '',
       studentInfo: '',
       etc: '',
       delYn: 'N',
@@ -80,13 +81,19 @@ const hallOfFameEdit = () => {
     }
 
     let temp = true
-    let rowIdList = [], schoolNameList = [], studentInfoList = [], etcList = [], delYnList = []
+    let rowIdList = [], schoolNameList = [], subjectList = [], studentInfoList = [], etcList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
 
       if (!item?.schoolName) {
         alert('학교명을 입력하세요.')
+        temp = false
+        return temp
+      }
+
+      if (!item?.subject) {
+        alert('과목을 입력하세요.')
         temp = false
         return temp
       }
@@ -99,6 +106,7 @@ const hallOfFameEdit = () => {
 
       rowIdList.push(item.id ? item.id : 0)
       schoolNameList.push(item.schoolName ? item.schoolName : '')
+      subjectList.push(item.subject ? item.subject : '')
       studentInfoList.push(item.studentInfo ? item.studentInfo : '')
       etcList.push(item.etc ? item.etc : '')
       delYnList.push(item.delYN ? item.delYN : 'N')
@@ -110,6 +118,7 @@ const hallOfFameEdit = () => {
     delDataList.forEach((item) => {
       rowIdList.push(item.id)
       schoolNameList.push('')
+      subjectList.push('')
       studentInfoList.push('')
       etcList.push('')
       delYnList.push('Y')
@@ -118,6 +127,7 @@ const hallOfFameEdit = () => {
     const formData = new FormData()
     formData.append('id', rowIdList.length > 1 ? rowIdList.join(',') : rowIdList)
     formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
+    formData.append('subject', subjectList.length > 1 ? subjectList.join(',') : subjectList)
     formData.append('studentInfo', studentInfoList.length > 1 ? studentInfoList.join(',') : studentInfoList)
     formData.append('etc', etcList.length > 1 ? etcList.join(',') : etcList)
     formData.append('delYN', delYnList.length > 1 ? delYnList.join(',') : delYnList)
@@ -146,6 +156,7 @@ const hallOfFameEdit = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>학교명</td>
+              <td>과목</td>
               <td>입학예정자 정보</td>
               <td>기타사항</td>
               <td>삭제</td>
@@ -162,6 +173,15 @@ const hallOfFameEdit = () => {
                     defaultValue={item.schoolName}
                     key={item.schoolName}
                     {...register(`list[${index}].schoolName`)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type='text'
+                    className='form-control'
+                    defaultValue={item.subject}
+                    key={item.subject}
+                    {...register(`list[${index}].subject`)}
                   />
                 </td>
                 <td>

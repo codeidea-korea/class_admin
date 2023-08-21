@@ -192,7 +192,9 @@ const HallOfFame = () => {
               <td>번호</td>
               <td>연도</td>
               <td>학교명</td>
+              <td>과목</td>
               <td>입학예정자 정보</td>
+              <td>기타사항</td>
             </tr>
             </thead>
             <tbody>
@@ -202,7 +204,9 @@ const HallOfFame = () => {
                   <td>{index + 1}</td>
                   <td>{year}</td>
                   <td>{item.schoolName}</td>
+                  <td>{item.subject}</td>
                   <td>{item.studentInfo}</td>
+                  <td>{item.etc}</td>
                 </tr>
               ))
             ) : (
