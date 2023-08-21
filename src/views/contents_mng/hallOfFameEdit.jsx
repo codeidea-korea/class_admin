@@ -92,7 +92,7 @@ const hallOfFameEdit = () => {
         return temp
       }
 
-      if (!item?.subject) {
+      if (field === '영재원' && !item?.subject) {
         alert('과목을 입력하세요.')
         temp = false
         return temp
@@ -156,7 +156,11 @@ const hallOfFameEdit = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>학교명</td>
-              <td>과목</td>
+              {field === '영재원' ? (
+                <td>과목</td>
+              ) : (
+                <></>
+              )}
               <td>입학예정자 정보</td>
               <td>기타사항</td>
               <td>삭제</td>
@@ -175,15 +179,19 @@ const hallOfFameEdit = () => {
                     {...register(`list[${index}].schoolName`)}
                   />
                 </td>
-                <td>
-                  <input
-                    type='text'
-                    className='form-control'
-                    defaultValue={item.subject}
-                    key={item.subject}
-                    {...register(`list[${index}].subject`)}
-                  />
-                </td>
+                {field === '영재원' ? (
+                  <td>
+                    <input
+                      type='text'
+                      className='form-control'
+                      defaultValue={item.subject}
+                      key={item.subject}
+                      {...register(`list[${index}].subject`)}
+                    />
+                  </td>
+                ) : (
+                  <></>
+                )}
                 <td>
                   <input
                     type='text'

@@ -49,7 +49,7 @@ const HallOfFame = () => {
         if (data[0]) {
           setSubId(data[0].id)
           setYear(data[0].year)
-          navigate(`?field=${fieldTab}&sub=${data[0].id}`)
+          // navigate(`?field=${fieldTab}&sub=${data[0].id}`)
         } else {
           setSubId(0)
         }
@@ -114,6 +114,14 @@ const HallOfFame = () => {
   }
 
   useEffect(() => {
+    if (params.get('field') === '영재학교') {
+      setFieldTab('영재학교')
+    } else if (params.get('field') === '과학고') {
+      setFieldTab('과학고')
+    } else {
+      setFieldTab('영재원')
+    }
+
     if (yearUnit) {
       if (params.get('sub')) {
         setTimeout(function() {
@@ -192,7 +200,11 @@ const HallOfFame = () => {
               <td>번호</td>
               <td>연도</td>
               <td>학교명</td>
-              <td>과목</td>
+              {fieldTab === '영재원' ? (
+                <td>과목</td>
+              ) : (
+                <></>
+              )}
               <td>입학예정자 정보</td>
               <td>기타사항</td>
             </tr>
@@ -204,7 +216,11 @@ const HallOfFame = () => {
                   <td>{index + 1}</td>
                   <td>{year}</td>
                   <td>{item.schoolName}</td>
-                  <td>{item.subject}</td>
+                  {fieldTab === '영재원' ? (
+                    <td>{item.subject}</td>
+                  ) : (
+                    <></>
+                  )}
                   <td>{item.studentInfo}</td>
                   <td>{item.etc}</td>
                 </tr>
