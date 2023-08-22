@@ -21,6 +21,7 @@ const hallOfFameEdit = () => {
     const addData = {
       id: 0,
       schoolName: '',
+      subSchoolName: '',
       subject: '',
       studentInfo: '',
       etc: '',
@@ -81,7 +82,7 @@ const hallOfFameEdit = () => {
     }
 
     let temp = true
-    let rowIdList = [], schoolNameList = [], subjectList = [], studentInfoList = [], etcList = [], delYnList = []
+    let rowIdList = [], schoolNameList = [], subSchoolNameList = [], subjectList = [], studentInfoList = [], etcList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
@@ -106,6 +107,7 @@ const hallOfFameEdit = () => {
 
       rowIdList.push(item.id ? item.id : 0)
       schoolNameList.push(item.schoolName ? item.schoolName : '')
+      subSchoolNameList.push(item.subSchoolName ? item.subSchoolName : '')
       subjectList.push(item.subject ? item.subject : '')
       studentInfoList.push(item.studentInfo ? item.studentInfo : '')
       etcList.push(item.etc ? item.etc : '')
@@ -118,6 +120,7 @@ const hallOfFameEdit = () => {
     delDataList.forEach((item) => {
       rowIdList.push(item.id)
       schoolNameList.push('')
+      subSchoolNameList.push('')
       subjectList.push('')
       studentInfoList.push('')
       etcList.push('')
@@ -127,6 +130,7 @@ const hallOfFameEdit = () => {
     const formData = new FormData()
     formData.append('id', rowIdList.length > 1 ? rowIdList.join(',') : rowIdList)
     formData.append('schoolName', schoolNameList.length > 1 ? schoolNameList.join(',') : schoolNameList)
+    formData.append('subSchoolName', subSchoolNameList.length > 1 ? subSchoolNameList.join(',') : subSchoolNameList)
     formData.append('subject', subjectList.length > 1 ? subjectList.join(',') : subjectList)
     formData.append('studentInfo', studentInfoList.length > 1 ? studentInfoList.join(',') : studentInfoList)
     formData.append('etc', etcList.length > 1 ? etcList.join(',') : etcList)
@@ -143,7 +147,7 @@ const hallOfFameEdit = () => {
       <div className='intro-y box mt-5'>
         <div className='p-3 px-5 flex items-center border-b border-slate-200/60'>
           <div className='text-lg font-medium flex items-center'>
-            영재원 영상 학습 관리
+            명예의 전당 관리
             <Lucide icon='ChevronRight' className='w-6 h-6 mx-3'></Lucide>
             {searchParams.get('field')}
             <Lucide icon='ChevronRight' className='w-6 h-6 mx-3'></Lucide>
@@ -156,6 +160,7 @@ const hallOfFameEdit = () => {
             <tr className='bg-slate-100 text-center'>
               <td>번호</td>
               <td>학교명</td>
+              <td>하위 학교명</td>
               {field === '영재원' ? (
                 <td>과목</td>
               ) : (
@@ -177,6 +182,15 @@ const hallOfFameEdit = () => {
                     defaultValue={item.schoolName}
                     key={item.schoolName}
                     {...register(`list[${index}].schoolName`)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type='text'
+                    className='form-control'
+                    defaultValue={item.subSchoolName}
+                    key={item.subSchoolName}
+                    {...register(`list[${index}].subSchoolName`)}
                   />
                 </td>
                 {field === '영재원' ? (

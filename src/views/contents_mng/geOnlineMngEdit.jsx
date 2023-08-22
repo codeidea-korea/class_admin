@@ -80,7 +80,7 @@ const GeOnlineMngEdit = () => {
 
   // 저장버튼
   const handleSave = () => {
-    if(getValues('list')?.length === 0) {
+    if(delDataList.length === 0 && getValues('list')?.length === 0) {
       alert('저장할 데이터를 입력하세요.');
       return;
     }
@@ -185,7 +185,7 @@ const GeOnlineMngEdit = () => {
                   />
                 </td>
                 <td>
-                  { getValues('list')?.length > 1 &&
+                  { getValues('list')?.length > 0 &&
                     <button
                       className="btn btn-outline-danger bg-white btn-sm whitespace-nowrap"
                       onClick={() => deleteHandle(item, index)}

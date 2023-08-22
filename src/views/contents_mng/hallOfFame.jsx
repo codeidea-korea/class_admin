@@ -200,6 +200,7 @@ const HallOfFame = () => {
               <td>번호</td>
               <td>연도</td>
               <td>학교명</td>
+              <td>하위 학교명</td>
               {fieldTab === '영재원' ? (
                 <td>과목</td>
               ) : (
@@ -216,6 +217,7 @@ const HallOfFame = () => {
                   <td>{index + 1}</td>
                   <td>{year}</td>
                   <td>{item.schoolName}</td>
+                  <td>{item.subSchoolName}</td>
                   {fieldTab === '영재원' ? (
                     <td>{item.subject}</td>
                   ) : (
