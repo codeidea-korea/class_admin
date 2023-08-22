@@ -86,7 +86,7 @@ const InstructorLineup = () => {
                     <div className='flex justify-center'>
                       {item.profileId && item.profileId > 0 && (
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.profileId}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${item.profileId}`}
                         >
                           <button
                             type={'button'}

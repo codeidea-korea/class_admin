@@ -9,6 +9,7 @@ import { userState } from '@/states/userState'
 
 const ReadOnlineEdit = () => {
   const navigate = useNavigate()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const user = useRecoilValue(userState)
   const params = new URLSearchParams(location.search)
   const curTab = params.get('curTab')
@@ -259,7 +260,7 @@ const ReadOnlineEdit = () => {
                     {watch(`list.${index}.fileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('fileId')}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch('fileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
                           {watch(`list.${index}.fileName`)}

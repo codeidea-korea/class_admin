@@ -9,6 +9,7 @@ import { useState } from 'react'
 
 const ReviewTestEdit = () => {
   const navigate = useNavigate()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const params = new URLSearchParams(location.search)
   const id = params.get('id')
   const teacherId = params.get('teacher-id')
@@ -290,7 +291,7 @@ const ReviewTestEdit = () => {
                   {watch(`list.${index}.questionFileName`) ? (
                     <>
                       <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('questionFileId')}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${watch('questionFileId')}`}
                         className='cursor-pointer text-blue underline'>
                         보기
                       </a>
@@ -331,7 +332,7 @@ const ReviewTestEdit = () => {
                 </td>
                 <td>
                   {item.answerFileId && item.answerFileId !== 0 ? (
-                    <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.answerFileId}`}
+                    <a href={`${baseUrl}/v1/contents-data/file-download/${item.answerFileId}`}
                        className='underline' download>
                       제출
                     </a>
@@ -343,7 +344,7 @@ const ReviewTestEdit = () => {
                   {item.modelAnswerFileId && item.modelAnswerFileId !== 0 ? (
                     <div className='input-group justify-center w-[200px] mx-auto'>
                       <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.modelAnswerFileId}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${item.modelAnswerFileId}`}
                         className='cursor-pointer text-blue underline'
                       >
                         답안 확인하기

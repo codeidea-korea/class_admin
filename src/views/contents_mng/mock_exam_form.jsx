@@ -7,6 +7,7 @@ import request from '@/utils/request'
 
 function OnlineBasicClassForm() {
   const { id } = useParams()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const navigate = useNavigate()
   const params = new URLSearchParams(location.search)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -288,7 +289,7 @@ function OnlineBasicClassForm() {
                     {watch(`list.${index}.fileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch(`list.${index}.fileId`)}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch(`list.${index}.fileId`)}`}
                           className='cursor-pointer text-blue underline'
                         >
                           {watch(`list.${index}.fileName`)}

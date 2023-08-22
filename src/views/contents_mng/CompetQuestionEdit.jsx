@@ -219,7 +219,7 @@ const CompetQuestionEdit = () => {
                     {watch(`list.${index}.questionFileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('questionFileId')}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch('questionFileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
                           {watch(`list.${index}.questionFileName`)}
@@ -263,7 +263,7 @@ const CompetQuestionEdit = () => {
                     {watch(`list.${index}.analyzeFileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('analyzeFileId')}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch('analyzeFileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
                           {watch(`list.${index}.analyzeFileName`)}

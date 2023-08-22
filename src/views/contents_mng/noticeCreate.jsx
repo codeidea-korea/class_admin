@@ -7,6 +7,7 @@ import request from '@/utils/request'
 
 function NoticeEdit({ isCreate }) {
   const { id } = useParams()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const navigate = useNavigate()
   const { watch, reset, register, setValue, getValues, handleSubmit } = useForm()
 
@@ -110,7 +111,7 @@ function NoticeEdit({ isCreate }) {
                   {watch('fileName') ? (
                     <div className="flex items-center gap-2">
                       <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${noticeData?.fileId}`}
                         className="underline text-blue"
                       >
                         {watch('fileName')}

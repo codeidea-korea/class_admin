@@ -115,7 +115,7 @@ function ClassVideoView() {
                     <div className="flex justify-center">
                       <a
                         className="btn btn-outline-pending flex items-center gap-2"
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item?.fileId}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${item?.fileId}`}
                         download
                       >
                         <Lucide icon="File" className="w-4 h-4"></Lucide>

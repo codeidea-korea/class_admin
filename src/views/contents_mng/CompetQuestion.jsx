@@ -1,8 +1,6 @@
 import { useEffect, useReducer, useState } from 'react'
 import { Lucide, Modal, ModalBody } from '@/base-components'
 import { Link } from 'react-router-dom'
-import ReactPaginate from 'react-paginate'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useQuery } from 'react-query'
 import request from '@/utils/request'
 
@@ -94,7 +92,7 @@ const CompetQuestion = () => {
                     <div className='flex justify-center'>
                       {item.questionFileId && item.questionFileId > 0 && (
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.questionFileId}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${item.questionFileId}`}
                         >
                           <button
                             type={'button'}
@@ -111,7 +109,7 @@ const CompetQuestion = () => {
                     <div className='flex justify-center'>
                       {item.analyzeFileId && item.analyzeFileId > 0 && (
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.analyzeFileId}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${item.analyzeFileId}`}
                         >
                           <button
                             type={'button'}

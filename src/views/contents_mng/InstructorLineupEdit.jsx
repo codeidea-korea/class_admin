@@ -6,6 +6,7 @@ import request from '@/utils/request'
 import { useForm } from 'react-hook-form'
 
 const InstructorLineupEdit = () => {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const navigate = useNavigate()
   const [pageParams, setPageParams] = useState({
     totalPages: 0,
@@ -249,7 +250,7 @@ const InstructorLineupEdit = () => {
                     {watch(`list.${index}.profileName`) ? (
                       <div className='flex items-center gap-2'>
                         <a
-                          href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${watch('profileId')}`}
+                          href={`${baseUrl}/v1/contents-data/file-download/${watch('profileId')}`}
                           className='cursor-pointer text-blue underline'
                         >
                           {watch(`list.${index}.profileName`)}

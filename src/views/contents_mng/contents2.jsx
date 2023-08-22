@@ -13,6 +13,7 @@ import {
   import useDidMountEffect from '@/hooks/useDidMountEffect'
 
 function Contents2() {
+    const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
     const [inputs, setInputs] = useState([]);
 
     useEffect(() => {
@@ -59,7 +60,7 @@ function Contents2() {
             formData.append("savedFileDelYN", 'N');
         });
       
-        fetch("https://api.shuman.codeidea.io/admin/content-management/update", {
+        fetch(`${baseUrl}/admin/content-management/update`, {
             headers: {
                 'Content-Type': 'multipart/form-data', 
 

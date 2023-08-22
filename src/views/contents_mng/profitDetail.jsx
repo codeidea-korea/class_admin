@@ -6,6 +6,7 @@ import Loading from '@/components/loading'
 function ProfitView() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
 
   const { data: profitData, isLoading: isProfitData } = useQuery(
     'getProfitData',
@@ -59,7 +60,7 @@ function ProfitView() {
                 <div className="text-slate-400 font-medium w-24">첨부파일</div>
                 <div>
                   {profitData?.fileId && (
-                    <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}>
+                    <a href={`${baseUrl}/v1/contents-data/file-download/${profitData?.fileId}`}>
                       {profitData?.fileName}
                     </a>
                   )}
@@ -76,7 +77,7 @@ function ProfitView() {
           {profitData?.fileId && (
             <div className="p-5">
               <img
-                src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}
+                src={`${baseUrl}/v1/contents-data/file-download/${profitData?.fileId}`}
                 alt=""
               />
             </div>

@@ -6,6 +6,7 @@ import Loading from '@/components/loading'
 import request from '@/utils/request'
 
 function ProfitEdit({ isCreate }) {
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const { id } = useParams()
   const navigate = useNavigate()
   const { watch, reset, register, setValue, getValues, handleSubmit } = useForm()
@@ -110,7 +111,7 @@ function ProfitEdit({ isCreate }) {
                   {watch('fileName') ? (
                     <div className="flex items-center gap-2">
                       <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${profitData?.fileId}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${profitData?.fileId}`}
                         className="underline text-blue"
                       >
                         {watch('fileName')}

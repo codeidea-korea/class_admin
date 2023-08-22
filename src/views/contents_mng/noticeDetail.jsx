@@ -6,6 +6,7 @@ import Loading from '@/components/loading'
 function NoticeView() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
 
   const { data: noticeData, isLoading: isNoticeData } = useQuery(
     'getNoticeData',
@@ -62,7 +63,7 @@ function NoticeView() {
                 <div className="text-slate-400 font-medium w-24">첨부파일</div>
                 <div>
                   {noticeData?.fileId && (
-                    <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}>
+                    <a href={`${baseUrl}/v1/contents-data/file-download/${noticeData?.fileId}`}>
                       {noticeData?.fileName}
                     </a>
                   )}
@@ -79,7 +80,7 @@ function NoticeView() {
           {noticeData?.fileId && (
             <div className="p-5">
               <img
-                src={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${noticeData?.fileId}`}
+                src={`${baseUrl}/v1/contents-data/file-download/${noticeData?.fileId}`}
                 alt=""
               />
             </div>

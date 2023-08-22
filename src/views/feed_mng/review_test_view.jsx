@@ -7,6 +7,7 @@ import request from '@/utils/request'
 
 const ReviewTestView = () => {
   const params = new URLSearchParams(location.search)
+  const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const user = useRecoilValue(userState)
   const id = params.get('id')
   const teacherId = params.get('teacher-id')
@@ -97,7 +98,7 @@ const ReviewTestView = () => {
                   <td>{item.content}</td>
                   <td>
                     {item.questionFileId && item.questionFileId !== 0 ? (
-                      <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.questionFileId}`}
+                      <a href={`${baseUrl}/v1/contents-data/file-download/${item.questionFileId}`}
                          className='underline' download>
                         보기
                       </a>
@@ -108,7 +109,7 @@ const ReviewTestView = () => {
                   <td>{item.creDate}</td>
                   <td>
                     {item.answerFileId && item.answerFileId !== 0 ? (
-                      <a href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.answerFileId}`}
+                      <a href={`${baseUrl}/v1/contents-data/file-download/${item.answerFileId}`}
                          className='underline' download>
                         제출
                       </a>
@@ -119,7 +120,7 @@ const ReviewTestView = () => {
                   <td>
                     {item.modelAnswerFileId && item.modelAnswerFileId !== 0 ? (
                       <a
-                        href={`https://api.shuman.codeidea.io/v1/contents-data/file-download/${item.modelAnswerFileId}`}
+                        href={`${baseUrl}/v1/contents-data/file-download/${item.modelAnswerFileId}`}
                         className='underline' download>
                         답안 확인하기
                       </a>
