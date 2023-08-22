@@ -229,7 +229,11 @@ const HallOfFame = () => {
               ))
             ) : (
               <tr className='text-center'>
-                <td colSpan={4}>데이터가 존재하지 않습니다.</td>
+                {fieldTab === '영재원' ? (
+                  <td colSpan={7}>데이터가 존재하지 않습니다.</td>
+                ) : (
+                  <td colSpan={6}>데이터가 존재하지 않습니다.</td>
+                )}
               </tr>
             )}
             </tbody>
