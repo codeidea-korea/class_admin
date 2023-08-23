@@ -82,7 +82,8 @@ const hallOfFameEdit = () => {
     }
 
     let temp = true
-    let rowIdList = [], schoolNameList = [], subSchoolNameList = [], subjectList = [], studentInfoList = [], etcList = [], delYnList = []
+    let rowIdList = [], schoolNameList = [], subSchoolNameList = [], subjectList = [], studentInfoList = [],
+      etcList = [], delYnList = []
 
     getValues('list').map((item) => {
       if (!temp) return
@@ -240,14 +241,25 @@ const hallOfFameEdit = () => {
               </tr>
             ))}
             <tr>
-              <td colSpan={5} className='text-center'>
-                <button
-                  className='btn btn-outline-primary border-dotted'
-                  onClick={() => handleAddList()}
-                >
-                  <Lucide icon='Plus' className='w-4 h-4'></Lucide>
-                </button>
-              </td>
+              {field === '영재원' ? (
+                <td colSpan={7} className='text-center'>
+                  <button
+                    className='btn btn-outline-primary border-dotted'
+                    onClick={() => handleAddList()}
+                  >
+                    <Lucide icon='Plus' className='w-4 h-4'></Lucide>
+                  </button>
+                </td> 
+              ) : (
+                <td colSpan={6} className='text-center'>
+                  <button
+                    className='btn btn-outline-primary border-dotted'
+                    onClick={() => handleAddList()}
+                  >
+                    <Lucide icon='Plus' className='w-4 h-4'></Lucide>
+                  </button>
+                </td>
+              )}
             </tr>
             </tbody>
           </table>
