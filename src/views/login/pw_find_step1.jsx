@@ -168,6 +168,7 @@ function PwFindstep1() {
                       <input type='text' className='intro-x login__input form-control py-3 px-4 block mt-1'
                              name={'phone'}
                              placeholder='인증을 진행해 주세요.'
+                             value={findPwdParams.phone}
                              onChange={handleChange}
                              disabled={true}
                       />
