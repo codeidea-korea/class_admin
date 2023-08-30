@@ -14,7 +14,7 @@ function MemberEdit() {
 	const user = useRecoilValue(userState);
 	const [userInfo, setUserInfo] = useState();
 	const [memberInfo, setMemberInfo] = useState({
-		name: '', grade: '', birthDay: '', schoolName: '', schoolYear: '', email: '', phone: '', addr: '', addrDetail: '', tos4YN: '', children: [], 
+		name: '', grade: '', birthDay: '', schoolName: '', schoolYear: '', email: '', phone: '', addr: '', addrDetail: '', tos4YN: '', children: [], fieldName: []
 	});
 	const [openPostcode, setOpenPostcode] = useState(false);
 	const [Searchschool, setSearchschool] = useState(false);
@@ -40,6 +40,7 @@ function MemberEdit() {
 					addr:res.data.addr, 
 					addrDetail:res.data.addrDetail, 
 					tos4YN:res.data.tos4YN, 
+					fieldName:res.data.fieldName,
 				});
 			}
 		})
@@ -61,8 +62,23 @@ function MemberEdit() {
 	/** filed control */
 	const handleChange = (event) => {
         const { name, value } = event.currentTarget;
-        setMemberInfo({ ...memberInfo, [name]: value });
+
+				if(name === 'fieldName1' || name === 'fieldName2' || name === 'fieldName3') {
+					if(event.target.checked) {
+						let fieldName = memberInfo.fieldName;
+						fieldName.push(value)
+						setMemberInfo({...memberInfo, fieldName: fieldName})
+					} else {
+						setMemberInfo({...memberInfo, fieldName: memberInfo.fieldName.filter(val => val !== value)})
+					}
+				} else {
+					setMemberInfo({ ...memberInfo, [name]: value });
+				}
     };
+
+	useEffect(() => {
+		console.log(memberInfo.fieldName)
+	}, [memberInfo])
 
 	// 주소찾기
     const handlePostcode = {
@@ -243,6 +259,30 @@ function MemberEdit() {
 							<tr>
 								<td><span className="font-bold">회원 상태</span></td>
 								<td>{userStatusName(userInfo?.status)}</td>
+							</tr>
+							<tr>
+								<td>
+									<span className="font-bold">소속</span>
+								</td>
+								<td>
+									<div className="flex">
+										<div className="form-check mr-5">
+											<input id="fieldName1" name="fieldName1" className="form-check-input" type="checkbox" value={'영재원'}
+														 checked={memberInfo?.fieldName?.includes("영재원")} onChange={handleChange}/>
+											<label className="form-check-label" htmlFor="fieldName1">영재원</label>
+										</div>
+										<div className="form-check mr-2 mt-2 sm:mt-0">
+											<input id="fieldName2" name="fieldName2" className="form-check-input" type="checkbox" value={'과학고'}
+														 checked={memberInfo?.fieldName?.includes("과학고")} onChange={handleChange}/>
+											<label className="form-check-label" htmlFor="fieldName2">과학고</label>
+										</div>
+										<div className="form-check mr-2 mt-2 sm:mt-0">
+											<input id="fieldName3" name="fieldName3" className="form-check-input" type="checkbox" value={'영재학교'}
+														 checked={memberInfo?.fieldName?.includes("영재학교")} onChange={handleChange}/>
+											<label className="form-check-label" htmlFor="fieldName3">영재학교</label>
+										</div>
+									</div>
+								</td>
 							</tr>
 							<tr>
 								<td>
