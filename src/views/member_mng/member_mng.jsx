@@ -248,7 +248,7 @@ function MemberMng() {
                 <td className='w-10'>
                   <input className='form-check-input ck-all' type='checkbox' onChange={handlerAllCheck} />
                 </td>
-                <td className='w-20'>번호</td>
+                <td className='w-10'>번호</td>
                 <td>아이디</td>
                 <td>이름</td>
                 <td>
