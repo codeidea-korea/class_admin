@@ -23,7 +23,7 @@ export function userAuthorityName(authority) {
     switch(authority){
         case "STUDENT": str = "학생"; break;
         case "PARENTS": str = "학부모"; break;
-        case "NOMAL": str = "미정"; break;
+        case "NORMAL": str = "미정"; break;
         case "ADMIN": str = "미정"; break;
         case "TEACHER": str = "미정"; break;
         case "DIRECTOR": str = "미정"; break;

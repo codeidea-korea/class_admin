@@ -11,7 +11,7 @@ function AdminMng() {
 	const api = useAxios();
 	const navigate = useNavigate();
 	const user = useRecoilValue(userState);
-	const [admins, setAdmins] = useState();
+	const [admins, setAdmins] = useState([]);
 	const [searchWord, setSearchWord] = useState('');
 	const [pageParams, setPageParams] = useState({
 		totalPages: 0, totalElements: 0, currentPage: 1, pageRangeDisplayed: 10
@@ -24,10 +24,9 @@ function AdminMng() {
 
 	// 관리자 데이터 가져오기
 	const getAdminList = async (searchString) => {
-        await api.get(`/admin/admin-management?searchWord=${searchString}&page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`, 
+        await api.get(`/admin/admin-management?searchWord=${searchString}&page=${pageParams.currentPage}&limit=${pageParams.pageRangeDisplayed}`,
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
-			console.log(res)
 			if (res.status === 200) {
 				setAdmins(res.data.content);
 				setPageParams({ ...pageParams, totalPages: res.data.totalPages, totalElements: res.data.totalElements })
@@ -36,7 +35,7 @@ function AdminMng() {
 		.catch((err) => {
 			console.log('error', err);
 			if (err.response.status === 401){
-				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+				alert('토큰이 만료되었습니다. 다시 로그인해주세요.');
 				navigate('/login');
 			}
 		});
@@ -81,19 +80,21 @@ function AdminMng() {
     };
 
 	/** 관리자 구분(권한) 변경하기 */
-	const handleAuthorityChange = (user_no, change_status) => {
-		api.patch(`/admin/admin-management/authority/${user_no}?status=${change_status}`, null, 
+	const handleAuthorityChange = (user_no, change_status, index) => {
+		api.patch(`/admin/admin-management/authority/${user_no}?status=${change_status}`, null,
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
-			console.log(res);
 			if (res.status === 200) {
+        const updatedAdmins = [...admins]
+        updatedAdmins[index].authority = change_status;
+        setAdmins(updatedAdmins)
 				basicNonStickyNotificationToggle();
 			}
 		})
 		.catch((err) => {
 			console.log('error', err);
 			if (err.response.status === 401){
-				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+				alert('토큰이 만료되었습니다. 다시 로그인해주세요.');
 				navigate('/login');
 			}else{
 				alert(err.response.data.msg); return false;
@@ -102,19 +103,21 @@ function AdminMng() {
 	}
 
 	// 관리자 상태값 변경하기
-	const handleStatusChange = (user_no, change_status) => {
-		api.patch(`/admin/admin-management/status/${user_no}?status=${change_status}`, null, 
+	const handleStatusChange = (user_no, change_status, index) => {
+		api.patch(`/admin/admin-management/status/${user_no}?status=${change_status}`, null,
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
-			console.log(res);
 			if (res.status === 200) {
+        const updatedAdmins = [...admins]
+        updatedAdmins[index].status = change_status;
+        setAdmins(updatedAdmins)
 				basicNonStickyNotificationToggle();
 			}
 		})
 		.catch((err) => {
 			console.log('error', err);
 			if (err.response.status === 401){
-				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+				alert('토큰이 만료되었습니다. 다시 로그인해주세요.');
 				navigate('/login');
 			}else{
 				alert(err.response.data.msg); return false;
@@ -137,14 +140,14 @@ function AdminMng() {
 		setInviteEmail(event.currentTarget.value);
 	}
 	const requestInvite = () => {
-		if (inviteEmail === ""){ 
+		if (inviteEmail === ""){
 			setAlertInviteEmail({...alertInviteEmail, alertEmail: [1, '이메일을 입력해주세요.']}); return false;
 		}else{
 			if (!emailReg.test(inviteEmail)) {
 				setAlertInviteEmail({...alertInviteEmail, alertEmail: [1, '이메일 형식이 아닙니다.']}); return false;
 			}
 		}
-		api.get(`/admin/admin-management/email-invitation?email=${inviteEmail}`, 
+		api.get(`/admin/admin-management/email-invitation?email=${inviteEmail}`,
 			{headers: {Authorization: `Bearer ${user.token}`}}
 		).then((res) => {
 			console.log(res);
@@ -156,7 +159,7 @@ function AdminMng() {
 		.catch((err) => {
 			console.log('error', err);
 			if (err.response.status === 401){
-				alert('토큰이 만료되었습니다. 다시 로그인해주세요.'); 
+				alert('토큰이 만료되었습니다. 다시 로그인해주세요.');
 				navigate('/login');
 			}else{
 				setAlertInviteEmail({...alertInviteEmail, alertEmail: [1, err.response.data.msg]})
@@ -187,7 +190,7 @@ function AdminMng() {
             if (item.checked) sequences.push(parseInt(item.value));
         });
 		if(sequences.length > 0){
-			await api.delete(`/admin/admin-management?users=${sequences}`,  
+			await api.delete(`/admin/admin-management?users=${sequences}`,
 				{headers: {Authorization: `Bearer ${user.token}`}})
 			.then((res) => {
 				console.log(res)
@@ -224,9 +227,9 @@ function AdminMng() {
 					</button>
 					<div className="ml-auto">
 						<div className="flex flex-middle gap-3">
-							<input type="text" name={"searchWord"} className="form-control w-60" placeholder="검색어 입력" 
+							<input type="text" name={"searchWord"} className="form-control w-60" placeholder="검색어 입력"
 								value={searchWord}
-								onChange={(event) => { setSearchWord(event.currentTarget.value) }} 
+								onChange={(event) => { setSearchWord(event.currentTarget.value) }}
 								onKeyPress={(event) => {
 									if (event.key === 'Enter') { getAdminList(searchWord); }
 								}}
@@ -274,8 +277,8 @@ function AdminMng() {
 										<td>{item.userId}</td>
 										<td>{item.name}</td>
 										<td>
-											<select value={item.authority} className="form-select small w-24" 
-											onChange={(event) => {handleAuthorityChange(item.id, event.currentTarget.value)}}>
+											<select value={item.authority} className="form-select small w-24"
+											onChange={(event) => {handleAuthorityChange(item.id, event.currentTarget.value, index)}}>
 												<option value="NORMAL">일반</option>
 												<option value="ADMIN">관리자</option>
 												<option value="TEACHER">선생님</option>
@@ -286,8 +289,8 @@ function AdminMng() {
 										<td>{item.email}</td>
 										<td>{item.creDate}</td>
 										<td>
-											<select value={item.status} className="form-select small w-24" 
-											onChange={(event) => {handleStatusChange(item.id, event.currentTarget.value)}}>
+											<select value={item.status} className="form-select small w-24"
+											onChange={(event) => {handleStatusChange(item.id, event.currentTarget.value, index)}}>
 												<option value="ACTIVE">재직</option>
 												<option value="SLEEP">휴직</option>
 												<option value="LEAVE">퇴직</option>
@@ -391,7 +394,7 @@ function AdminMng() {
 			{/* END: Modal 선택삭제 */}
 
 			{/* BEGIN: Basic Non Sticky Notification Content */}
-			<Notification 
+			<Notification
 				getRef={(el)=> {
 					basicNonStickyNotification.current = el;
 				}}
@@ -401,7 +404,7 @@ function AdminMng() {
 				className="flex flex-col sm:flex-row"
 			>
 				<div className="font-medium">
-					성공적으로 변경되었습니다. 
+					성공적으로 변경되었습니다.
 				</div>
 			</Notification>
 			{/* END: Basic Non Sticky Notification Content */}
