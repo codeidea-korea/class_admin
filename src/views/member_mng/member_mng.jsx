@@ -283,7 +283,7 @@ function MemberMng() {
                 </td>
                 <td>
                   <select name={'fieldName'} id='fieldName' className='form-control' onChange={handleSearch}>
-                    <option value=''>학교</option>
+                    <option value=''>소속</option>
                     <option value='영재원'>영재원</option>
                     <option value='과학고'>과학고</option>
                     <option value='영재학교'>영재학교</option>
