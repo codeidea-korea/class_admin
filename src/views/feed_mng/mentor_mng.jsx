@@ -397,9 +397,9 @@ function MentoMng() {
                 <Lucide icon='Search' className='w-4 h-4 mr-2'></Lucide>검색
               </button>
             </form>
-            <div className='relative'>
+            <div className='relative overflow-y-auto max-h-[500px] mt-3'>
               {isGetTeacherList && <Loading />}
-              <table className='table table-hover mt-3'>
+              <table className='table table-hover'>
                 <tbody>
                 <tr className='bg-slate-100 font-medium text-center'>
                   <td></td>
