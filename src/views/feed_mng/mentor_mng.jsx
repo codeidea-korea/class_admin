@@ -120,6 +120,9 @@ function MentoMng() {
           refetchMentorList()
         }
       })
+      .catch((res) => {
+        alert(res.response.data.msg)
+      })
   }
 
   const { mutate: deleteStudent } = useMutation(
