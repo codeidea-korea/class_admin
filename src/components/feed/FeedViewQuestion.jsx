@@ -1,12 +1,6 @@
-import React, { Fragment, useState, useReducer, useEffect } from 'react'
-import {
-  Lucide,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-} from '@/base-components'
-import { useRecoilValue, useRecoilState } from 'recoil'
+import React, { Fragment, useEffect, useReducer, useState } from 'react'
+import { Lucide, Modal, ModalBody, ModalFooter, ModalHeader } from '@/base-components'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from '@/states/userState'
 import request from '@/utils/request'
 import { useMutation } from 'react-query'
@@ -15,11 +9,12 @@ import { QuestionContent } from '@/stores/content'
 import dayjs from 'dayjs'
 
 function FeedViewQuestion({
-  feedId,
-  feedDetail,
-  refetchFeedDetail,
-  setIsLoading,
-}) {
+                            feedId,
+                            teacherId,
+                            feedDetail,
+                            refetchFeedDetail,
+                            setIsLoading,
+                          }) {
   const user = useRecoilValue(userState)
   const baseUrl = import.meta.env.VITE_PUBLIC_API_SERVER_URL
   const [content, setContent] = useRecoilState(QuestionContent)
@@ -63,25 +58,29 @@ function FeedViewQuestion({
 
   /** 피드백 달기 버튼 */
   const feedbackStart = async (id, activity, content) => {
-    if (!activity) {
-      if (selection.sentence === '') {
-        alert('피드백할 영역을 선택해주세요.')
-        return
+    if (teacherId === user.id) {
+      if (!activity) {
+        if (selection.sentence === '') {
+          alert('피드백할 영역을 선택해주세요.')
+          return
+        }
+        setSelection({
+          id,
+          fhId: feedId,
+        })
+      } else {
+        console.log(id)
+        setSelection({
+          id,
+          fhId: feedId,
+          sentence: '',
+          content: content,
+        })
       }
-      setSelection({
-        id,
-        fhId: feedId,
-      })
+      setIsModal({ feedback: true })
     } else {
-      console.log(id)
-      setSelection({
-        id,
-        fhId: feedId,
-        sentence: '',
-        content: content,
-      })
+      alert('학생의 멘토 담당 선생님만 피드백이 가능합니다.')
     }
-    setIsModal({ feedback: true })
   }
 
   const { mutate: createFeedback } = useMutation(
@@ -243,16 +242,16 @@ function FeedViewQuestion({
 
   return (
     <Fragment>
-      <button className="btn bg-white flex items-center w-44">
-        <Lucide icon="Info" className="w-4 h-4 mr-2"></Lucide>자소서 작성 꿀팁
-        <Lucide icon="ChevronDown" className="w-4 h-4 ml-auto"></Lucide>
+      <button className='btn bg-white flex items-center w-44'>
+        <Lucide icon='Info' className='w-4 h-4 mr-2'></Lucide>자소서 작성 꿀팁
+        <Lucide icon='ChevronDown' className='w-4 h-4 ml-auto'></Lucide>
       </button>
-      <div className="tipParentDiv">
+      <div className='tipParentDiv'>
         {feedDetail?.qnaList.map((item, index) => (
           <div
             key={index}
             id={'tip_' + item.number}
-            className="p-5 bg-slate-50 text-pending mt-3 rounded-md tipDiv"
+            className='p-5 bg-slate-50 text-pending mt-3 rounded-md tipDiv'
             style={{
               whiteSpace: 'pre-line',
               lineHeight: '1.3rem',
@@ -263,10 +262,10 @@ function FeedViewQuestion({
           </div>
         ))}
       </div>
-      <div className="mt-5 intro-y">
-        <ul className="nav nav-tabs">
+      <div className='mt-5 intro-y'>
+        <ul className='nav nav-tabs'>
           {feedDetail?.qnaList.map((item, index) => (
-            <li className="nav-item flex-1" key={item.questionId}>
+            <li className='nav-item flex-1' key={item.questionId}>
               <button
                 className={`nav-link w-full py-2 ${tab === index && 'active'}`}
                 onClick={() => setTab(index)}
@@ -276,7 +275,7 @@ function FeedViewQuestion({
             </li>
           ))}
           {feedDetail?.activityYN === 'Y' && (
-            <li className="nav-item flex-1">
+            <li className='nav-item flex-1'>
               <button
                 className={`nav-link w-full py-2 ${
                   tab === feedDetail?.qnaList.length && 'active'
@@ -288,7 +287,7 @@ function FeedViewQuestion({
             </li>
           )}
         </ul>
-        <div className="tab-content w-full border-l border-r border-b">
+        <div className='tab-content w-full border-l border-r border-b'>
           {feedDetail?.qnaList.map((item, index) => (
             <div
               className={`tab-pane leading-relaxed p-5 ${
@@ -296,17 +295,17 @@ function FeedViewQuestion({
               }`}
               key={item.questionId}
             >
-              <div className="text-base font-medium mt-5">
+              <div className='text-base font-medium mt-5'>
                 {item.number}. {item.title}
-                <span className="text-slate-400 text-sm ml-2">
+                <span className='text-slate-400 text-sm ml-2'>
                   (띄어쓰기 포함 {item.limit}자 이내)
                 </span>
               </div>
-              <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-                <div className="col-span-8">
-                  <div className="flex justify-end">
+              <div className='intro-y grid grid-cols-12 gap-6 mt-5'>
+                <div className='col-span-8'>
+                  <div className='flex justify-end'>
                     <button
-                      className="btn btn-green btn-sm"
+                      className='btn btn-green btn-sm'
                       onClick={() => {
                         feedbackStart(item.answerId)
                       }}
@@ -314,7 +313,7 @@ function FeedViewQuestion({
                       피드백 달기
                     </button>
                   </div>
-                  <div className="bg-slate-100 p-5 rounded-md mt-3">
+                  <div className='bg-slate-100 p-5 rounded-md mt-3'>
                     {content[index] && (
                       <Editor
                         content={content[index]}
@@ -326,7 +325,7 @@ function FeedViewQuestion({
                       ></Editor>
                     )}
                   </div>
-                  <div className="flex justify-between text-slate-400 mt-2 text-sm">
+                  <div className='flex justify-between text-slate-400 mt-2 text-sm'>
                     <div>
                       글자수(
                       {content[index]
@@ -338,10 +337,10 @@ function FeedViewQuestion({
                   </div>
                 </div>
 
-                <div className="col-span-4">
-                  <div className="flex justify-end">
+                <div className='col-span-4'>
+                  <div className='flex justify-end'>
                     <button
-                      className="btn btn-dark btn-sm"
+                      className='btn btn-dark btn-sm'
                       onClick={() => {
                         setIsModal({
                           history: true,
@@ -375,11 +374,11 @@ function FeedViewQuestion({
             {/* 1번 테이블 */}
             {feedDetail?.activityList?.map((item, index) => (
               <Fragment key={`activity-${item.id}`}>
-                <div className="intro-y grid grid-cols-12 gap-6 mt-5">
-                  <div className="col-span-8">
-                    <div className="flex justify-end">
+                <div className='intro-y grid grid-cols-12 gap-6 mt-5'>
+                  <div className='col-span-8'>
+                    <div className='flex justify-end'>
                       <button
-                        className="btn btn-green btn-sm"
+                        className='btn btn-green btn-sm'
                         onClick={() => {
                           feedbackStart(item.id, true, item.content)
                         }}
@@ -388,10 +387,10 @@ function FeedViewQuestion({
                       </button>
                     </div>
                   </div>
-                  <div className="col-span-4">
-                    <div className="flex justify-end">
+                  <div className='col-span-4'>
+                    <div className='flex justify-end'>
                       <button
-                        className="btn btn-dark btn-sm"
+                        className='btn btn-dark btn-sm'
                         onClick={() => {
                           setIsModal({
                             history: true,
@@ -404,78 +403,78 @@ function FeedViewQuestion({
                     </div>
                   </div>
                 </div>
-                <div className="intro-y grid grid-cols-12 gap-6">
-                  <div className="col-span-8">
-                    <table className="table table-bordered mt-3">
+                <div className='intro-y grid grid-cols-12 gap-6'>
+                  <div className='col-span-8'>
+                    <table className='table table-bordered mt-3'>
                       <tbody>
-                        <tr>
-                          <td className="bg-slate-100">연번</td>
-                          <td className="bg-slate-100">증빙 자료 유형</td>
-                          <td className="bg-slate-100">제작 연월일</td>
-                          <td className="bg-slate-100  w-96">제목</td>
-                        </tr>
-                        <tr>
-                          <td className="bg-slate-100">{index + 1}</td>
-                          <td>-</td>
-                          <td>
-                            {dayjs(item.productAt).format('YYYY년 M월 D일')}
-                          </td>
-                          <td>{item.title}</td>
-                        </tr>
-                        <tr>
-                          <td className="bg-slate-100">첨부파일</td>
-                          <td colSpan={4}>
-                            {item.fileName ? (
-                              <div className="flex items-center">
-                                <div className="w-full">
-                                  파일명: {item.fileName}
-                                </div>
-                                <div className="ml-auto">
-                                  <a
-                                    href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
-                                    className="btn btn-primary w-20 btn-sm"
-                                  >
-                                    다운로드
-                                  </a>
-                                </div>
+                      <tr>
+                        <td className='bg-slate-100'>연번</td>
+                        <td className='bg-slate-100'>증빙 자료 유형</td>
+                        <td className='bg-slate-100'>제작 연월일</td>
+                        <td className='bg-slate-100  w-96'>제목</td>
+                      </tr>
+                      <tr>
+                        <td className='bg-slate-100'>{index + 1}</td>
+                        <td>-</td>
+                        <td>
+                          {dayjs(item.productAt).format('YYYY년 M월 D일')}
+                        </td>
+                        <td>{item.title}</td>
+                      </tr>
+                      <tr>
+                        <td className='bg-slate-100'>첨부파일</td>
+                        <td colSpan={4}>
+                          {item.fileName ? (
+                            <div className='flex items-center'>
+                              <div className='w-full'>
+                                파일명: {item.fileName}
                               </div>
-                            ) : (
-                              '파일없음'
-                            )}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td rowSpan={3} className="bg-slate-100">
-                            내용
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colSpan={4}>
-                            <p className="btn btn-sm btn-secondary">
-                              증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여
-                              200자 이내)
-                            </p>
-                            <div className="mt-3">{item.content}</div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colSpan={3}>
-                            <div className="flex items-center">
-                              <div className="btn mr-2">글자 수</div>
-                              <div className="mr-10">
-                                ({item.content?.length} / 200)
-                              </div>
-                              <div className="btn mr-2">최종 수정일</div>
-                              <div className="">
-                                {dayjs(item.modDate).format('YYYY년 M월 D일')}
+                              <div className='ml-auto'>
+                                <a
+                                  href={`${baseUrl}/v1/contents-data/file-download/${item.fileId}`}
+                                  className='btn btn-primary w-20 btn-sm'
+                                >
+                                  다운로드
+                                </a>
                               </div>
                             </div>
-                          </td>
-                        </tr>
+                          ) : (
+                            '파일없음'
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td rowSpan={3} className='bg-slate-100'>
+                          내용
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan={4}>
+                          <p className='btn btn-sm btn-secondary'>
+                            증빙 자료에 대한 요약설명(*띄어쓰기를 포함하여
+                            200자 이내)
+                          </p>
+                          <div className='mt-3'>{item.content}</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan={3}>
+                          <div className='flex items-center'>
+                            <div className='btn mr-2'>글자 수</div>
+                            <div className='mr-10'>
+                              ({item.content?.length} / 200)
+                            </div>
+                            <div className='btn mr-2'>최종 수정일</div>
+                            <div className=''>
+                              {dayjs(item.modDate).format('YYYY년 M월 D일')}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
                       </tbody>
                     </table>
                   </div>
-                  <div className="col-span-4">
+                  <div className='col-span-4'>
                     {[...new Set(item.feedbackList.map(JSON.stringify))]
                       .map(JSON.parse)
                       .map((items) => (
@@ -505,7 +504,7 @@ function FeedViewQuestion({
 
       {/* BEGIN: Modal 히스토리보기 */}
       <Modal
-        size="modal-lg"
+        size='modal-lg'
         show={isModal.history}
         onHidden={() => {
           setIsModal({
@@ -514,19 +513,19 @@ function FeedViewQuestion({
         }}
       >
         <ModalHeader>
-          <h2 className="font-medium text-base mr-auto">히스토리</h2>
+          <h2 className='font-medium text-base mr-auto'>히스토리</h2>
           <button
-            className="btn btn-rounded-secondary hidden sm:flex p-1"
+            className='btn btn-rounded-secondary hidden sm:flex p-1'
             onClick={() => {
               setIsModal({
                 history: false,
               })
             }}
           >
-            <Lucide icon="X" className="w-4 h-4" />
+            <Lucide icon='X' className='w-4 h-4' />
           </button>
         </ModalHeader>
-        <ModalBody className="p-5 flex flex-col gap-5 h-500 overflow-x-scroll">
+        <ModalBody className='p-5 flex flex-col gap-5 h-500 overflow-x-scroll'>
           {/* <div className="p-3 border rounded-md mr-12">
             Lörem ipsum krodinock tres vasade. Heminoning. Vavis anande hall då
             gigahet att rediligt. Multiss kreddig. Jining autorar när ånt
@@ -548,10 +547,10 @@ function FeedViewQuestion({
             </div>
           </div> */}
           {(tab === feedDetail?.qnaList.length
-            ? Object.entries(
+              ? Object.entries(
                 feedDetail?.activityList[activeTab].feedbackHistory,
               )
-            : Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)
+              : Object.entries(feedDetail?.qnaList[tab]?.feedbackHistory)
           ).map(([key, value]) => (
             <Fragment key={value[0].id}>
               {[...new Set(value.map(JSON.stringify))]
@@ -561,26 +560,26 @@ function FeedViewQuestion({
                 .map((item, index) => (
                   <Fragment key={index}>
                     {item.sentence.length !== 0 && (
-                      <div className="p-3 border rounded-md mr-12">
+                      <div className='p-3 border rounded-md mr-12'>
                         {item.sentence}
-                        <div className="flex justify-end mt-3">
-                          <span className="font-medium mr-2 text-sm">
+                        <div className='flex justify-end mt-3'>
+                          <span className='font-medium mr-2 text-sm'>
                             학생 자소서
                           </span>
-                          <span className="text-slate-400 text-sm">
+                          <span className='text-slate-400 text-sm'>
                             {item.creDate}
                           </span>
                         </div>
                       </div>
                     )}
 
-                    <div className="p-3 border rounded-md ml-12 bg-slate-100 text-right">
+                    <div className='p-3 border rounded-md ml-12 bg-slate-100 text-right'>
                       <div>{item.reply}</div>
-                      <div className="flex justify-end mt-3">
-                        <span className="font-medium mr-2 text-sm">
+                      <div className='flex justify-end mt-3'>
+                        <span className='font-medium mr-2 text-sm'>
                           {item.teacherName} 선생님 피드백
                         </span>
-                        <span className="text-slate-400 text-sm">
+                        <span className='text-slate-400 text-sm'>
                           {item.creDate}
                         </span>
                       </div>
@@ -595,40 +594,40 @@ function FeedViewQuestion({
 
       {/* BEGIN: Modal 피드백 입력 팝업 */}
       <Modal
-        size="modal-lg"
+        size='modal-lg'
         show={isModal.feedback}
         onHidden={() => {
           setIsModal({ feedback: false })
         }}
       >
-        <ModalBody className="p-5">
-          <div className="mt-6 box bg-slate-100 p-5 intro-y">
-            <div className="flex items-center">
-              <h2 className="font-bold text-lg">피드백 : {user.name}</h2>
+        <ModalBody className='p-5'>
+          <div className='mt-6 box bg-slate-100 p-5 intro-y'>
+            <div className='flex items-center'>
+              <h2 className='font-bold text-lg'>피드백 : {user.name}</h2>
               <button
-                className="ml-auto"
+                className='ml-auto'
                 onClick={() => {
                   setIsModal({ feedback: false })
                 }}
               >
-                <Lucide icon="X" className="w-6 h-6"></Lucide>
+                <Lucide icon='X' className='w-6 h-6'></Lucide>
               </button>
             </div>
-            <div className="mt-3 flex">
+            <div className='mt-3 flex'>
               <div
-                className="text-slate-400 w-full"
+                className='text-slate-400 w-full'
                 style={{ whiteSpace: 'pre-line', lineHeight: '1.3rem' }}
               >
                 {selection.sentence}
               </div>
             </div>
-            <div className="mt-3 flex">
-              <div className="w-full flex items-end">
+            <div className='mt-3 flex'>
+              <div className='w-full flex items-end'>
                 <textarea
-                  rows="7"
+                  rows='7'
                   value={selection.reply}
-                  className="rounded-md w-full"
-                  placeholder="피드백을 작성해 주세요."
+                  className='rounded-md w-full'
+                  placeholder='피드백을 작성해 주세요.'
                   onChange={(event) => {
                     setSelection({
                       reply: event.target.value,
@@ -641,8 +640,8 @@ function FeedViewQuestion({
         </ModalBody>
         <ModalFooter>
           <button
-            type="button"
-            className="btn btn-ouline-secondary w-24 mr-2"
+            type='button'
+            className='btn btn-ouline-secondary w-24 mr-2'
             onClick={() => {
               setIsModal({ feedback: false })
             }}
@@ -650,8 +649,8 @@ function FeedViewQuestion({
             취소
           </button>
           <button
-            type="button"
-            className="btn btn-primary w-24"
+            type='button'
+            className='btn btn-primary w-24'
             // onClick={feedbackStore}
             onClick={() => {
               if (tab == feedDetail?.qnaList.length) {
@@ -670,36 +669,36 @@ function FeedViewQuestion({
 
       {/* BEGIN: Modal 피드백 수정 팝업 */}
       <Modal
-        size="modal-lg"
+        size='modal-lg'
         show={isModal.editFeedback}
         onHidden={() => setIsModal({ editFeedback: false })}
       >
-        <ModalBody className="p-5">
-          <div className="mt-6 box bg-slate-100 p-5 intro-y">
-            <div className="flex items-center">
-              <h2 className="font-bold text-lg">피드백 : {user.name}</h2>
+        <ModalBody className='p-5'>
+          <div className='mt-6 box bg-slate-100 p-5 intro-y'>
+            <div className='flex items-center'>
+              <h2 className='font-bold text-lg'>피드백 : {user.name}</h2>
               <button
-                className="ml-auto"
+                className='ml-auto'
                 onClick={() => setIsModal({ editFeedback: false })}
               >
-                <Lucide icon="X" className="w-6 h-6"></Lucide>
+                <Lucide icon='X' className='w-6 h-6'></Lucide>
               </button>
             </div>
-            <div className="mt-3 flex">
+            <div className='mt-3 flex'>
               <div
-                className="text-slate-400 w-full"
+                className='text-slate-400 w-full'
                 style={{ whiteSpace: 'pre-line', lineHeight: '1.3rem' }}
               >
                 {feedbackModParams.sentence}
               </div>
             </div>
-            <div className="mt-3 flex">
-              <div className="w-full flex items-end">
+            <div className='mt-3 flex'>
+              <div className='w-full flex items-end'>
                 <textarea
-                  rows="7"
+                  rows='7'
                   value={feedbackModParams.reply}
-                  className="rounded-md w-full"
-                  placeholder="피드백을 작성해 주세요."
+                  className='rounded-md w-full'
+                  placeholder='피드백을 작성해 주세요.'
                   onChange={(event) => {
                     setFeedbackModParams({
                       reply: event.target.value,
@@ -712,15 +711,15 @@ function FeedViewQuestion({
         </ModalBody>
         <ModalFooter>
           <button
-            type="button"
-            className="btn btn-ouline-secondary w-24 mr-2"
+            type='button'
+            className='btn btn-ouline-secondary w-24 mr-2'
             onClick={() => setIsModal({ editFeedback: false })}
           >
             취소
           </button>
           <button
-            type="button"
-            className="btn btn-primary w-24"
+            type='button'
+            className='btn btn-primary w-24'
             onClick={() => {
               if (tab === feedDetail?.qnaList.length) {
                 updateFeedback2()
@@ -739,22 +738,22 @@ function FeedViewQuestion({
 }
 
 const FeedbackList = ({
-  setFeedbackParams,
-  setFeedbackModParams,
-  removeFeedback,
-  setIsModal,
-  item,
-  setFeedbackContent,
-  content,
-}) => {
+                        setFeedbackParams,
+                        setFeedbackModParams,
+                        removeFeedback,
+                        setIsModal,
+                        item,
+                        setFeedbackContent,
+                        content,
+                      }) => {
   return (
     <div
-      className="bg-slate-100 p-5 rounded-md mt-3 outline_red relative"
+      className='bg-slate-100 p-5 rounded-md mt-3 outline_red relative'
       style={{ borderColor: item.color }}
     >
-      <div className="absolute x_button">
+      <div className='absolute x_button'>
         <button
-          className="btn bg-white rounded-full hover:bg-danger hover:text-white p-1"
+          className='btn bg-white rounded-full hover:bg-danger hover:text-white p-1'
           onClick={() => {
             if (confirm('선택하신 피드백을 삭제하시겠습니까?')) {
               setFeedbackContent(content)
@@ -765,15 +764,15 @@ const FeedbackList = ({
             }
           }}
         >
-          <Lucide icon="X" className="w-4 h-4" />
+          <Lucide icon='X' className='w-4 h-4' />
         </button>
       </div>
-      <div className="flex justify-between font-bold text-slate-500">
+      <div className='flex justify-between font-bold text-slate-500'>
         <div>피드백</div>
         <div>{item.teacherName}</div>
       </div>
       <div
-        className="mt-3"
+        className='mt-3'
         style={{
           whiteSpace: 'pre-line',
           lineHeight: '1.3rem',
@@ -782,7 +781,7 @@ const FeedbackList = ({
         {item.reply}
       </div>
       <button
-        className="btn bg-white w-full btn-sm mt-3"
+        className='btn bg-white w-full btn-sm mt-3'
         onClick={() => {
           setFeedbackModParams({
             id: item.id,

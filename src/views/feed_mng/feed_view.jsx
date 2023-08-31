@@ -79,6 +79,7 @@ function FeedView() {
                 <>
                   <FeedViewQuestion
                     feedId={feedId}
+                    teacherId={feedDetail.teacherId}
                     feedDetail={feedDetail}
                     refetchFeedDetail={refetchFeedDetail}
                     setIsLoading={setIsLoading}

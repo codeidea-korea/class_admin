@@ -45,6 +45,7 @@ function Login() {
             console.log(res);
             if (res.status === 200) {
                 setUserInfo({...userInfo, 
+                    id: res.data.id,
                     authority: res.data.authority,
                     status: res.data.status,
                     token: res.data.token,
