@@ -12,7 +12,7 @@ function MemberMng() {
   const api = useAxios()
   const navigate = useNavigate()
   const user = useRecoilValue(userState)
-  const [users, setUsers] = useState()
+  const [users, setUsers] = useState([])
   const [searchParams, setSearchParams] = useState({
     searchWord: '', schoolYear: '', grade: '', linkYN: '', status: '', fieldName: '',
   })
@@ -111,12 +111,14 @@ function MemberMng() {
   }
 
   /** 회원 등급 변경 */
-  const userGradeUpdate = async (gval, uid) => {
-    await api.patch(`/admin/user-management/grade/${uid}?grade=${gval}`, null,
+  const userGradeUpdate = (gval, uid, index) => {
+    api.patch(`/admin/user-management/grade/${uid}?grade=${gval}`, null,
       { headers: { Authorization: `Bearer ${user.token}` } },
     ).then((res) => {
-      console.log(res)
       if (res.status === 200) {
+        const updatedUsers = [...users]
+        updatedUsers[index].grade = gval
+        setUsers(updatedUsers)
         basicNonStickyNotificationToggle()
       }
     })
@@ -324,11 +326,8 @@ function MemberMng() {
                     <td>{item.email}</td>
                     <td>{item.creDate}</td>
                     <td>
-                      <select defaultValue={item.grade} className='form-select small w-full'
-                              value={grade === '' ? item.grade : grade}
-                              onChange={(event) => {
-                                userGradeUpdate(event.currentTarget.value, item.id)
-                              }}>
+                      <select value={item.grade} className='form-select small w-full'
+                              onChange={(event) => {userGradeUpdate(event.currentTarget.value, item.id, index)}}>
                         <option value='PREMIUM'>프리미엄</option>
                         <option value='GOLD'>골드</option>
                         <option value='SILVER'>실버</option>
