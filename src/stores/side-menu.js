@@ -101,6 +101,11 @@ const sideMenu = atom({
           },
           {
             icon: '',
+            pathname: '/muster_question',
+            title: '소집 면접 대비 기출 문제',
+          },
+          {
+            icon: '',
             pathname: '/compet_question',
             title: '각종대회 문제 풀이',
           },

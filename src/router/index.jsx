@@ -70,6 +70,8 @@ import InstructorLineupEdit from '@/views/contents_mng/InstructorLineupEdit'
 import HallOfFame from '@/views/contents_mng/hallOfFame'
 import HallOfFameEdit from '@/views/contents_mng/hallOfFameEdit'
 import Join_popup1 from '@/views/login/join_popup1'
+import MusterQuestion from '@/views/contents_mng/MusterQuestion'
+import MusterQuestionEdit from '@/views/contents_mng/MusterQuestionEdit'
 
 function Router() {
   const routes = [
@@ -476,6 +478,26 @@ function Router() {
           element: (
             <PrivateRoute
               element={<PriorQuestionEdit />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+
+        // 소집 면접 대비 기출 문제
+        {
+          path: '/muster_question',
+          element: (
+            <PrivateRoute
+              element={<MusterQuestion />}
+              role={['ADMIN', 'DIRECTOR']}
+            />
+          ),
+        },
+        {
+          path: '/muster_question/edit',
+          element: (
+            <PrivateRoute
+              element={<MusterQuestionEdit />}
               role={['ADMIN', 'DIRECTOR']}
             />
           ),
