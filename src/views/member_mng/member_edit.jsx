@@ -14,7 +14,7 @@ function MemberEdit() {
 	const user = useRecoilValue(userState);
 	const [userInfo, setUserInfo] = useState();
 	const [memberInfo, setMemberInfo] = useState({
-		name: '', grade: '', birthDay: '', schoolName: '', schoolYear: '', email: '', phone: '', addr: '', addrDetail: '', tos4YN: '', children: [], fieldName: []
+		name: '', grade: '', birthDay: '', schoolName: '', schoolYear: '', email: '', phone: null, addr: '', addrDetail: '', tos4YN: '', children: [], fieldName: []
 	});
 	const [openPostcode, setOpenPostcode] = useState(false);
 	const [Searchschool, setSearchschool] = useState(false);
@@ -35,8 +35,8 @@ function MemberEdit() {
 					birthDay:res.data.birthDay, 
 					schoolName:res.data.schoolName, 
 					schoolYear:res.data.schoolYear, 
-					email:res.data.email, 
-					phone:res.data.phone, 
+					email:res.data.email,
+					phone:res.data.phone === '' ? null : res.data.phone,
 					addr:res.data.addr, 
 					addrDetail:res.data.addrDetail, 
 					tos4YN:res.data.tos4YN, 
@@ -67,9 +67,9 @@ function MemberEdit() {
 					if(event.target.checked) {
 						let fieldName = memberInfo.fieldName;
 						fieldName.push(value)
-						setMemberInfo({...memberInfo, fieldName: fieldName})
+						setMemberInfo({...memberInfo, fieldName: fieldName.filter(val => val !== '')})
 					} else {
-						setMemberInfo({...memberInfo, fieldName: memberInfo.fieldName.filter(val => val !== value)})
+						setMemberInfo({...memberInfo, fieldName: memberInfo.fieldName.filter(val => val !== value && val !== '')})
 					}
 				} else {
 					setMemberInfo({ ...memberInfo, [name]: value });
